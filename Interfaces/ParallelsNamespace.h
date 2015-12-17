@@ -32,8 +32,8 @@
 #include <prlsdk/PrlErrors.h>
 #include <prlsdk/PrlEnums.h>
 #include <prlsdk/PrlPorts.h>
-#include "Interfaces/ParallelsDefines.h"
-#include "Interfaces/ParallelsTypes.h"
+#include "ParallelsDefines.h"
+#include "ParallelsTypes.h"
 
 //Mouse and keyboard profiles extension
 #define PROFILE_EXTENSION				"kbd"

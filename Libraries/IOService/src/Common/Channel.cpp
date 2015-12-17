@@ -36,9 +36,6 @@
 #include <prlsdk/PrlCommandsFlags.h>
 #include <prlsdk/PrlTypes.h>
 
-// By adding this interface we enable allocations tracing in the module
-#include "Interfaces/Debug.h"
-
 using namespace IOService;
 
 /*****************************************************************************

@@ -47,7 +47,7 @@
 #if defined(_WIN_)
 # define prl_valloc(size) _aligned_malloc(size, PAGE_SIZE)
 #elif defined(_LIN_)
-#include <Interfaces/ParallelsTypes.h>
+#include "ParallelsTypes.h"
 
 static inline void *prl_valloc(size_t size)
 {

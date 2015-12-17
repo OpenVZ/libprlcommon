@@ -30,7 +30,7 @@
 #include <QUrl>
 #include <QStringList>
 
-#include <Interfaces/ParallelsPlatform.h>
+#include "Interfaces/ParallelsTypes.h"
 #include <Interfaces/ParallelsQt.h>
 #include "Libraries/HostUtils/HostUtils.h"
 #include <Libraries/HostUtils/PCSUtils.h>
