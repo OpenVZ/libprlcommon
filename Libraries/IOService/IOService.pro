@@ -27,7 +27,7 @@ TEMPLATE = subdirs
 
 LEVEL = ../..
 include($$LEVEL/Build/Options.pri)
-include($$LEVEL/Parallels.pri)
+include($$LEVEL/common.pri)
 
 addSubdirsDir(IOCommunication, src/IOCommunication)
 addSubdirsDir(Common, src/Common)

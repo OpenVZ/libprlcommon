@@ -27,7 +27,7 @@
 #ifndef STD_PrlTime_h__
 #define STD_PrlTime_h__
 
-#include "SDK/Include/PrlTypes.h"
+#include "prlsdk/PrlTypes.h"
 
 #ifdef __cplusplus
 extern "C" {
