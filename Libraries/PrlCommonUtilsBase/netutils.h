@@ -25,7 +25,7 @@
 
 #include <QString>
 
-#include <Interfaces/ParallelsTypes.h>
+#include "../Interfaces/ParallelsTypes.h"
 
 #ifndef ETH_ADDRESS_LEN
 # define ETH_ADDRESS_LEN 6

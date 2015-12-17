@@ -30,7 +30,7 @@
 #include <QMutex>
 
 #include "IORoutingTable.h"
-#include "Interfaces/ParallelsNamespace.h"
+#include "../../Interfaces/ParallelsNamespace.h"
 
 namespace IOService {
 

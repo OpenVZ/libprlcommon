@@ -30,7 +30,7 @@
 #include <QReadWriteLock>
 #include <QDateTime>
 
-#include "Libraries/Std/SmartPtr.h"
+#include "../../Std/SmartPtr.h"
 #include "IOProtocol.h"
 #include "IOSendJob.h"
 #include "IORoutingTable.h"

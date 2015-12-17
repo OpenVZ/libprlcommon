@@ -32,10 +32,10 @@
 #include <QObject>
 #include <QThread>
 
-#include "Interfaces/ParallelsTypes.h"
+#include "../../Interfaces/ParallelsTypes.h"
 #include "Channel.h"
-#include "Libraries/PrlDataSerializer/CPrlStringDataSerializer.h"
-#include "Libraries/PrlUuid/Uuid.h"
+#include "../../PrlDataSerializer/CPrlStringDataSerializer.h"
+#include "../../PrlUuid/Uuid.h"
 
 #include <prlsdk/PrlErrors.h>
 #include <prlsdk/PrlEnums.h>

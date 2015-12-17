@@ -33,9 +33,9 @@
 #include <QPair>
 #include <QFlags>
 #include <QMutex>
-#include "Interfaces/ParallelsNamespace.h"
+#include "../Interfaces/ParallelsNamespace.h"
 #include <prlsdk/PrlEnums.h>
-#include "Libraries/PrlCommonUtilsBase/ParallelsDirsDefs.h"
+#include "ParallelsDirsDefs.h"
 
 class QDir;
 
@@ -43,7 +43,7 @@ class ParallelsDirs
 {
 public:
 
-#include "Libraries/PrlCommonUtilsBase/ParallelsDirsBase.h"
+#include "ParallelsDirsBase.h"
 
 	static QString getAppGuiName( PRL_APPLICATION_MODE nAppMode );
 	static QString getAppSwitcherAppName();

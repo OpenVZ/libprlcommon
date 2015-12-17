@@ -27,6 +27,6 @@ PROJ_FILE = $$PWD/Common.pro
 QTCONFIG = core network gui
 !include(../../../../Build/qmake/staticlib.pri): error(include error)
 
-INCLUDEPATH *= $$PWD
+INCLUDEPATH *= $$PWD $$PWD/../ $$PWD/../../ 
 
 include($$LIBS_LEVEL/IOService/src/IOCommunication/IOCommunication.pri)

@@ -27,6 +27,6 @@ PROJ_FILE = $$PWD/IOCommunication.pro
 QTCONFIG = core xml network
 !include(../../../../Build/qmake/staticlib.pri): error(include error)
 
-INCLUDEPATH *= $$PWD
+INCLUDEPATH *= $$PWD $$PWD/../ $$PWD/../../
 
 include($$LIBS_LEVEL/OpenSSL/OpenSSL.pri)

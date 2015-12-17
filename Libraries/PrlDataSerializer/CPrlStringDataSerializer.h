@@ -28,7 +28,7 @@
 #ifndef CPrlStringDataSerializer_H
 #define CPrlStringDataSerializer_H
 
-#include "Libraries/PrlDataSerializer/CPrlDataSerializer.h"
+#include "CPrlDataSerializer.h"
 #include <QString>
 
 /**

@@ -58,7 +58,7 @@ public:
     /** Declare some max constants */
     enum MaxNumbers { MaxRoutesNumber = 20 };
 
-#include <Interfaces/packed.h>
+#include "../../Interfaces/packed.h"
     /** Routing table header */
     struct Header
     {
@@ -70,9 +70,9 @@ public:
                                                   This number must be <=
                                                        #MaxRoutesNumber.*/
     } PACKED;
-#include <Interfaces/unpacked.h>
+#include "../../Interfaces/unpacked.h"
 
-#include <Interfaces/packed.h>
+#include "../../Interfaces/packed.h"
     /** Direct or range routes. */
     struct DirectRangeRoute
     {
@@ -82,7 +82,7 @@ public:
         RouteRequirement routeReq;     /**< Route requirement */
 
     } PACKED;
-#include <Interfaces/unpacked.h>
+#include "../../Interfaces/unpacked.h"
 
     /**
      * Default constructor.

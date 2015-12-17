@@ -29,7 +29,7 @@
 
 #include <QString>
 #include <prlsdk/PrlTypes.h>
-#include <Libraries/PrlUuid/PrlUuid.h>
+#include "PrlUuid.h"
 
 class Uuid : public PrlUuid
 {

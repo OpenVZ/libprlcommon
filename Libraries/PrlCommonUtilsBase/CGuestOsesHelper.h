@@ -34,7 +34,7 @@
 #include <prlsdk/PrlEnums.h>
 #include <prlsdk/PrlOses.h>
 #include <QList>
-#include "Libraries/PrlDataSerializer/CPrlOpaqueTypeDataSerializer.h"
+#include "../PrlDataSerializer/CPrlOpaqueTypeDataSerializer.h"
 
 struct COpaqueTypeListImpl
 {

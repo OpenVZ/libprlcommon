@@ -27,7 +27,7 @@
 #ifndef PRL_COMMON_UTILS_OS_INFO_INCLUDED
 #define PRL_COMMON_UTILS_OS_INFO_INCLUDED
 
-#include "Interfaces/ParallelsTypes.h"
+#include "../Interfaces/ParallelsTypes.h"
 
 #ifdef __cplusplus
 extern "C" {

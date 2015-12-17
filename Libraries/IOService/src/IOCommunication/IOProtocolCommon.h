@@ -27,7 +27,7 @@
 #ifndef IOPROTOCOLCOMMON_H
 #define IOPROTOCOLCOMMON_H
 
-#include <Interfaces/ParallelsTypes.h>
+#include "../../Interfaces/ParallelsTypes.h"
 
 namespace IOService
 {
@@ -40,7 +40,7 @@ namespace IOService
 
 	namespace IOCommunication
 	{
-#include <Interfaces/packed.h>
+#include "../../Interfaces/packed.h"
 		/** First struct, which we receive from other side. */
 		struct ProtocolVersion
 		{
@@ -49,7 +49,7 @@ namespace IOService
 			UINT16	minorNumber;   /**< Minor number */
 			char    whatWeAre[64]; /**< Full description (build info, etc) */
 		} PACKED;
-#include <Interfaces/unpacked.h>
+#include "../../Interfaces/unpacked.h"
 	}
 
 }

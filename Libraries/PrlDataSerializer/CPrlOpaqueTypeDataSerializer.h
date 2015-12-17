@@ -28,7 +28,7 @@
 #ifndef CPrlOpaqueTypeDataSerializer_H
 #define CPrlOpaqueTypeDataSerializer_H
 
-#include "Libraries/PrlDataSerializer/CPrlDataSerializer.h"
+#include "CPrlDataSerializer.h"
 
 /**
  * Helper class that serves for valid casting enumeration types to quint32 type

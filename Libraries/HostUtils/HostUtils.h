@@ -54,12 +54,12 @@
 #include <sys/time.h>
 #endif
 
-#include "Interfaces/ParallelsTypes.h"
+#include "../Interfaces/ParallelsTypes.h"
 #include <prlsdk/PrlEnums.h>
 #include <prlsdk/PrlTypes.h>
 #include <prlsdk/PrlErrors.h>
-#include "Libraries/Logging/Logging.h"
-#include <Interfaces/ParallelsQt.h>
+#include "../Logging/Logging.h"
+#include "../Interfaces/ParallelsQt.h"
 
 #include <QFileInfo>
 #include <QFile>
@@ -261,7 +261,7 @@ public:
 			UINT64 uiSize
 		);
 
-#include "Libraries/HostUtils/HostUtilsBase.h"
+#include "HostUtilsBase.h"
 
 	// Get maximum file size for given filename
 	static PRL_UINT64 GetMaxFileSize(const QString& fileName);

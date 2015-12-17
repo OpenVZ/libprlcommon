@@ -33,8 +33,8 @@
 #include <QReadWriteLock>
 #include <QVector>
 
-#include "Interfaces/ParallelsNamespace.h"
-#include "Libraries/IOService/src/IOCommunication/IOClient.h"
+#include "../../Interfaces/ParallelsNamespace.h"
+#include "../IOCommunication/IOClient.h"
 #include <prlsdk/PrlIOStructs.h>
 
 namespace IOService {

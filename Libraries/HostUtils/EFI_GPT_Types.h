@@ -29,7 +29,7 @@
 #include <QString>
 #include <QList>
 
-#include "Libraries/PrlUuid/Uuid.h"
+#include "../PrlUuid/Uuid.h"
 
 ////////////////////////////////////////////////////////////////////////
 /**

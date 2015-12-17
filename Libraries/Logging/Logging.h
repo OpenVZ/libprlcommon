@@ -66,7 +66,7 @@
 #define __LOGGING_H__
 
 // Configuration variables are stored in the separated file
-#include "Libraries/Logging/LoggingConfig.h"
+#include "LoggingConfig.h"
 
 // For va_arg parameters
 #include <stdarg.h>

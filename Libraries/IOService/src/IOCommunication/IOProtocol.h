@@ -35,9 +35,9 @@
 
 #include "IODataBuffer.h"
 
-#include "Libraries/Std/SmartPtr.h"
-#include "Libraries/PrlUuid/Uuid.h"
-#include "Interfaces/ParallelsTypes.h"
+#include "../../Std/SmartPtr.h"
+#include "../../PrlUuid/Uuid.h"
+#include "../../Interfaces/ParallelsTypes.h"
 #include <prlsdk/PrlIOStructs.h>
 #include "IOSenderHandle.h"
 #include "IOProtocolCommon.h"
@@ -504,7 +504,7 @@ namespace IOService {
     public:
         // Package members
 
-#include <Interfaces/packed.h>
+#include "../../Interfaces/packed.h"
         // POD header
         struct PODHeader {
             Uuid_t         uuid;          /**< Package uuid */
@@ -518,7 +518,7 @@ namespace IOService {
             quint16        crc16;         /**< CRC16 header checksum.
                                               (CRC16 member must be the last)*/
         } PACKED header;
-#include <Interfaces/unpacked.h>
+#include "../../Interfaces/unpacked.h"
 
         // POD callback
         struct PODCallback {
@@ -540,12 +540,12 @@ namespace IOService {
 
         SmartPtr<char> buffers[1];        /**< Package buffers */
 
-#include <Interfaces/packed.h>
+#include "../../Interfaces/packed.h"
         struct PODData {
             EncodingType   bufferEncoding; /**< Package buffer encodings */
             quint32        bufferSize;     /**< Package buffer sizes */
         } PACKED data[1];
-#include <Interfaces/unpacked.h>
+#include "../../Interfaces/unpacked.h"
 
     public:
         /**
@@ -699,7 +699,7 @@ namespace IOService {
 
 
 
-#include <Interfaces/packed.h>
+#include "../../Interfaces/packed.h"
         /** Handshake header struct, which describes other side. */
         struct HandshakeHeader
         {
@@ -707,7 +707,7 @@ namespace IOService {
             Uuid_t           connectionUuid;
 
         } PACKED;
-#include <Interfaces/unpacked.h>
+#include "../../Interfaces/unpacked.h"
 
 
         /**

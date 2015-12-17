@@ -30,7 +30,7 @@
 #include <prlsdk/PrlTypes.h>
 #include <prlsdk/PrlEnums.h>
 #include <QSet>
-#include "Libraries/PrlDataSerializer/CPrlDataSerializer.h"
+#include "../PrlDataSerializer/CPrlDataSerializer.h"
 
 class CFeaturesMatrix : public CPrlDataSerializer
 {
