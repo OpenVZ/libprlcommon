@@ -22,8 +22,8 @@
 # Schaffhausen, Switzerland.
 #
 
-isEmpty(__PARALLELS_PRI__) {
-__PARALLELS_PRI__ = 1
+isEmpty(__PRL_PRI__) {
+__PRL_PRI__ = 1
 
 linux-*-64 {
 	CONFIG += x86_64
@@ -52,21 +52,12 @@ contains(QMAKE_HOST.os, Linux):{
 include($$SRC_LEVEL/Build/qmake/gen_header.pri)
 win32: include($$SRC_LEVEL/Build/qmake/gen_dxshaders.pri)
 
-# Getting build configuration (generated with Gen.py script)
-!include(Build/Build.pri) {
-	error("Build.pri not found - run Gen.py to generate it")
-}
-
 # Enable precompiled headers in the project by default
 USE_PRECOMPILED_HEADERS = 1
 
 x86only {
 	CONFIG += x86
 	CONFIG -= x86_64
-}
-
-x86_64 {
-	MAKEFILE = Makefile64
 }
 
 # These macro are the only way of the platform definition
@@ -136,7 +127,7 @@ win32:DEFINES += NTDDI_VERSION=0x05000100
 
 # Force using 64 bit filesize/offset
 # since they are 32 bit by default on linux
-linux-*:DEFINES += _FILE_OFFSET_BITS=64
+linux-*:DEFINES += _FILE_OFFSET_BITS=64 _LIN_
 
 # These two configs are assential (!) for the dependencies tracking
 # Please see the 'Library Dependencies' section of Qt documentation

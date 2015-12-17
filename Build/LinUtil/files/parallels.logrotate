@@ -1,7 +1,0 @@
-/var/log/parallels.log {
-    daily
-    rotate 10
-    copytruncate
-    notifempty
-    missingok
-}

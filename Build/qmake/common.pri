@@ -26,7 +26,7 @@ isEmpty(__COMMON_PRI__) {
 	__COMMON_PRI__ = 1
 	equals(TARGET, bin) | equals(TARGET, lib): error(TARGET has unacceptable name $$TARGET)
 
-	include(../../Parallels.pri)
+	include(../../common.pri)
 
 	# ROOT = $$PWD
 	# BUILD_DIR = $$ROOT/build
