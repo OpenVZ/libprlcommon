@@ -71,10 +71,6 @@ public:
 	// #132602
 	static QString getPathToDispatcherTesterConfig();
 
-	// #131807 (Customer experience program support from instaleler)
-	static QString getEnableCEIProgramInstallerFilePath();
-	static QString getDisableCEIProgramInstallerFilePath();
-
 	static QString getParallelsDriversDir();
 	/// returns path to the directory where Parallels applications is located
 	static QString getParallelsApplicationDir();

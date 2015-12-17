@@ -47,7 +47,7 @@
 #include <QMutexLocker>
 
 #include "Build/Current.ver"
-#include "Build/Current-locale.ver"
+// #include "Build/Current-locale.ver"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -691,20 +691,6 @@ QString ParallelsDirs::getPathToDispatcherTesterConfig()
 	return QString( "%1/%2" )
 		.arg( getDispatcherConfigDir())
 		.arg( "dispatcher.tester.conf" );
-}
-
-QString ParallelsDirs::getEnableCEIProgramInstallerFilePath()
-{
-	return QString("%1/%2")
-		.arg( getSystemTempDir() )
-		.arg( INSTALLER_CEIPROGRAM_FLAG_FILE_ENABLE );
-}
-
-QString ParallelsDirs::getDisableCEIProgramInstallerFilePath()
-{
-	return QString("%1/%2")
-		.arg( getSystemTempDir() )
-		.arg( INSTALLER_CEIPROGRAM_FLAG_FILE_DISABLE );
 }
 
 QPair<PRL_APPLICATION_MODE, ParallelsDirs::InitOptions>
