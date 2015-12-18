@@ -1,9 +1,9 @@
 #
-# common.pro
+# common.deps
 #
-# Copyright (C) 1999-2015 Parallels IP Holdings GmbH
+# Copyright (C) 2015 Parallels IP Holdings GmbH
 #
-# This file is part of Parallels SDK. Parallels SDK is free
+# This file is part of Virtuozzo SDK. Virtuozzo SDK is free
 # software; you can redistribute it and/or modify it under the
 # terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation; either version 2.1 of the License,
@@ -20,22 +20,15 @@
 #
 # Our contact details: Parallels IP Holdings GmbH, Vordergasse 59, 8200
 # Schaffhausen, Switzerland.
-#
 
-TEMPLATE = subdirs
-
-include(Build/Options.pri)
-include(common.pri)
-
-isEmpty(PREFIX) {
-            PREFIX = /usr/local
-}
-
-TARGET = prlcommon
-PROJ_PATH = $$PWD
-include(Build/qmake/build_target.pri)
-
-target.path = $${PREFIX}/lib64
-INSTALLS += target
-
-include(common.deps)
+include($$LIBS_LEVEL/PrlCommonUtilsBase/PrlCommonUtilsBase.pri)
+include($$LIBS_LEVEL/HostUtils/HostUtils.pri)
+include($$LIBS_LEVEL/Logging/Logging.pri)
+include($$LIBS_LEVEL/OpenSSL/OpenSSL.pri)
+include($$LIBS_LEVEL/OpenSSL/utils/OpenSSL_utils.pri)
+include($$LIBS_LEVEL/IOService/IOCommunication.pri)
+include($$LIBS_LEVEL/IOService/IOService.pri)
+include($$LIBS_LEVEL/IOService/src/Common/Common.pri)
+include($$LIBS_LEVEL/IOService/src/IOCommunication/IOCommunication.pri)
+include($$LIBS_LEVEL/PrlUuid/PrlUuid.pri)
+include($$LIBS_LEVEL/PrlDataSerializer/PrlDataSerializer.pri)

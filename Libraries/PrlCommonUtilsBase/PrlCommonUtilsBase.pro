@@ -30,12 +30,6 @@ DEFINES += PRINTABLE_TARGET=cmn_utils_base
 
 include(PrlCommonUtilsBase.pri)
 
-# We cannot include XmlModel.pri into PrlCommonUtils.pri
-# because the second includes the first one already
-# But XmlModel headers are used here. So include source
-# generating config directly.
-include($$SRC_LEVEL/XmlModel/build/gen_xmlmodel_src.pri)
-
 HEADERS = ParallelsDirs.h \
 		Common.h \
 		SysError.h \

@@ -22,11 +22,7 @@
 # Schaffhausen, Switzerland.
 #
 
-x86_64 | linux-*-64 {
-	mkfile = Makefile64_$$TARGET
-} else {
-	mkfile = Makefile_$$TARGET
-}
+mkfile = Makefile_$$TARGET
 
 isEmpty(NON_SUBDIRS) {
 	# Will overwrite TEMPLATE in project file 
@@ -43,7 +39,7 @@ isEmpty(NON_SUBDIRS) {
 
 _TARGET_IS_SET = 1
 
-!include(../../Parallels.pri): error(Cannot include Parallels.pri)
+!include(../../common.pri): error(Cannot include common.pri)
 
 equals(TEMPLATE, subdirs) {
 	win32-msvc2013: wdkruntime: isEmpty(_msvcrt_compat_internal) {
