@@ -49,3 +49,6 @@ linux-* {
 	SOURCES += PCSUtils.cpp
 }
 
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/HostUtils
+INSTALLS += headers

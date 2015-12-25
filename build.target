@@ -45,3 +45,13 @@ include(common.deps)
 DEFINES += PRINTABLE_TARGET=common
 
 unix: LIBS += -Wl,-no-whole-archive
+
+INTERFACE_HEADERS = $$system(ls Interfaces/*.h)
+headers.files = $${INTERFACE_HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/Interfaces
+INSTALLS += headers
+
+STD_HEADERS = $$system(ls Libraries/Std/*.h)
+stdheaders.files = $${STD_HEADERS}
+stdheaders.path = $${PREFIX}/include/prlcommon/Std
+INSTALLS += stdheaders

@@ -55,3 +55,7 @@ SOURCES += PrlUuid.cpp \
 	Uuid.cpp
 HEADERS += PrlUuid.h \
 	Uuid.h
+
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/PrlUuid
+INSTALLS += headers

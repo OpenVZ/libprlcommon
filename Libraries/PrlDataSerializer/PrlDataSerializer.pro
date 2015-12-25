@@ -36,3 +36,7 @@ HEADERS += \
 
 SOURCES += \
            CPrlStringDataSerializer.cpp
+
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/PrlDataSerializer
+INSTALLS += headers

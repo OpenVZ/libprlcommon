@@ -40,7 +40,8 @@ SOURCES += Logging.cpp
 # PrlTime required for logging rate limiter
 !win32:SOURCES += $$LIBS_LEVEL/Std/PrlTime.cpp
 
-linux-* {
-QMAKE_CXXFLAGS_RELEASE -= -O2
-QMAKE_CFLAGS_RELEASE -= -O2
-}
+linux-*: QMAKE_CXXFLAGS = -Wno-unused-result
+
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/Logging
+INSTALLS += headers

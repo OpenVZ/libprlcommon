@@ -27,10 +27,6 @@ TEMPLATE = subdirs
 include(Build/Options.pri)
 include(common.pri)
 
-isEmpty(PREFIX) {
-            PREFIX = /usr/local
-}
-
 TARGET = prlcommon
 PROJ_PATH = $$PWD
 include(Build/qmake/build_target.pri)

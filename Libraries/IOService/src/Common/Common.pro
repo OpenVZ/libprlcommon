@@ -34,3 +34,7 @@ SOURCES = \
 HEADERS = \
           Channel.h \
           ExecChannel.h
+
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/IOService/Common/
+INSTALLS += headers

@@ -82,3 +82,6 @@ gen_sdk.variable_out = SOURCES
 gen_sdk.CONFIG += combine
 gen_sdk.depends += ./GenStringify.py
 
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/PrlCommonUtilsBase
+INSTALLS += headers

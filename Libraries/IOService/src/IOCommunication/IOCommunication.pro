@@ -64,3 +64,7 @@ SOURCES = \
           Socket/Socket_p.cpp \
           IOSSLInterface.cpp \
           Socket/SslHelper.cpp
+
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/IOService/IOCommunication/
+INSTALLS += headers
