@@ -48,7 +48,6 @@
 
 #include "../IOConnection.h"
 #include <Libraries/Logging/Logging.h>
-#include <Libraries/OpenSSL/OpenSSL.h>
 
 namespace IOService {
 // SSL helper

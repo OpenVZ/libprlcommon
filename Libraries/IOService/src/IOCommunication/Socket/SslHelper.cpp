@@ -25,6 +25,7 @@
 
 
 #include "SslHelper.h"
+#include <Libraries/OpenSSL/OpenSSL.h>
 
 // OpenSSL headers
 #ifndef OPENSSL_NO_ENGINE
