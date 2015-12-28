@@ -37,9 +37,6 @@ HEADERS += Logging.h
 HEADERS += LoggingConfig.h
 SOURCES += Logging.cpp
 
-# PrlTime required for logging rate limiter
-!win32:SOURCES += $$LIBS_LEVEL/Std/PrlTime.cpp
-
 linux-*: QMAKE_CXXFLAGS = -Wno-unused-result
 
 headers.files = $${HEADERS}

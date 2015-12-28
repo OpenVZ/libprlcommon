@@ -27,8 +27,6 @@ PROJ_FILE = $$PWD/HostUtils.pro
 QTCONFIG = core
 include(../../Build/qmake/staticlib.pri)
 
-include($$LIBS_LEVEL/Logging/Logging.pri)
-
 win32: LIBS += -lAdvapi32 -lNetapi32 -lSecur32 -lKernel32
 
 linux-* {
