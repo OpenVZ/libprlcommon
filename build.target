@@ -42,6 +42,14 @@ unix: QMAKE_LFLAGS += -Wl,-whole-archive
 
 include(common.deps)
 
+unix {
+	VERSION = $$cat(Makefile.version)
+	VERSIONS = $$split(VERSION, ".")
+	VER_MAJ = $$member(VERSIONS,0)
+	VER_MIN = $$member(VERSIONS,1)
+	VER_PAT = $$member(VERSIONS,2)
+}
+
 DEFINES += PRINTABLE_TARGET=common
 
 unix: LIBS += -Wl,-no-whole-archive
