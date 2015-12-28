@@ -27,7 +27,7 @@
 #define H_PrlAssert_H
 
 #include <QtGlobal>
-#include "Libraries/Logging/Logging.h"
+#include "../Logging/Logging.h"
 
 /************************************************************************/
 /*    PRL_ASSERT is Q_ASSERT + log message in RELEASE and DEBUG  mode   */

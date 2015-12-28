@@ -29,6 +29,7 @@
 #endif
 
 #include <Libraries/OpenSSL/OpenSSL.h>
+#include <Libraries/Logging/Logging.h>
 #include "IOSSLInterface.h"
 #undef OPENSSL_NO_DEPRECATED
 #include "Socket/SslHelper.h"

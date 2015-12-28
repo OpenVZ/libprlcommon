@@ -30,10 +30,10 @@
 #define __ETRACE_H__
 
 // This header uses Parallels types - so we need to include it here
-#include "Interfaces/ParallelsTypes.h"
+#include "../Interfaces/ParallelsTypes.h"
 
 #if !defined(_ETRACE_USE_CPUID_)
-#include "Libraries/Std/AtomicOps.h"
+#include "AtomicOps.h"
 #define EtrAtomicInc(x) AtomicIncU(x)
 #endif
 
@@ -345,7 +345,7 @@ enum {
 
 #define CPUID_FOR_ETRACE	0xFACE0FFF
 
-#include <Interfaces/packed.h>
+#include "../Interfaces/packed.h"
 
 typedef struct _ETRACE_DESC
 {
@@ -382,7 +382,7 @@ typedef struct _ETRACE_MEM
 	ETRACE_DATA data[1];
 } ETRACE_MEM;
 
-#include <Interfaces/unpacked.h>
+#include "../Interfaces/unpacked.h"
 
 #define ETRACE_CYCLES_MASK	0x0000FFFFFFFFFFFFULL
 
@@ -486,7 +486,7 @@ static void etrace_log_cpuid(unsigned int _eax,
 
 	/* host: user-space (prl_vm_app) */
 
-	#include "Libraries/Logging/Logging.h"
+	#include "../Logging/Logging.h"
 
 	#define ETRACE_LOG(src, type, val)										\
 	do {																	\

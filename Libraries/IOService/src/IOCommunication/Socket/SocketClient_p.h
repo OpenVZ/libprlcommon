@@ -28,6 +28,7 @@
 #define SOCKETCLIENTP_H
 
 #include "Socket_p.h"
+#include "../../../Logging/Logging.h"
 
 namespace IOService {
 

@@ -56,8 +56,6 @@
 #include "SocketListeners_p.h"
 #include "SslHelper.h"
 
-#include "Libraries/Logging/Logging.h"
-
 // Define flags and types for Windows
 #ifdef _WIN_
   typedef int socklen_t;
@@ -212,7 +210,7 @@ struct DetachedClientState
     typedef int SocketState;
 #endif
 
-#include <Interfaces/packed.h>
+#include "../../../Interfaces/packed.h"
     struct PODHeader
     {
         IOCommunication::ProtocolVersion clientProtocolVersion;
@@ -223,7 +221,7 @@ struct DetachedClientState
         quint32 readAheadSize;
 
     } PACKED header;
-#include <Interfaces/unpacked.h>
+#include "../../../Interfaces/unpacked.h"
 
     struct Data
     {
@@ -238,7 +236,7 @@ struct DetachedClientState
     DetachedClientState ();
 };
 
-#include <Interfaces/packed.h>
+#include "../../../Interfaces/packed.h"
 struct SSLv3Header
 {
     quint8 type;
@@ -246,7 +244,7 @@ struct SSLv3Header
     quint16 sslDataLength;
 
 } PACKED;
-#include <Interfaces/unpacked.h>
+#include "../../../Interfaces/unpacked.h"
 
 // Write thread implementation
 class SocketWriteThread : protected QThread

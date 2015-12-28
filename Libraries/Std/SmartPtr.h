@@ -26,7 +26,7 @@
 #pragma once
 
 #include <new>
-#include "Libraries/Std/AtomicOps.h"
+#include "AtomicOps.h"
 
 
 namespace SmartPtrPolicy

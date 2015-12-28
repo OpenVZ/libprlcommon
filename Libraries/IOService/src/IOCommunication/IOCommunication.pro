@@ -33,8 +33,10 @@ HEADERS = \
           IOConnection.h \
           IODataBuffer.h \
           IOProtocol.h \
+          IOProtocolCommon.h \
           IORoutingTable.h \
           IORoutingTableHelper.h \
+          IOSenderHandle.h \
           IOSendJob.h \
           IOSendJobInterface.h \
           IOServer.h \
@@ -48,6 +50,23 @@ HEADERS = \
           IOSSLInterface.h \
           Socket/SslHelper.h
 
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/IOService/IOCommunication/
+INSTALLS += headers
+
+HEADERS_S = \
+          Socket/SocketClient_p.h \
+          Socket/SocketListeners_p.h \
+          Socket/SocketServer_p.h \
+          Socket/Socket_p.h \
+          IOSSLInterface.h \
+          Socket/SslHelper.h
+
+headers_s.files = $${HEADERS_S}
+headers_s.path = $${PREFIX}/include/prlcommon/IOService/IOCommunication/Socket/
+INSTALLS += headers_s
+
+HEADERS += $${HEADERS_S}
 
 SOURCES = \
           IOClient.cpp \
@@ -65,6 +84,3 @@ SOURCES = \
           IOSSLInterface.cpp \
           Socket/SslHelper.cpp
 
-headers.files = $${HEADERS}
-headers.path = $${PREFIX}/include/prlcommon/IOService/IOCommunication/
-INSTALLS += headers

@@ -41,6 +41,7 @@ HEADERS = ParallelsDirs.h \
             CSimpleFileHelper.h \
             StringUtils.h \
             EnumToString.h \
+            ErrorSimple.h \
             NetworkUtils.h \
             CFeaturesMatrix.h \
             CGuestOsesHelper.h \

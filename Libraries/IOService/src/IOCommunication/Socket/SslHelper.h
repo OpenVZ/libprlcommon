@@ -47,7 +47,6 @@
 #endif
 
 #include "../IOConnection.h"
-#include <Libraries/Logging/Logging.h>
 
 namespace IOService {
 // SSL helper

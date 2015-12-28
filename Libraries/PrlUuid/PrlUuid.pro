@@ -54,8 +54,15 @@ unix {
 SOURCES += PrlUuid.cpp \
 	Uuid.cpp
 HEADERS += PrlUuid.h \
+	PrlUuidCommon.h \
 	Uuid.h
 
 headers.files = $${HEADERS}
 headers.path = $${PREFIX}/include/prlcommon/PrlUuid
 INSTALLS += headers
+
+HEADERS_UNIX = libuuid_unix/uuid.h
+
+headers_unix.files = $${HEADERS_UNIX}
+headers_unix.path = $${PREFIX}/include/prlcommon/PrlUuid/libuuid_unix
+INSTALLS += headers_unix
