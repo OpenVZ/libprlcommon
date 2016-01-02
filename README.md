@@ -2,7 +2,7 @@ Virtuozzo Common Libraries
 =============
 
 Virtuozzo Common Libraries is a set of libraries used in other Virtuozzo
-components providing common for them functionality:
+components providing common functionality for them:
 
 - HostUtils - a set of common functions for host information gathering/parsing;
 - IOService - common transport classes;
