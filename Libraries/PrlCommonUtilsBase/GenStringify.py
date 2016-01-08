@@ -42,7 +42,10 @@ PrivateErrors = 2
 AllErrors = PublicErrors | PrivateErrors
 
 
-SDK_HEADER_PATH = '/usr/include/prlsdk'
+if (len(sys.argv) > 1):
+    SDK_HEADER_PATH = os.path.join(sys.argv[1], 'prlsdk')
+else:
+    SDK_HEADER_PATH = '/usr/include/prlsdk'
 
 HEADER_FILE_HEADER = """/*
  * %(filename)s.h

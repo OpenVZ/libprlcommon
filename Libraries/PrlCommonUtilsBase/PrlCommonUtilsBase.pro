@@ -71,13 +71,13 @@ SOURCES = ParallelsDirs.cpp \
             netutils.cpp
 
 SDK_VALUES = \
-    /usr/include/prlsdk/PrlErrorsValues.h \
-    /usr/include/prlsdk/PrlEventsValues.h \
-    /usr/include/prlsdk/PrlEnums.h
+    $$SDK_HEADERS/prlsdk/PrlErrorsValues.h \
+    $$SDK_HEADERS/prlsdk/PrlEventsValues.h \
+    $$SDK_HEADERS/prlsdk/PrlEnums.h
 
 QMAKE_EXTRA_COMPILERS += gen_sdk
 gen_sdk.input = SDK_VALUES
-gen_sdk.commands = $$LIBS_LEVEL/PrlCommonUtilsBase/GenStringify.py
+gen_sdk.commands = $$LIBS_LEVEL/PrlCommonUtilsBase/GenStringify.py $$SDK_HEADERS
 gen_sdk.output = PrlStringifyConsts.cpp
 gen_sdk.variable_out = SOURCES
 gen_sdk.CONFIG += combine
