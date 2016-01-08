@@ -13,3 +13,21 @@ components providing common functionality for them:
 - PrlUuid - a wrapper for Virtuozzo uuids generation;
 - Std - set of simple common headers.
 
+How to install
+--------------
+
+Project depends on:
+
+- [libprlsdk](https://src.openvz.org/scm/ovz/libprlsdk.git) headers.
+  One needs to install them or checkout and define a proper `SDK_HEADERS` variable
+  (`export SDK_HEADERS=~/libprlsdk/Sources`).
+- qt-devel
+- boost-devel
+
+To build the libraries run:
+
+```bash
+qmake-qt4
+make
+sudo make install
+```
