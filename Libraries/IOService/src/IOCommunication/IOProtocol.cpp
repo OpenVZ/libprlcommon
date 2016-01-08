@@ -773,6 +773,7 @@ IOPackage::IOPackage ( IOPackage::Type type, quint32 buffNum )
     quint32 initBuffNum = (buffNum > 1 ? buffNum : 1);
     PODData* initData = IODATAMEMBER(this);
 
+    SmartPtr<char> *p = buffers;
     for ( quint32 i = 0; i < initBuffNum; ++i ) {
         // Zero data
         initData[i].bufferEncoding = RawEncoding;
@@ -781,7 +782,7 @@ IOPackage::IOPackage ( IOPackage::Type type, quint32 buffNum )
         // First buffer is already created by compiler
         if ( i >= 1 ) {
             // Place new smart ptr in allocated array
-            new( buffers + i ) SmartPtr<char>;
+            new( p + i ) SmartPtr<char>;
         }
     }
 }
@@ -800,15 +801,17 @@ IOPackage::IOPackage ( const IOPackage& p )
     if ( buffNum > 0 ) {
         ::memcpy( IODATAMEMBER(this), IODATAMEMBERCONST(&p), IODATASIZE(&p) );
 
+        SmartPtr<char> *d = buffers;
+        const SmartPtr<char> *s = p.buffers;
         for ( quint32 i = 0; i < buffNum; ++i ) {
             // First buffer is already created by compiler
             if ( i >= 1 )
                 // Call default constructor and place
                 // new smart ptr in allocated array
-                new( buffers + i ) SmartPtr<char>;
+                new( d + i ) SmartPtr<char>;
 
             // Call assignment operator
-            buffers[i] = p.buffers[i];
+            d[i] = s[i];
         }
     }
     else {
@@ -851,6 +854,7 @@ IOPackage::IOPackage ( QDataStream& in )
         }
 
         // Create buffers
+        SmartPtr<char> *p = buffers;
         for ( quint32 i = 0; i < header.buffersNumber; ++i ) {
             quint32 buffSize = ioData[i].bufferSize;
 
@@ -868,10 +872,10 @@ IOPackage::IOPackage ( QDataStream& in )
             if ( i >= 1 )
                 // Call default constructor and place
                 // new smart ptr in allocated array
-                new( buffers + i ) SmartPtr<char>;
+                new( p + i ) SmartPtr<char>;
 
             // Create smart ptr with array policy
-            buffers[i] = buff;
+            p[i] = buff;
         }
     }
 }
@@ -884,8 +888,9 @@ IOPackage::~IOPackage ()
 
     if ( header.buffersNumber > 1 ) {
         // Reverse order
+        SmartPtr<char> *p = buffers;
         for ( quint32 i = header.buffersNumber - 1; i > 0 ; --i ) {
-            buffers[i].~SmartPtr<char>();
+            p[i].~SmartPtr<char>();
         }
     }
 }
