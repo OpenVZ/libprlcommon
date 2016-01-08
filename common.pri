@@ -261,7 +261,15 @@ unix {
 	QMAKE_CXXFLAGS += -frandom-seed=parallels
 }
 
-INCLUDEPATH += . $$SRC_LEVEL $$SRC_LEVEL/Interfaces
+SDK_HEADERS = $$(SDK_HEADERS)
+isEmpty(SDK_HEADERS): SDK_HEADERS = /usr/include
+
+!exists($$SDK_HEADERS/prlsdk) {
+	error(There is no Virtuozzo SDK headers at $$SDK_HEADERS! \
+	Please install them or define a proper path to them in SDK_HEADERS environment variable)
+}
+
+INCLUDEPATH += . $$SRC_LEVEL $$SRC_LEVEL/Interfaces $$SDK_HEADERS
 DEPENDPATH += . $$SRC_LEVEL $$SRC_LEVEL/Interfaces
 
 clear(_linkable)
