@@ -763,7 +763,7 @@ public:
 //#define XML_DOC_VERSION_DATA						"version=\"1.0\" encoding=\"ISO-8859-1\""
 #define XML_DOC_VERSION_DATA						"version=\"1.0\" encoding=\"UTF-8\""
 
-#define XML_DEFAULT_PROBLEM_REP_PREAMBLE			QT_TRANSLATE_NOOP("QObject", "This is a Parallels problem report. Please send this file to Parallels Software International Inc. mailto:reports@parallels.com")
+#define XML_DEFAULT_PROBLEM_REP_PREAMBLE			QT_TRANSLATE_NOOP("QObject", "This is a Parallels problem report. Please send this file to Parallels IP Holdings GmbH. mailto:reports@parallels.com")
 
 /**
  * Virtual Machine configuration XML model
@@ -1809,6 +1809,7 @@ public:
 #define EVT_PARAM_VM_CLONE_CMD_VM_NAME			"vm_clone_cmd_vm_name"
 #define EVT_PARAM_VM_CLONE_CMD_CREATE_TEMPLATE	"vm_clone_cmd_create_template"
 #define EVT_PARAM_VM_CLONE_CMD_CHANGE_SID	"vm_clone_cmd_change_sid"
+#define EVT_PARAM_VM_CLONE_CMD_VM_UUID		"vm_clone_cmd_vm_uuid"
 ////////////////////////////////////////////////////////////////////////////////
 #define EVT_PARAM_VM_START_EX_CMD_START_MODE				"vm_start_ex_cmd_start_mode"
 #define EVT_PARAM_VM_START_EX_CMD_RESERVED					"vm_start_ex_cmd_reserved_parameter"
