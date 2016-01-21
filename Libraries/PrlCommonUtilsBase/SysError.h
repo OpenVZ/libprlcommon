@@ -58,6 +58,15 @@ struct Expected
 	{
 	}
 
+	template <typename U>
+	Expected(const Expected<T, U>& e_)
+	{
+		if (e_.isFailed())
+			boost::get<U>(m_data) = e_.error();
+		else
+			boost::get<T>(m_data) = e_.value();
+	}
+
 	bool isFailed() const
 	{
 		return !isSucceed();
@@ -108,8 +117,8 @@ struct Expected<void, E>
 	{
 	}
 
-	template<typename T>
-	Expected(const Expected<T, E>& expected_)
+	template<typename T, typename U>
+	Expected(const Expected<T, U>& expected_)
 	{
 		if (expected_.isFailed())
 			m_error = expected_.error();
