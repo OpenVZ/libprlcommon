@@ -62,9 +62,9 @@ struct Expected
 	Expected(const Expected<T, U>& e_)
 	{
 		if (e_.isFailed())
-			boost::get<U>(m_data) = e_.error();
+			m_data = e_.error();
 		else
-			boost::get<T>(m_data) = e_.value();
+			m_data = e_.value();
 	}
 
 	bool isFailed() const
