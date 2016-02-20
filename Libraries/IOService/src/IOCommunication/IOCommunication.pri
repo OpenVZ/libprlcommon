@@ -24,7 +24,7 @@
 
 LIBTARGET = IOCommunication
 PROJ_FILE = $$PWD/IOCommunication.pro
-QTCONFIG = core xml network
+QTCONFIG = core network
 !include(../../../../Build/qmake/staticlib.pri): error(include error)
 
 INCLUDEPATH *= $$PWD $$PWD/../ $$PWD/../../

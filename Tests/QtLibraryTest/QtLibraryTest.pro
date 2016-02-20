@@ -1,5 +1,5 @@
 CONFIG += qtestlib testcase
-QT = xml network core
+QT = network core
 
 INCLUDEPATH += /usr/share /usr/include/prlsdk
 
