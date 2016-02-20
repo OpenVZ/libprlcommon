@@ -1416,6 +1416,8 @@ public:
 			DspCmdGetCPUPoolsList		= DspClientToDispatcherCommandRangeStart + 178,
 			DspCmdMoveToCPUPool		= DspClientToDispatcherCommandRangeStart + 179,
 			DspCmdRecalculateCPUPool	= DspClientToDispatcherCommandRangeStart + 180,
+			DspCmdBeginVmBackup		= DspClientToDispatcherCommandRangeStart + 181,
+			DspCmdEndVmBackup		= DspClientToDispatcherCommandRangeStart + 182,
 			DspClientToDispatcherCommandRangeEnd = 2999,
 
 
