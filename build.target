@@ -27,6 +27,7 @@ NON_SUBDIRS = yes
 TEMPLATE = lib
 CONFIG += shared
 CONFIG -= static
+QT -= gui xml
 
 include(Build/Options.pri)
 include(common.pri)

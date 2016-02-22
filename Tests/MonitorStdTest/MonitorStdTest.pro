@@ -1,6 +1,5 @@
 CONFIG += qtestlib testcase
 QT += core
-QT -= gui
 
 TARGET = test_monitor_std
 
