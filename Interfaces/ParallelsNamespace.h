@@ -101,8 +101,12 @@
 #define MIGRATE_DISP_PROTO_V3	3
 /* migration of external disks was added */
 #define MIGRATE_DISP_PROTO_V4	4
+/* migration of tracking disk maps  */
+#define MIGRATE_DISP_PROTO_V5   5
+/* Virtuozzo 7.0.0 version */
+#define MIGRATE_DISP_PROTO_V7   7
 /* current migrate protocol version */
-#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V4
+#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V7
 
 /* backup client-dispatcher and dispatcher-dispatcher protocol versions */
 /* RC version */
