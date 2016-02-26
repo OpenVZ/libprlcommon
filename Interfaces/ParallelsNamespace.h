@@ -576,7 +576,9 @@ public:
 	{
 		RealSerialPort = PDT_USE_REAL_DEVICE,
 		SerialOutputFile = PDT_USE_OUTPUT_FILE,
-		SerialSocket = PDT_USE_OTHER
+		SerialSocket = PDT_USE_OTHER,
+		SerialTCP = PDT_USE_TCP,
+		SerialUDP = PDT_USE_UDP
 	};
 
 	/**
