@@ -296,7 +296,7 @@ PRL_UINT16 CGuestOsesHelper::GetDefaultOsVersion(PRL_UINT8 nOsType)
 			nDefaultOsVersion = PVS_GUEST_VER_MACOS_SNOW_LEOPARD;
 		break;
 		case PVS_GUEST_TYPE_WINDOWS:
-			nDefaultOsVersion = ( bIsDesktopOrWorkstation ? PVS_GUEST_VER_WIN_WINDOWS7 : PVS_GUEST_VER_WIN_2008 );
+			nDefaultOsVersion = ( bIsDesktopOrWorkstation ? PVS_GUEST_VER_WIN_WINDOWS7 : PVS_GUEST_VER_WIN_2012 );
 		break;
 		case PVS_GUEST_TYPE_CHROMEOS:
 			nDefaultOsVersion = PVS_GUEST_VER_CHROMEOS_1x;
