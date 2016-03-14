@@ -48,19 +48,19 @@ namespace IO
 ///////////////////////////////////////////////////////////////////////////////
 // File
 
-PRL_RESULT File::open(int flags)
+PRL_RESULT File::open(const QString &fileName, int flags)
 {
-	if (!QFileInfo(m_name).exists())
+	if (!QFileInfo(fileName).exists())
 	{
-		WRITE_TRACE(DBG_FATAL, "File not found: '%s'", m_name.toUtf8().constData());
+		WRITE_TRACE(DBG_FATAL, "File not found: '%s'", fileName.toUtf8().constData());
 		return PRL_ERR_FILE_NOT_FOUND;
 	}
 
-	m_fd = ::open(m_name.toUtf8().constData(), flags);
+	m_fd = ::open(fileName.toUtf8().constData(), flags);
 	if (m_fd < 0)
 	{
 		WRITE_TRACE(DBG_FATAL, "Cannot open file '%s': %m",
-		            m_name.toUtf8().constData());
+		            fileName.toUtf8().constData());
 		return PRL_ERR_DISK_FILE_OPEN_ERROR;
 	}
 	return PRL_ERR_SUCCESS;
