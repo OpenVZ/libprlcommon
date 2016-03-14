@@ -43,6 +43,7 @@ struct Ploop : Format
 			PRL_UINT64 offSec);
 	virtual PRL_RESULT write(const void *data, PRL_UINT32 sizeBytes,
 			PRL_UINT64 offSec);
+	virtual Parameters::disk_type getInfo(void);
 	virtual PRL_RESULT close(void);
 
 private:

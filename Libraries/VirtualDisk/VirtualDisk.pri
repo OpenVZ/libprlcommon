@@ -22,6 +22,6 @@
 
 LIBTARGET = VirtualDisk
 PROJ_FILE = $$PWD/VirtualDisk.pro
-QTCONFIG = core
+QTCONFIG = core xml
 
 include(../../Build/qmake/staticlib.pri)

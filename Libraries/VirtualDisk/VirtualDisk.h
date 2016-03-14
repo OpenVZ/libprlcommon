@@ -23,12 +23,192 @@
 #ifndef __VIRTUAL_DISK__
 #define __VIRTUAL_DISK__
 
+#include <vector>
 #include <QString>
 #include <prlsdk/PrlDisk.h>
 #include <boost/noncopyable.hpp>
 
+#include <prlxmlmodel/VmConfig/CVmEvent.h>
+#include "../PrlCommonUtilsBase/SysError.h"
+#include "../PrlCommonUtilsBase/ErrorSimple.h"
+
 namespace VirtualDisk
 {
+namespace Parameters
+{
+
+///////////////////////////////////////////////////////////////////////////////
+// Image
+
+struct Image
+{
+	Image():
+		m_type(PRL_DISK_INVALID), m_start(0), m_size(0)
+	{
+	}
+
+	PRL_IMAGE_TYPE getType() const
+	{
+		return m_type;
+	}
+
+	void setType(PRL_IMAGE_TYPE type)
+	{
+		m_type = type;
+	}
+
+	PRL_UINT64 getStart() const
+	{
+		return m_start;
+	}
+
+	void setStart(PRL_UINT64 start)
+	{
+		m_start = start;
+	}
+
+	PRL_UINT64 getSize() const
+	{
+		return m_size;
+	}
+
+	void setSize(PRL_UINT64 size)
+	{
+		m_size = size;
+	}
+
+	const QString& getFilename() const
+	{
+		return m_filename;
+	}
+
+	void setFilename(const QString &filename)
+	{
+		m_filename = filename;
+	}
+
+private:
+	PRL_IMAGE_TYPE m_type;
+	PRL_UINT64 m_start;
+	PRL_UINT64 m_size;
+	QString m_filename;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Disk
+
+struct Disk
+{
+	Disk();
+	explicit Disk(const void *data);
+
+	PRL_UINT64 getHeads() const
+	{
+		return m_heads;
+	}
+
+	void setHeads(PRL_UINT64 heads)
+	{
+		m_heads = heads;
+	}
+
+	PRL_UINT64 getCylinders() const
+	{
+		return m_cylinders;
+	}
+
+	void setCylinders(PRL_UINT64 cylinders)
+	{
+		m_cylinders = cylinders;
+	}
+
+	PRL_UINT64 getSectors() const
+	{
+		return m_sectors;
+	}
+
+	void setSectors(PRL_UINT64 sectors)
+	{
+		m_sectors = sectors;
+	}
+
+	PRL_UINT64 getSizeInSectors() const
+	{
+		return m_sizeInSectors;
+	}
+
+	void setSizeInSectors(PRL_UINT64 sizeInSectors)
+	{
+		m_sizeInSectors = sizeInSectors;
+	}
+
+	PRL_UINT64 getBlockSize() const
+	{
+		return m_blockSize;
+	}
+
+	void setBlockSize(PRL_UINT64 blockSize)
+	{
+		m_blockSize = blockSize;
+	}
+
+	const std::vector<Image>& getStorages() const
+	{
+		return m_storages;
+	}
+
+	void setStorages(const std::vector<Image>& storages)
+	{
+		m_storages = storages;
+	}
+
+	void addStorage(const Image &storage)
+	{
+		m_storages.push_back(storage);
+	}
+
+	const PRL_GUID& getUid() const
+	{
+		return m_uid;
+	}
+
+	void setUid(const PRL_GUID &uid)
+	{
+		memmove(&m_uid, &uid, sizeof(m_uid));
+	}
+
+	const QString& getName() const
+	{
+		return m_name;
+	}
+
+	void setName(const QString &name)
+	{
+		m_name = name;
+	}
+
+	PRL_UINT32 getBufferSize() const;
+	PRL_RESULT fillBuffer(void *data, PRL_UINT32 bufSize) const;
+
+private:
+	PRL_UINT32 getConstantSize() const;
+
+	static PRL_UINT32 getStringSize(const QString &s);
+
+	PRL_UINT32 m_heads;
+	PRL_UINT32 m_cylinders;
+	PRL_UINT32 m_sectors;
+	PRL_UINT64 m_sizeInSectors;
+	PRL_UINT32 m_blockSize;
+	std::vector<Image> m_storages;
+	PRL_GUID m_uid;
+	QString m_name;
+};
+
+typedef Prl::Expected<Disk, Error::Simple> disk_type;
+
+} // namespace Parameters
+
 ///////////////////////////////////////////////////////////////////////////////
 // struct Format
 
@@ -41,6 +221,7 @@ struct Format : boost::noncopyable
 			PRL_UINT64 offSec) = 0;
 	virtual PRL_RESULT write(const void *data, PRL_UINT32 sizeBytes,
 			PRL_UINT64 offSec) = 0;
+	virtual Parameters::disk_type getInfo(void) = 0;
 	virtual PRL_RESULT close(void) = 0;
 };
 

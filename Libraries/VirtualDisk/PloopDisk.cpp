@@ -118,6 +118,11 @@ PRL_RESULT Ploop::write(const void *data, PRL_UINT32 sizeBytes,
 	return m_file.pwrite(data, sizeBytes, offSec * 512);
 }
 
+Parameters::disk_type Ploop::getInfo(void)
+{
+	return Error::Simple(PRL_ERR_UNIMPLEMENTED);
+}
+
 PRL_RESULT Ploop::close(void)
 {
 
