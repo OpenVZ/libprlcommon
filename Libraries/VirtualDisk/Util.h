@@ -44,12 +44,17 @@ namespace IO
 
 struct File
 {
-	explicit File(const QString &name):
-		m_name(name), m_fd(-1)
+	File():
+		m_fd(-1)
 	{
 	}
 
-	PRL_RESULT open(int flags);
+	~File()
+	{
+		close();
+	}
+
+	PRL_RESULT open(const QString &fileName, int flags);
 	// size and offset are in BYTES
 	PRL_RESULT pread(void *data, PRL_UINT64 size, PRL_UINT64 offset) const;
 	PRL_RESULT pwrite(const void *data, PRL_UINT64 size, PRL_UINT64 offset) const;
@@ -57,7 +62,8 @@ struct File
 	PRL_RESULT close();
 
 private:
-	QString m_name;
+	File(const File &other);
+
 	int m_fd;
 };
 
