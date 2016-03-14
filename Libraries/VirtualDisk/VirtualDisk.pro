@@ -28,8 +28,10 @@ include(VirtualDisk.pri)
 INCLUDEPATH += .
 
 HEADERS = PloopDisk.h \
-		VirtualDisk.h
+          VirtualDisk.h \
+          Util.h
 
 SOURCES = PloopDisk.cpp \
-		VirtualDisk.cpp
+          VirtualDisk.cpp \
+          Util.cpp
 
