@@ -68,6 +68,9 @@ PRL_RESULT File::open(const QString &fileName, int flags)
 
 PRL_RESULT File::pread(void *data, PRL_UINT64 size, PRL_UINT64 offset) const
 {
+	if (!data)
+		return PRL_ERR_INVALID_ARG;
+
 	if (m_fd < 0)
 		return PRL_ERR_DISK_DISK_NOT_OPENED;
 
@@ -95,6 +98,9 @@ PRL_RESULT File::pread(void *data, PRL_UINT64 size, PRL_UINT64 offset) const
 
 PRL_RESULT File::pwrite(const void *data, PRL_UINT64 size, PRL_UINT64 offset) const
 {
+	if (!data)
+		return PRL_ERR_INVALID_ARG;
+
 	if (m_fd < 0)
 		return PRL_ERR_DISK_DISK_NOT_OPENED;
 
