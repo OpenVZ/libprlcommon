@@ -35,3 +35,6 @@ SOURCES = PloopDisk.cpp \
           VirtualDisk.cpp \
           Util.cpp
 
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/VirtualDisk
+INSTALLS += headers
