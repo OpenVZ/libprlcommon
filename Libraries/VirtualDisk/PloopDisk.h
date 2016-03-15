@@ -35,7 +35,7 @@ namespace VirtualDisk
 
 struct Ploop : Format
 {
-	Ploop() : m_di(NULL), m_wasMmounted(false) {}
+	Ploop();
 	~Ploop();
 	virtual PRL_RESULT open(const QString &fileName,
 			const PRL_DISK_OPEN_FLAGS flags);
@@ -50,6 +50,7 @@ private:
 
 private:
 	struct ploop_disk_images_data *m_di;
+	struct ploop_functions *m_ploop;
 	IO::File m_file;
 	bool m_wasMmounted;
 };
