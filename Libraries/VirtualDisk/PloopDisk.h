@@ -26,6 +26,7 @@
 #include <QString>
 
 #include "VirtualDisk.h"
+#include "Util.h"
 
 namespace VirtualDisk
 {
@@ -34,7 +35,8 @@ namespace VirtualDisk
 
 struct Ploop : Format
 {
-	Ploop() {}
+	Ploop() : m_di(NULL), m_wasMmounted(false) {}
+	~Ploop();
 	virtual PRL_RESULT open(const QString &fileName,
 			const PRL_DISK_OPEN_FLAGS flags);
 	virtual PRL_RESULT read(void *data, PRL_UINT32 sizeBytes,
@@ -42,6 +44,14 @@ struct Ploop : Format
 	virtual PRL_RESULT write(const void *data, PRL_UINT32 sizeBytes,
 			PRL_UINT64 offSec);
 	virtual PRL_RESULT close(void);
+
+private:
+	QString getDescriptorPath(const QString &fileName) const;
+
+private:
+	struct ploop_disk_images_data *m_di;
+	IO::File m_file;
+	bool m_wasMmounted;
 };
 
 } // namespace VirtualDisk

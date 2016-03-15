@@ -25,13 +25,14 @@
 
 #include <QString>
 #include <prlsdk/PrlDisk.h>
+#include <boost/noncopyable.hpp>
 
 namespace VirtualDisk
 {
 ///////////////////////////////////////////////////////////////////////////////
 // struct Format
 
-struct Format
+struct Format : boost::noncopyable
 {
 	virtual ~Format() {};
 	virtual PRL_RESULT open(const QString &fileName,
