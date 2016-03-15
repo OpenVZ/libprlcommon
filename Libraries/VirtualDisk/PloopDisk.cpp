@@ -105,7 +105,7 @@ Ploop::~Ploop()
 	close();
 }
 
-QString Ploop::getDescriptorPath(const QString &fileName) const
+QString Ploop::getDescriptorPath(const QString &fileName)
 {
 	return fileName + "/DiskDescriptor.xml";
 }

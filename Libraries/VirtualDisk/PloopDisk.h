@@ -37,6 +37,9 @@ struct Ploop : Format
 {
 	Ploop();
 	~Ploop();
+
+	static QString getDescriptorPath(const QString &fileName);
+
 	virtual PRL_RESULT open(const QString &fileName,
 			const PRL_DISK_OPEN_FLAGS flags);
 	virtual PRL_RESULT read(void *data, PRL_UINT32 sizeBytes,
@@ -45,9 +48,6 @@ struct Ploop : Format
 			PRL_UINT64 offSec);
 	virtual Parameters::disk_type getInfo(void);
 	virtual PRL_RESULT close(void);
-
-private:
-	QString getDescriptorPath(const QString &fileName) const;
 
 private:
 	struct ploop_disk_images_data *m_di;
