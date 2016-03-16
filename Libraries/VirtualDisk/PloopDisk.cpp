@@ -29,6 +29,7 @@
 #include <dlfcn.h>
 
 #include <prlsdk/PrlErrors.h>
+
 #include <ploop/libploop.h>
 #include <ploop/dynload.h>
 
@@ -184,7 +185,27 @@ PRL_RESULT Ploop::write(const void *data, PRL_UINT32 sizeBytes,
 
 Parameters::disk_type Ploop::getInfo(void)
 {
-	return Error::Simple(PRL_ERR_UNIMPLEMENTED);
+	if (m_di == NULL)
+		return Error::Simple(PRL_ERR_UNINITIALIZED);
+
+	Parameters::Disk disk;
+
+	disk.setHeads(m_di->heads);
+	disk.setCylinders(m_di->cylinders);
+	disk.setSectors(m_di->sectors);
+
+	disk.setSizeInSectors(m_di->size);
+	disk.setBlockSize(m_di->blocksize);
+
+	Parameters::Image image;
+	image.setType(m_di->mode == PLOOP_EXPANDED_MODE ?
+				PRL_IMAGE_COMPRESSED : PRL_IMAGE_PLAIN);
+	image.setStart(0);
+	image.setSize(m_di->size);
+
+	disk.addStorage(image);
+
+	return disk;
 }
 
 PRL_RESULT Ploop::close(void)
