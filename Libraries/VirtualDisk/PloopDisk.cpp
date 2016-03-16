@@ -26,18 +26,79 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <dlfcn.h>
 
 #include <prlsdk/PrlErrors.h>
 #include <ploop/libploop.h>
+#include <ploop/dynload.h>
 
 #include "PloopDisk.h"
 #include "Libraries/Logging/Logging.h"
+typedef void (* resolve_functions)(struct ploop_functions *);
 
 namespace VirtualDisk
 {
 
 ///////////////////////////////////////////////////////////////////////////////
+// struct LibPloop
+
+struct LibPloop : boost::noncopyable
+{
+	LibPloop() : m_Handle(NULL)
+	{
+		load();
+	}
+
+	~LibPloop()
+	{
+		if (m_Handle != NULL)
+			dlclose(m_Handle);
+	}
+
+	struct ploop_functions *getFunctions()
+	{
+		return m_Handle ? &m_fun : NULL;
+	}
+
+	void load();
+
+private:
+	void *m_Handle;
+	struct ploop_functions m_fun;
+};
+
+void LibPloop::load()
+{
+	if (m_Handle != NULL)
+		return;
+
+	m_Handle = dlopen("libploop.so.7", RTLD_LAZY);
+	if (m_Handle == NULL)
+		return;
+
+	resolve_functions f = (resolve_functions) dlsym(m_Handle,
+			"ploop_resolve_functions");
+	if (f == NULL)
+	{
+		WRITE_TRACE(DBG_FATAL, "Failed to load ploop_resolve_functions: %s",  dlerror());
+		dlclose(m_Handle);
+		m_Handle = NULL;
+		return;
+	}
+
+	f(&m_fun);
+}
+
+Q_GLOBAL_STATIC(LibPloop, getLibPloop)
+
+///////////////////////////////////////////////////////////////////////////////
 // struct Ploop
+
+Ploop::Ploop() :
+	m_di(NULL), m_wasMmounted(false)
+{
+	m_ploop = getLibPloop()->getFunctions();
+}
 
 Ploop::~Ploop()
 {
@@ -58,18 +119,21 @@ PRL_RESULT Ploop::open(const QString &fileName,
 	if (m_di != NULL)
 		return PRL_ERR_INVALID_ARG;
 
-	if (::ploop_open_dd(&m_di, getDescriptorPath(fileName).toUtf8().constData()))
+	if (m_ploop == NULL)
+		return PRL_ERR_UNINITIALIZED;
+
+	if (m_ploop->open_dd(&m_di, getDescriptorPath(fileName).toUtf8().constData()))
 	{
 		WRITE_TRACE(DBG_FATAL, "ploop_open_dd: %s",
-				ploop_get_last_error());
+				m_ploop->get_last_error());
 		return PRL_ERR_FAILURE;
 	}
 
-	rc = ploop_get_dev(m_di, dev, sizeof(dev));
+	rc = m_ploop->get_dev(m_di, dev, sizeof(dev));
 	if (rc == -1)
 	{
 		WRITE_TRACE(DBG_FATAL, "ploop_get_dev: %s",
-				ploop_get_last_error());
+				m_ploop->get_last_error());
 		close();
 		return PRL_ERR_FAILURE;
 	}
@@ -78,10 +142,10 @@ PRL_RESULT Ploop::open(const QString &fileName,
 	{
 		struct ploop_mount_param p = ploop_mount_param();
 
-		if (ploop_mount_image(m_di, &p))
+		if (m_ploop->mount_image(m_di, &p))
 		{
 			WRITE_TRACE(DBG_FATAL, "ploop_mount_image: %s",
-					ploop_get_last_error());
+					m_ploop->get_last_error());
 
 			close();
 			return PRL_ERR_FAILURE;
@@ -93,7 +157,7 @@ PRL_RESULT Ploop::open(const QString &fileName,
 
 	int f = O_DIRECT | (flags & PRL_DISK_READ ? O_RDONLY : O_RDWR);
 
-	rc =  m_file.open(dev, f);
+	rc = m_file.open(dev, f);
 	if (rc)
 		close();
 
@@ -125,6 +189,8 @@ Parameters::disk_type Ploop::getInfo(void)
 
 PRL_RESULT Ploop::close(void)
 {
+	if (m_ploop == NULL)
+		return PRL_ERR_UNINITIALIZED;
 
 	if (m_di == NULL)
 		return PRL_ERR_SUCCESS;
@@ -134,16 +200,16 @@ PRL_RESULT Ploop::close(void)
 
 	if (m_wasMmounted)
 	{
-		if (ploop_umount_image(m_di))
+		if (m_ploop->umount_image(m_di))
 		{
 			WRITE_TRACE(DBG_FATAL, "ploop_mount_image: %s",
-					ploop_get_last_error());
+					m_ploop->get_last_error());
 		}
 		m_wasMmounted = false;
 
 	}
 
-	ploop_close_dd(m_di);
+	m_ploop->close_dd(m_di);
 	m_di = NULL;
 
 	return PRL_ERR_SUCCESS;
