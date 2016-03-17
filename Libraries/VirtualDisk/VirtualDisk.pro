@@ -29,11 +29,13 @@ INCLUDEPATH += .
 
 HEADERS = PloopDisk.h \
           VirtualDisk.h \
-          Util.h
+          Util.h \
+          Qcow2Disk.h
 
 SOURCES = PloopDisk.cpp \
           VirtualDisk.cpp \
-          Util.cpp
+          Util.cpp \
+          Qcow2Disk.cpp
 
 headers.files = $${HEADERS}
 headers.path = $${PREFIX}/include/prlcommon/VirtualDisk

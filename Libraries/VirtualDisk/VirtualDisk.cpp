@@ -23,6 +23,7 @@
 #include <prlcommon/Logging/Logging.h>
 
 #include "PloopDisk.h"
+#include "Qcow2Disk.h"
 
 namespace VirtualDisk
 {
@@ -136,8 +137,13 @@ PRL_RESULT Disk::fillBuffer(void *data, PRL_UINT32 bufSize) const
 
 Format* detectImageFormat(const QString &fname)
 {
-	Q_UNUSED(fname);
-	return new (std::nothrow) Ploop;
+	if (!QFileInfo(fname).exists())
+		return NULL;
+
+	if (QFileInfo(Ploop::getDescriptorPath(fname)).exists())
+		return new (std::nothrow) Ploop;
+
+	return new (std::nothrow) Qcow2;
 }
 
 } // namespace VirtualDisk
