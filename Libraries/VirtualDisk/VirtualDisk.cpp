@@ -20,7 +20,7 @@
  * Our contact details: Parallels IP Holdings GmbH, Vordergasse 59, 8200
  * Schaffhausen, Switzerland.
  */
-#include <prlcommon/Logging/Logging.h>
+#include "../Logging/Logging.h"
 
 #include "PloopDisk.h"
 #include "Qcow2Disk.h"
