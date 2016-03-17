@@ -45,6 +45,8 @@ struct Ploop : Format
 			PRL_UINT64 offSec);
 	virtual Parameters::disk_type getInfo(void);
 	virtual PRL_RESULT close(void);
+	PRL_RESULT create(const QString &fileName,
+			const Parameters::Disk &params);
 
 private:
 	QString getDescriptorPath(const QString &fileName) const;

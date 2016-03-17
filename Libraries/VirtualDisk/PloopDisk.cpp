@@ -33,6 +33,8 @@
 #include <ploop/libploop.h>
 #include <ploop/dynload.h>
 
+#include <QByteArray>
+
 #include "PloopDisk.h"
 #include "Libraries/Logging/Logging.h"
 typedef void (* resolve_functions)(struct ploop_functions *);
@@ -163,6 +165,33 @@ PRL_RESULT Ploop::open(const QString &fileName,
 		close();
 
 	return rc;
+}
+
+PRL_RESULT Ploop::create(const QString &fileName,
+		const Parameters::Disk &params)
+{
+	if (m_ploop == NULL)
+		return PRL_ERR_UNINITIALIZED;
+
+	if (fileName.isEmpty())
+		return PRL_ERR_INVALID_ARG;
+
+	struct ploop_create_param x = ploop_create_param();
+
+	QString f = fileName + "/root.hds";
+	QByteArray image(f.toUtf8().constData());
+	x.image = image.data();
+	x.size = params.getSizeInSectors();
+	x.blocksize = params.getBlockSize();
+
+	if (m_ploop->create_image(&x)) {
+		WRITE_TRACE(DBG_FATAL, "ploop_create_image: %s",
+				m_ploop->get_last_error());
+
+		return PRL_ERR_FAILURE;
+	}
+
+	return PRL_ERR_SUCCESS;
 }
 
 PRL_RESULT Ploop::read(void *data, PRL_UINT32 sizeBytes,
