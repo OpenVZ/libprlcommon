@@ -48,6 +48,8 @@ struct Ploop : Format
 			PRL_UINT64 offSec);
 	virtual Parameters::disk_type getInfo(void);
 	virtual PRL_RESULT close(void);
+	PRL_RESULT create(const QString &fileName,
+			const Parameters::Disk &params);
 
 private:
 	struct ploop_disk_images_data *m_di;

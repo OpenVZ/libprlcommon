@@ -29,8 +29,11 @@
 #include <dlfcn.h>
 
 #include <prlsdk/PrlErrors.h>
+
 #include <ploop/libploop.h>
 #include <ploop/dynload.h>
+
+#include <QByteArray>
 
 #include "PloopDisk.h"
 #include "Libraries/Logging/Logging.h"
@@ -164,6 +167,33 @@ PRL_RESULT Ploop::open(const QString &fileName,
 	return rc;
 }
 
+PRL_RESULT Ploop::create(const QString &fileName,
+		const Parameters::Disk &params)
+{
+	if (m_ploop == NULL)
+		return PRL_ERR_UNINITIALIZED;
+
+	if (fileName.isEmpty())
+		return PRL_ERR_INVALID_ARG;
+
+	struct ploop_create_param x = ploop_create_param();
+
+	QString f = fileName + "/root.hds";
+	QByteArray image(f.toUtf8().constData());
+	x.image = image.data();
+	x.size = params.getSizeInSectors();
+	x.blocksize = params.getBlockSize();
+
+	if (m_ploop->create_image(&x)) {
+		WRITE_TRACE(DBG_FATAL, "ploop_create_image: %s",
+				m_ploop->get_last_error());
+
+		return PRL_ERR_FAILURE;
+	}
+
+	return PRL_ERR_SUCCESS;
+}
+
 PRL_RESULT Ploop::read(void *data, PRL_UINT32 sizeBytes,
 		PRL_UINT64 offSec)
 {
@@ -184,7 +214,27 @@ PRL_RESULT Ploop::write(const void *data, PRL_UINT32 sizeBytes,
 
 Parameters::disk_type Ploop::getInfo(void)
 {
-	return Error::Simple(PRL_ERR_UNIMPLEMENTED);
+	if (m_di == NULL)
+		return Error::Simple(PRL_ERR_UNINITIALIZED);
+
+	Parameters::Disk disk;
+
+	disk.setHeads(m_di->heads);
+	disk.setCylinders(m_di->cylinders);
+	disk.setSectors(m_di->sectors);
+
+	disk.setSizeInSectors(m_di->size);
+	disk.setBlockSize(m_di->blocksize);
+
+	Parameters::Image image;
+	image.setType(m_di->mode == PLOOP_EXPANDED_MODE ?
+				PRL_IMAGE_COMPRESSED : PRL_IMAGE_PLAIN);
+	image.setStart(0);
+	image.setSize(m_di->size);
+
+	disk.addStorage(image);
+
+	return disk;
 }
 
 PRL_RESULT Ploop::close(void)
