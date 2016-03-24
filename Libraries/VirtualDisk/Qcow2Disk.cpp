@@ -50,7 +50,7 @@ namespace
 {
 
 enum {SECTOR_SIZE = 512};
-enum {CMD_WORK_TIMEOUT = 60 * 60};
+enum {CMD_WORK_TIMEOUT = 60 * 60 * 1000};
 
 const char MODPROBE[] = "/usr/sbin/modprobe";
 const char QEMU_NBD[] = "/usr/bin/qemu-nbd";
