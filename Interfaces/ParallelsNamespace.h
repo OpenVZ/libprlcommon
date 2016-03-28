@@ -115,8 +115,10 @@
 #define BACKUP_PROTO_V2	2
 /* PVS-6 : ploop container's support was added */
 #define BACKUP_PROTO_V3	3
+/* VZ-7 : VM config conversion and driver installation needed */
+#define BACKUP_PROTO_V4	4
 /* current backup protocol version */
-#define BACKUP_PROTO_VERSION BACKUP_PROTO_V3
+#define BACKUP_PROTO_VERSION BACKUP_PROTO_V4
 
 /* copy of CT template client-dispatcher and dispatcher-dispatcher protocol versions */
 /* PSBM-5 version */
