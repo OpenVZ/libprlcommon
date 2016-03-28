@@ -109,10 +109,12 @@ const IORoutingTable IORoutingTableHelper::GetClientRoutingTable (
 		return IORoutingTable(IORoutingTable::SSLRoute,
 			IORoutingTable::RequiredRoute);
 	}
-	Q_ASSERT(PSL_NORMAL_SECURITY == security_);
 
 	Visitor v;
-	mpl::for_each<normalRouteList_type>(boost::ref(v));
+	if (PSL_NORMAL_SECURITY == security_)
+		mpl::for_each<normalRouteList_type>(boost::ref(v));
+	else
+		Q_ASSERT(PSL_LOW_SECURITY == security_);
 	return v.getResult();
 }
 
