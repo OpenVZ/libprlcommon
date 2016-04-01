@@ -2066,6 +2066,7 @@ public:
 #define EVT_PARAM_VM_DUMP_META_FILE				"vmcfg_vm_dump_meta_file"
 #define EVT_PARAM_VM_FAST_REBOOT					"vmcfg_vm_fast_reboot"
 #define EVT_PARAM_VM_FAST_REBOOT_USER					"vmcfg_vm_fast_reboot_user"
+#define EVT_PARAM_VMCFG_CPU_FEATURES_MASK				"vmcfg_cpu_features_mask"
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Event parameters for PET_VM_EVT_REQUEST_FILE_OPEN event
