@@ -108,6 +108,7 @@ struct Qcow2: Format
 	                         PRL_UINT64 offSec);
 	virtual Parameters::disk_type getInfo();
 	virtual PRL_RESULT close(void);
+	static bool isValid(const QString &fileName);
 
 private:
 	void closeForce();
