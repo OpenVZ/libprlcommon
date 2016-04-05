@@ -334,4 +334,13 @@ Parameters::disk_type Qcow2::getInfo()
 	return disk;
 }
 
+bool Qcow2::isValid(const QString &fileName)
+{
+	Qcow2 q;
+	if (PRL_FAILED(q.open(fileName, PRL_DISK_FAKE_OPEN)))
+		return false;
+	q.close();
+	return true;
+}
+
 } // namespace VirtualDisk
