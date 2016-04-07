@@ -1984,7 +1984,7 @@ public:
 #define EVT_PARAM_MIGRATE_CMD_TARGET_SERVER_PORT		"migrate_cmd_target_server_port"
 #define EVT_PARAM_MIGRATE_CMD_TARGET_SERVER_SESSION_UUID	"migrate_cmd_target_server_session_uuid"
 #define EVT_PARAM_MIGRATE_CMD_VM_CONFIG				"migrate_cmd_vm_config"
-#define EVT_PARAM_MIGRATE_CMD_VM_RUNTIME_CONFIG				"migrate_cmd_vm_runtime_config"
+#define EVT_PARAM_MIGRATE_CMD_VM_RUNTIME_CONFIG			"migrate_cmd_vm_runtime_config"
 #define EVT_PARAM_MIGRATE_CMD_HOST_HARDWARE_INFO		"migrate_cmd_host_hardware_info"
 #define EVT_PARAM_MIGRATE_CMD_TARGET_VM_NAME			"migrate_cmd_target_vm_name"
 #define EVT_PARAM_MIGRATE_CMD_TARGET_VM_HOME_PATH		"migrate_cmd_target_vm_home_path"
@@ -2001,6 +2001,7 @@ public:
 #define EVT_PARAM_MIGRATE_MEMORY_FILE_PATH			"migrate_memory_file_path"
 #define EVT_PARAM_MIGRATE_CMD_STORAGE_INFO			"migrate_cmd_storage_info"
 #define EVT_PARAM_MIGRATE_CMD_BUNDLE_PERMISSIONS		"migrate_cmd_bundle_permissions"
+#define EVT_PARAM_MIGRATE_CMD_BUNDLE_NAME			"migrate_cmd_bundle_name"
 #define EVT_PARAM_MIGRATE_CMD_CONFIG_PERMISSIONS		"migrate_cmd_config_permissions"
 #define EVT_PARAM_MIGRATE_REQUIRES_DISK_SPACE			"migrate_requires_disk_space"
 
