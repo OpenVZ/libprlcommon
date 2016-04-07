@@ -337,7 +337,7 @@ Parameters::disk_type Qcow2::getInfo()
 bool Qcow2::isValid(const QString &fileName)
 {
 	Qcow2 q;
-	if (PRL_FAILED(q.open(fileName, PRL_DISK_FAKE_OPEN)))
+	if (PRL_FAILED(q.open(fileName, PRL_DISK_READ)))
 		return false;
 	q.close();
 	return true;
