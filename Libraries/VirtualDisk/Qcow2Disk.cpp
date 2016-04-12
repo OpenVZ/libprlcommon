@@ -38,11 +38,14 @@
 
 #include <QStringList>
 #include <QDir>
+#include <boost/property_tree/json_parser.hpp>
 
 #include <prlsdk/PrlErrorsValues.h>
 #include "../Logging/Logging.h"
 #include "../HostUtils/HostUtils.h"
 #include "Util.h"
+
+namespace pt = boost::property_tree;
 
 namespace VirtualDisk
 {
@@ -337,11 +340,37 @@ Parameters::disk_type Qcow2::getInfo()
 
 bool Qcow2::isValid(const QString &fileName)
 {
-	Qcow2 q;
-	if (PRL_FAILED(q.open(fileName, PRL_DISK_READ)))
+	QStringList cmdLine = QStringList()
+		<< QEMU_IMG << "info" << "--output=json" << fileName;
+	QString out;
+	if (!HostUtils::RunCmdLineUtility(
+			cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
+	{
+		WRITE_TRACE(DBG_FATAL, "Cannot get image info");
 		return false;
-	q.close();
-	return true;
+	}
+
+	pt::ptree pt;
+	QByteArray bytes(out.toUtf8());
+	std::istringstream stream(bytes.constData());
+	try
+	{
+		read_json(stream, pt);
+	}
+	catch(const pt::json_parser_error &e)
+	{
+		WRITE_TRACE(DBG_FATAL, "Cannot parse qemu-img info output");
+		return false;
+	}
+
+	boost::optional<std::string> format = pt.get_optional<std::string>("format");
+	if (!format)
+	{
+		WRITE_TRACE(DBG_FATAL, "Cannot get image format");
+		return false;
+	}
+
+	return *format == "qcow2";
 }
 
 } // namespace VirtualDisk
