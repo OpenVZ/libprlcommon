@@ -41,7 +41,8 @@ struct Ploop : Format
 	static QString getDescriptorPath(const QString &fileName);
 
 	virtual PRL_RESULT open(const QString &fileName,
-			const PRL_DISK_OPEN_FLAGS flags);
+			const PRL_DISK_OPEN_FLAGS flags,
+			const policyList_type &policies = policyList_type());
 	virtual PRL_RESULT read(void *data, PRL_UINT32 sizeBytes,
 			PRL_UINT64 offSec);
 	virtual PRL_RESULT write(const void *data, PRL_UINT32 sizeBytes,

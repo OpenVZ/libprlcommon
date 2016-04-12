@@ -172,7 +172,7 @@ qemu_type Qemu::create()
 	return Error::Simple(PRL_ERR_DISK_GENERIC_ERROR);
 }
 
-PRL_RESULT Qemu::setImage(const QString &image, bool readOnly) const
+PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset) const
 {
 	QStringList cmdLine = QStringList()
 		<< QEMU_NBD << "-c" << enquote(getDevice())
@@ -180,6 +180,8 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly) const
 		<< "--cache=none" << "--aio=native" << enquote(image);
 	if (readOnly)
 		cmdLine << "-r";
+	if (offset)
+		cmdLine << "-o" << QString::number(offset);
 
 	QString out;
 	if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
@@ -204,6 +206,61 @@ PRL_RESULT Qemu::disconnect() const
 }
 
 } // namespace Nbd
+
+namespace Command
+{
+
+///////////////////////////////////////////////////////////////////////////////
+// SetImage
+
+struct SetImage
+{
+	SetImage():
+		m_offset(0)
+	{
+	}
+
+	PRL_RESULT operator() (const QSharedPointer<Nbd::Qemu> &dev,
+	                       const QString &image, bool readOnly) const
+	{
+		return dev->setImage(image, readOnly, m_offset);
+	}
+
+	void setOffset(PRL_UINT64 offset)
+	{
+		m_offset = offset;
+	}
+
+private:
+	PRL_UINT64 m_offset;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Visitor
+
+struct Visitor: boost::static_visitor<>
+{
+	template <typename T>
+		void operator() (const T& value)
+	{
+		Q_UNUSED(value);
+	}
+
+	const SetImage& getSetImage() const
+	{
+		return m_setImage;
+	}
+
+private:
+	SetImage m_setImage;
+};
+
+template<> void Visitor::operator() (const Policy::Offset &offset)
+{
+	m_setImage.setOffset(offset.getData());
+}
+
+} // namespace Command
 
 ///////////////////////////////////////////////////////////////////////////////
 // Qcow2
@@ -232,7 +289,8 @@ PRL_RESULT Qcow2::create(const QString &fileName, const Parameters::Disk &params
 	return PRL_ERR_SUCCESS;
 }
 
-PRL_RESULT Qcow2::open(const QString &fileName, PRL_DISK_OPEN_FLAGS flags)
+PRL_RESULT Qcow2::open(const QString &fileName, PRL_DISK_OPEN_FLAGS flags,
+                       const policyList_type &policies)
 {
 	if (m_device)
 	{
@@ -251,9 +309,13 @@ PRL_RESULT Qcow2::open(const QString &fileName, PRL_DISK_OPEN_FLAGS flags)
 		return device.error().code();
 
 	QSharedPointer<Nbd::Qemu> dev = device.value();
-	PRL_RESULT res = dev->setImage(fileName, !(flags & PRL_DISK_WRITE));
+
+	Command::Visitor v;
+	std::for_each(policies.begin(), policies.end(), boost::apply_visitor(v));
+	PRL_RESULT res = v.getSetImage()(dev, fileName, !(flags & PRL_DISK_WRITE));
 	if (PRL_FAILED(res))
 		return res;
+
 	m_device = dev;
 
 	if (PRL_FAILED(res = m_file.open(m_device->getDevice(), openFlags.value())))

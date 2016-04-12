@@ -72,7 +72,8 @@ struct Qemu
 	}
 
 	PRL_RESULT setDevice(const QString &device);
-	PRL_RESULT setImage(const QString &image, bool readOnly) const;
+	PRL_RESULT setImage(const QString &image, bool readOnly,
+	                    PRL_UINT64 offset = 0) const;
 
 	PRL_RESULT disconnect() const;
 
@@ -101,7 +102,8 @@ struct Qcow2: Format
 	                         const Parameters::Disk &params);
 
 	virtual PRL_RESULT open(const QString &fileName,
-	                        const PRL_DISK_OPEN_FLAGS flags);
+	                        const PRL_DISK_OPEN_FLAGS flags,
+	                        const policyList_type &policies = policyList_type());
 	virtual PRL_RESULT read(void *data, PRL_UINT32 sizeBytes,
 	                        PRL_UINT64 offSec);
 	virtual PRL_RESULT write(const void *data, PRL_UINT32 sizeBytes,

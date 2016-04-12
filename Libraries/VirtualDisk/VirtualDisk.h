@@ -27,6 +27,7 @@
 #include <QString>
 #include <prlsdk/PrlDisk.h>
 #include <boost/noncopyable.hpp>
+#include <boost/variant.hpp>
 
 #include <prlxmlmodel/VmConfig/CVmEvent.h>
 #include "../PrlCommonUtilsBase/SysError.h"
@@ -209,6 +210,36 @@ typedef Prl::Expected<Disk, Error::Simple> disk_type;
 
 } // namespace Parameters
 
+namespace Policy
+{
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Offset
+
+struct Offset
+{
+	explicit Offset(PRL_UINT64 data):
+		m_data(data)
+	{
+	}
+
+	PRL_UINT64 getData() const
+	{
+		return m_data;
+	}
+
+private:
+	PRL_UINT64 m_data;
+};
+
+} // namespace Policy
+
+typedef boost::variant<
+	boost::blank,
+	Policy::Offset
+> policy_type;
+typedef std::vector<policy_type> policyList_type;
+
 ///////////////////////////////////////////////////////////////////////////////
 // struct Format
 
@@ -216,7 +247,8 @@ struct Format : boost::noncopyable
 {
 	virtual ~Format() {};
 	virtual PRL_RESULT open(const QString &fileName,
-			const PRL_DISK_OPEN_FLAGS flags) = 0;
+			const PRL_DISK_OPEN_FLAGS flags,
+			const policyList_type &policies = policyList_type()) = 0;
 	virtual PRL_RESULT read(void *data, PRL_UINT32 sizeBytes,
 			PRL_UINT64 offSec) = 0;
 	virtual PRL_RESULT write(const void *data, PRL_UINT32 sizeBytes,
