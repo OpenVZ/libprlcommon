@@ -61,7 +61,7 @@ void ParallelsDirTest::testGetDispatcherConfigDir()
 		break;
 	case osWinVista: expectedPath="C:/ProgramData/Parallels";
 		break;
-	case osLinux: expectedPath="/etc/parallels";
+	case osLinux: expectedPath="/etc/vz";
 		break;
 	case osMac: expectedPath="/Library/Preferences/Parallels";
 		break;
@@ -84,7 +84,7 @@ void ParallelsDirTest::testGetCallerUserPreferencesDir()
 		break;
 	case osWinVista: expectedPath=expectedPath + "/AppData/Roaming/Parallels";
 		break;
-	case osLinux: expectedPath=expectedPath + "/.parallels";
+	case osLinux: expectedPath=expectedPath + "/.vz";
 		break;
 	default:
 		QFAIL ("Someshit happend.");
