@@ -66,7 +66,7 @@ bool ParallelsDirs::ms_bAppModeInited =  false;
 
 namespace
 {
-	const char g_strParallelsDirName[] = "parallels";
+	const char g_strParallelsDirName[] = "vz";
 }
 
 ParallelsDirs::UserInfo::UserInfo()
@@ -123,7 +123,7 @@ QString ParallelsDirs::getConfigScriptsDir()
 
 QString ParallelsDirs::getDispatcherConfigDir()
 {
-	//Lin: /etc/parallels
+	//Lin: /etc/vz
 
 	QString path;
 
@@ -242,7 +242,7 @@ QString ParallelsDirs::getNetworkConfigFilePath()
 
 QString ParallelsDirs::getCallerUserPreferencesDir()
 {
-//Lin: $HOME/.parallels
+//Lin: $HOME/.vz
 
 	QString path;
 	do
