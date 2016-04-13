@@ -839,11 +839,9 @@ void Logger::ResetLogFile( Logger::LOG_RESET_REASON reason /* = LRR_RESTART */ )
 } while (0)
 
 	FPUTS(fd, "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n");
-	FPUTS(fd, "* Parallels Virtualization System Log File\n");
+	FPUTS(fd, "* Virtualization System Log File\n");
 	FPUTS(fd, "*\n");
 	FPRINTF(fd, "* Product information %s\n", VER_SHORTPRODUCTNAME_STR);
-	FPRINTF(fd, "* Build information %s %s\n",
-			VER_PRODUCTVERSION_STR, VER_SPECIAL_BUILD_STR);
 	FPUTS(fd, "*\n");
 
 	GetDateTimeString(buf);
