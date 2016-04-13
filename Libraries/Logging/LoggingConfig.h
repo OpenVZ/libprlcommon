@@ -104,8 +104,7 @@
 /**
  * Default log file names.
  */
-#define PRL_LOG_FILE_NAME_PAX		"parallels-pax.log"
-#define PRL_LOG_FILE_NAME_DEFAULT	"parallels.log"
+#define PRL_LOG_FILE_NAME_DEFAULT	"prl.log"
 
 
 #endif // __LOGGING_CONFIG_H__
