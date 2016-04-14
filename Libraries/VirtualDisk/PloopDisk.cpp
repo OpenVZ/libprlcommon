@@ -114,8 +114,11 @@ QString Ploop::getDescriptorPath(const QString &fileName)
 }
 
 PRL_RESULT Ploop::open(const QString &fileName,
-		const PRL_DISK_OPEN_FLAGS flags)
+		const PRL_DISK_OPEN_FLAGS flags,
+		const policyList_type &policies)
 {
+	Q_UNUSED(policies);
+
 	char dev[PATH_MAX];
 	PRL_RESULT rc;
 
