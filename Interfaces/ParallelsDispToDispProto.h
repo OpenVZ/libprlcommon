@@ -67,7 +67,12 @@ enum IDispToDispCommands
 	VmMigrateFinishCmd		= PVE::DispToDispRangeStart + 507,
 	VmMigrateDiskBlockCmd		= PVE::DispToDispRangeStart + 508,
 	VmMigrateVideoMemViewCmd	= PVE::DispToDispRangeStart + 509,
-	VmMigrateTunnelChunk		= PVE::DispToDispRangeStart + 510,
+
+	VmMigrateFreeGuestCmd		= PVE::DispToDispRangeStart + 510,
+	VmMigrateFillDiskMapCmd		= PVE::DispToDispRangeStart + 511,
+	VmMigrateMakeDiskMapCmd		= PVE::DispToDispRangeStart + 512,
+
+	VmMigrateTunnelChunk		= PVE::DispToDispRangeStart + 513,
 	VmMigrateRangeEnd		= PVE::DispToDispRangeStart + 599,
 
 	/* Backup proto commands */
