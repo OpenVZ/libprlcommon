@@ -32,6 +32,7 @@
 #define __VIRTUAL_DISK_QCOW2__
 
 #include <QSharedPointer>
+#include <QProcess>
 
 #include "VirtualDisk.h"
 #include "Util.h"
@@ -73,9 +74,9 @@ struct Qemu
 
 	PRL_RESULT setDevice(const QString &device);
 	PRL_RESULT setImage(const QString &image, bool readOnly,
-	                    PRL_UINT64 offset = 0) const;
+	                    PRL_UINT64 offset = 0);
 
-	PRL_RESULT disconnect() const;
+	PRL_RESULT disconnect();
 
 	const QString& getDevice() const
 	{
@@ -84,6 +85,7 @@ struct Qemu
 
 private:
 	QString m_device;
+	QProcess m_process;
 };
 
 } // namespace Nbd
