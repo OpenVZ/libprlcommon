@@ -53,7 +53,7 @@ namespace
 {
 
 enum {SECTOR_SIZE = 512};
-enum {CMD_WORK_TIMEOUT = 60 * 60 * 1000};
+enum {CMD_WORK_TIMEOUT = 60 * 60 * 1000, CMD_FAIL_TIMEOUT = 1000};
 
 const char MODPROBE[] = "/usr/sbin/modprobe";
 const char QEMU_NBD[] = "/usr/bin/qemu-nbd";
@@ -172,10 +172,10 @@ qemu_type Qemu::create()
 	return Error::Simple(PRL_ERR_DISK_GENERIC_ERROR);
 }
 
-PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset) const
+PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset)
 {
 	QStringList cmdLine = QStringList()
-		<< QEMU_NBD << "-c" << enquote(getDevice())
+		<< QEMU_NBD << "-v" << "-c" << enquote(getDevice())
 		<< "-f" << "qcow2"
 		<< "--cache=none" << "--aio=native" << enquote(image);
 	if (readOnly)
@@ -183,8 +183,10 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset
 	if (offset)
 		cmdLine << "-o" << QString::number(offset);
 
-	QString out;
-	if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
+	m_process.start(cmdLine.join(" "));
+	// If something is wrong with image,
+	// qemu-nbd will return an error immediately.
+	if (m_process.waitForFinished(CMD_FAIL_TIMEOUT))
 	{
 		WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd");
 		return PRL_ERR_DISK_FILE_OPEN_ERROR;
@@ -193,7 +195,7 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset
 	return PRL_ERR_SUCCESS;
 }
 
-PRL_RESULT Qemu::disconnect() const
+PRL_RESULT Qemu::disconnect()
 {
 	QStringList cmdLine = QStringList() << QEMU_NBD << "-d" << enquote(getDevice());
 	QString out;
@@ -202,6 +204,8 @@ PRL_RESULT Qemu::disconnect() const
 		WRITE_TRACE(DBG_FATAL, "Cannot disconnect device using qemu-nbd");
 		return PRL_ERR_DISK_GENERIC_ERROR;
 	}
+	// Wait infinitely to catch disconnect errors.
+	m_process.waitForFinished(-1);
 	return PRL_ERR_SUCCESS;
 }
 
