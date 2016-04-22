@@ -75,6 +75,13 @@ const unsigned int MAX_NCPU = 4096;
  */
 int parseCpuMask(const QString &sMask, unsigned int nMaxCpu = 0,
 			char *bitMask = NULL, unsigned int nLen = 0);
+
+/**
+ * parse node mask in the string representation (0,3-7) to the bit one.
+ *
+ */
+int parseNodeMask(const QString &sMask, char *bitMask = NULL, unsigned int nLen = 0);
+
 /**
 * @return true if vmName represents a valid name for vm and false otherwise
 */

@@ -191,6 +191,11 @@ int parseCpuMask(const QString &sMask, unsigned int nMaxCpu, char *bitMask, unsi
 	return 0;
 }
 
+int parseNodeMask(const QString &sMask, char *bitMask, unsigned int nLen)
+{
+	return parseCpuMask(sMask, 0, bitMask, nLen);
+}
+
 bool isValidVmName( const QString& vmName )
 {
 	QByteArray invalidSymbols( "/\\:*?\"<>|" );
