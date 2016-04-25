@@ -376,6 +376,7 @@ unsigned int osInfo_getMinRecommendedOsMemorySize(unsigned int nOsVersion)
 	case PVS_GUEST_VER_SOL_11:
 	case PVS_GUEST_VER_LIN_REDHAT_7:
 	case PVS_GUEST_VER_LIN_CENTOS_7:
+	case PVS_GUEST_VER_LIN_VZLINUX_7:
 		return 512;
 
 	case PVS_GUEST_VER_WIN_XP:
