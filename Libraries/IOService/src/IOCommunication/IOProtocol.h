@@ -143,6 +143,7 @@ namespace IOService {
             PTClient             = 7,
             ProxyManager         = 8,
             IOCtClient           = 9,
+            VmConverter          = 10,
 
             // Type bound
             EndTypeBound
