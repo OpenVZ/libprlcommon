@@ -38,7 +38,7 @@
 #include "Libraries/HostUtils/PCSUtils.h"
 #include "Libraries/Logging/Logging.h"
 
-#define LIBPCS_CLIENT	"libpcs_client.so"
+#define LIBPCS_CLIENT	"libpcs_client.so.1"
 
 static pcs_api_t pcs_api;
 static int api_valid = 0;
