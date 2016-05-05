@@ -176,7 +176,7 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset
 {
 	QStringList cmdLine = QStringList()
 		<< QEMU_NBD << "-v" << "-c" << enquote(getDevice())
-		<< "-f" << "qcow2"
+		<< "-f" << "qcow2" << "--detect-zeroes=on"
 		<< "--cache=none" << "--aio=native" << enquote(image);
 	if (readOnly)
 		cmdLine << "-r";
