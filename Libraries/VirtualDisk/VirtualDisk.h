@@ -29,7 +29,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/variant.hpp>
 
-#include <prlxmlmodel/VmConfig/CVmEvent.h>
+#include <prlxmlmodel/Messaging/CVmEvent.h>
 #include "../PrlCommonUtilsBase/SysError.h"
 #include "../PrlCommonUtilsBase/ErrorSimple.h"
 
