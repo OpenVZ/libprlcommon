@@ -266,10 +266,58 @@ template<> void Visitor::operator() (const Policy::Offset &offset)
 
 } // namespace Command
 
+namespace Policy
+{
+namespace Qcow2
+{
+
+///////////////////////////////////////////////////////////////////////////////
+// Visitor
+
+struct Visitor: boost::static_visitor<>
+{
+	explicit Visitor(const QString &fileName);
+
+	template <typename T>
+		void operator() (const T &value)
+	{
+		Q_UNUSED(value);
+	}
+
+	const QStringList& getCommandLine() const
+	{
+		return m_cmdLine;
+	}
+
+private:
+	QStringList m_cmdLine;
+};
+
+Visitor::Visitor(const QString &fileName)
+{
+	m_cmdLine << QEMU_IMG << "create"
+	          << "-f" << "qcow2"
+	          << "-o" << "lazy_refcounts=on"
+	          << enquote(fileName);
+}
+
+template<> void Visitor::operator() (const size_type &value)
+{
+	m_cmdLine << "-o" << QString("size=%1").arg(value);
+}
+
+template<> void Visitor::operator() (const base_type &value)
+{
+	m_cmdLine << "-o" << QString("backing_file=%1").arg(enquote(value));
+}
+
+} // namespace Qcow2
+} // namespace Policy
+
 ///////////////////////////////////////////////////////////////////////////////
 // Qcow2
 
-PRL_RESULT Qcow2::create(const QString &fileName, const Parameters::Disk &params)
+PRL_RESULT Qcow2::create(const QString &fileName, const qcow2PolicyList_type &policies)
 {
 	QFileInfo info(fileName);
 	if (info.exists() || !info.dir().mkpath("."))
@@ -278,9 +326,9 @@ PRL_RESULT Qcow2::create(const QString &fileName, const Parameters::Disk &params
 		return PRL_ERR_DISK_FILE_EXISTS;
 	}
 
-	QStringList cmdLine = QStringList()
-		<< QEMU_IMG << "create" << "-f" << "qcow2" << "-o" << "lazy_refcounts=on"
-		<< enquote(fileName) << QString::number(params.getSizeInSectors() * SECTOR_SIZE);
+	Policy::Qcow2::Visitor v(fileName);
+	std::for_each(policies.begin(), policies.end(), boost::apply_visitor(v));
+	QStringList cmdLine = v.getCommandLine();
 
 	QString out;
 	if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
