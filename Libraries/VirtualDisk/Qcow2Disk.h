@@ -90,6 +90,24 @@ private:
 
 } // namespace Nbd
 
+namespace Policy
+{
+namespace Qcow2
+{
+
+typedef QString base_type;
+typedef PRL_UINT64 size_type;
+
+} // namespace Qcow2
+} // namespace Policy
+
+typedef boost::variant<
+	boost::blank,
+	Policy::Qcow2::base_type,
+	Policy::Qcow2::size_type
+> qcow2Policy_type;
+typedef std::vector<qcow2Policy_type> qcow2PolicyList_type;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Qcow2
 
@@ -101,7 +119,7 @@ struct Qcow2: Format
 	}
 
 	static PRL_RESULT create(const QString &fileName,
-	                         const Parameters::Disk &params);
+	                         const qcow2PolicyList_type &policies = qcow2PolicyList_type());
 
 	virtual PRL_RESULT open(const QString &fileName,
 	                        const PRL_DISK_OPEN_FLAGS flags,
