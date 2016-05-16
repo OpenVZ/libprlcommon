@@ -102,7 +102,6 @@ typedef PRL_UINT64 size_type;
 } // namespace Policy
 
 typedef boost::variant<
-	boost::blank,
 	Policy::Qcow2::base_type,
 	Policy::Qcow2::size_type
 > qcow2Policy_type;
@@ -119,7 +118,7 @@ struct Qcow2: Format
 	}
 
 	static PRL_RESULT create(const QString &fileName,
-	                         const qcow2PolicyList_type &policies = qcow2PolicyList_type());
+	                         const qcow2PolicyList_type &policies);
 
 	virtual PRL_RESULT open(const QString &fileName,
 	                        const PRL_DISK_OPEN_FLAGS flags,
