@@ -326,6 +326,9 @@ PRL_RESULT Qcow2::create(const QString &fileName, const qcow2PolicyList_type &po
 		return PRL_ERR_DISK_FILE_EXISTS;
 	}
 
+	if (policies.empty())
+		return PRL_ERR_INVALID_ARG;
+
 	Policy::Qcow2::Visitor v(fileName);
 	std::for_each(policies.begin(), policies.end(), boost::apply_visitor(v));
 	QStringList cmdLine = v.getCommandLine();
