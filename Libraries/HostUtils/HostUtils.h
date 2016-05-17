@@ -68,6 +68,8 @@
 #include <QMap>
 #include <QProcess>
 
+#include <boost/optional/optional.hpp>
+
 // Fat file size limit in GB
 #define FS_FAT_FILE_SIZE_LIMIT_GB 	(2)
 // Fat file size limit in bytes
@@ -181,6 +183,13 @@ struct ExecHandlerBase
 		return *m_process;
 	}
 
+	const QByteArray &getStderr() const
+	{
+		if (!m_stderr)
+			m_stderr = m_process->readAllStandardError();
+		return m_stderr.get();
+	}
+
 protected:
 
 	void logExitCode() const
@@ -188,7 +197,7 @@ protected:
 		WRITE_TRACE(m_loglevel, "Program '%s' returned exit code: '%d' !",
 						QSTR2UTF8(m_cmd), m_process->exitCode());
 
-		QByteArray a = m_process->readAllStandardError();
+		const QByteArray a = getStderr();
 		if (!a.isEmpty())
 			WRITE_TRACE(m_loglevel, "Program '%s' returned with error: '%s' !",
 							QSTR2UTF8(m_cmd), a.constData());
@@ -197,7 +206,7 @@ protected:
 	QProcess *m_process;
 	QString m_cmd;
 	int m_loglevel;
-
+	mutable boost::optional<QByteArray> m_stderr;
 };
 
 struct DefaultExecHandler : public ExecHandlerBase
