@@ -33,6 +33,7 @@
 
 #include <QSharedPointer>
 #include <QProcess>
+#include <boost/serialization/strong_typedef.hpp>
 
 #include "VirtualDisk.h"
 #include "Util.h"
@@ -74,7 +75,7 @@ struct Qemu
 
 	PRL_RESULT setDevice(const QString &device);
 	PRL_RESULT setImage(const QString &image, bool readOnly,
-	                    PRL_UINT64 offset = 0);
+	                    const QStringList &args = QStringList());
 
 	PRL_RESULT disconnect();
 
@@ -97,13 +98,19 @@ namespace Qcow2
 
 typedef QString base_type;
 typedef PRL_UINT64 size_type;
+BOOST_STRONG_TYPEDEF(QString, unix_type)
+BOOST_STRONG_TYPEDEF(PRL_UINT16, port_type)
+BOOST_STRONG_TYPEDEF(bool, autoDevice_type)
 
 } // namespace Qcow2
 } // namespace Policy
 
 typedef boost::variant<
 	Policy::Qcow2::base_type,
-	Policy::Qcow2::size_type
+	Policy::Qcow2::size_type,
+	Policy::Qcow2::unix_type,
+	Policy::Qcow2::port_type,
+	Policy::Qcow2::autoDevice_type
 > qcow2Policy_type;
 typedef std::vector<qcow2Policy_type> qcow2PolicyList_type;
 
@@ -123,6 +130,11 @@ struct Qcow2: Format
 	virtual PRL_RESULT open(const QString &fileName,
 	                        const PRL_DISK_OPEN_FLAGS flags,
 	                        const policyList_type &policies = policyList_type());
+	PRL_RESULT open(const QString &filename,
+					const PRL_DISK_OPEN_FLAGS flags,
+					const qcow2PolicyList_type &qcow2,
+					const policyList_type &policies = policyList_type());
+
 	virtual PRL_RESULT read(void *data, PRL_UINT32 sizeBytes,
 	                        PRL_UINT64 offSec);
 	virtual PRL_RESULT write(const void *data, PRL_UINT32 sizeBytes,

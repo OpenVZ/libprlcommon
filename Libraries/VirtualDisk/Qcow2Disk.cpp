@@ -172,16 +172,23 @@ qemu_type Qemu::create()
 	return Error::Simple(PRL_ERR_DISK_GENERIC_ERROR);
 }
 
-PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset)
+PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
+                          const QStringList &args)
 {
 	QStringList cmdLine = QStringList()
-		<< QEMU_NBD << "-v" << "-c" << enquote(getDevice())
+		<< QEMU_NBD << "-v"
 		<< "-f" << "qcow2" << "--detect-zeroes=on"
 		<< "--cache=none" << "--aio=native" << enquote(image);
 	if (readOnly)
 		cmdLine << "-r";
-	if (offset)
-		cmdLine << "-o" << QString::number(offset);
+	if (!getDevice().isEmpty())
+		cmdLine << "-c" << enquote(getDevice());
+	else
+	{
+		// forbid server to stop after first connection
+		cmdLine << "--persistent";
+	}
+	cmdLine << args;
 
 	m_process.start(cmdLine.join(" "));
 	// If something is wrong with image,
@@ -197,12 +204,17 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset
 
 PRL_RESULT Qemu::disconnect()
 {
-	QStringList cmdLine = QStringList() << QEMU_NBD << "-d" << enquote(getDevice());
-	QString out;
-	if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
+	if (getDevice().isEmpty())
+		m_process.terminate();
+	else
 	{
-		WRITE_TRACE(DBG_FATAL, "Cannot disconnect device using qemu-nbd");
-		return PRL_ERR_DISK_GENERIC_ERROR;
+		QStringList cmdLine = QStringList() << QEMU_NBD << "-d" << enquote(getDevice());
+		QString out;
+		if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
+		{
+			WRITE_TRACE(DBG_FATAL, "Cannot disconnect device using qemu-nbd");
+			return PRL_ERR_DISK_GENERIC_ERROR;
+		}
 	}
 	// Wait infinitely to catch disconnect errors.
 	m_process.waitForFinished(-1);
@@ -220,14 +232,20 @@ namespace Command
 struct SetImage
 {
 	SetImage():
-		m_offset(0)
+		m_offset(0), m_device(QSharedPointer<Nbd::Qemu>(new Nbd::Qemu))
 	{
 	}
 
-	PRL_RESULT operator() (const QSharedPointer<Nbd::Qemu> &dev,
-	                       const QString &image, bool readOnly) const
+	PRL_RESULT operator() (const QString &image, bool readOnly)
 	{
-		return dev->setImage(image, readOnly, m_offset);
+		if (m_device.isFailed())
+			return m_device.error().code();
+		return m_device.value()->setImage(image, readOnly, buildArgs());
+	}
+
+	const QSharedPointer<Nbd::Qemu>& getDevice() const
+	{
+		return m_device.value();
 	}
 
 	void setOffset(PRL_UINT64 offset)
@@ -235,14 +253,42 @@ struct SetImage
 		m_offset = offset;
 	}
 
+	void setUnix(const QString &u)
+	{
+		if (!u.isEmpty())
+			m_args = QStringList() << "-k" << enquote(u);
+	}
+
+	void setPort(PRL_UINT16 port)
+	{
+		if (port)
+			m_args = QStringList() << "-p" << QString::number(port);
+	}
+
+	void setAutoDevice(bool autoDevice)
+	{
+		m_device = autoDevice ? Nbd::Qemu::create() : QSharedPointer<Nbd::Qemu>(new Nbd::Qemu);
+	}
+
 private:
+	QStringList buildArgs() const
+	{
+		QStringList a(m_args);
+		if (m_offset)
+			a << "-o" << QString::number(m_offset);
+		return a;
+	}
+
 	PRL_UINT64 m_offset;
+
+	QStringList m_args;
+	Nbd::qemu_type m_device;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Visitor
+// Open
 
-struct Visitor: boost::static_visitor<>
+struct Open: boost::static_visitor<>
 {
 	template <typename T>
 		void operator() (const T& value)
@@ -250,7 +296,7 @@ struct Visitor: boost::static_visitor<>
 		Q_UNUSED(value);
 	}
 
-	const SetImage& getSetImage() const
+	SetImage& getSetImage()
 	{
 		return m_setImage;
 	}
@@ -259,24 +305,32 @@ private:
 	SetImage m_setImage;
 };
 
-template<> void Visitor::operator() (const Policy::Offset &offset)
+template<> void Open::operator() (const Policy::Offset &offset)
 {
 	m_setImage.setOffset(offset.getData());
 }
 
-} // namespace Command
+template<> void Open::operator() (const Policy::Qcow2::unix_type &u)
+{
+	m_setImage.setUnix(u);
+}
 
-namespace Policy
+template<> void Open::operator() (const Policy::Qcow2::port_type &port)
 {
-namespace Qcow2
+	m_setImage.setPort(port);
+}
+
+template<> void Open::operator() (const Policy::Qcow2::autoDevice_type &dev)
 {
+	m_setImage.setAutoDevice(dev);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Visitor
+// Create
 
-struct Visitor: boost::static_visitor<>
+struct Create: boost::static_visitor<>
 {
-	explicit Visitor(const QString &fileName);
+	explicit Create(const QString &fileName);
 
 	template <typename T>
 		void operator() (const T &value)
@@ -293,7 +347,7 @@ private:
 	QStringList m_cmdLine;
 };
 
-Visitor::Visitor(const QString &fileName)
+Create::Create(const QString &fileName)
 {
 	m_cmdLine << QEMU_IMG << "create"
 	          << "-f" << "qcow2"
@@ -301,18 +355,17 @@ Visitor::Visitor(const QString &fileName)
 	          << enquote(fileName);
 }
 
-template<> void Visitor::operator() (const size_type &value)
+template<> void Create::operator() (const Policy::Qcow2::size_type &value)
 {
 	m_cmdLine << "-o" << QString("size=%1").arg(value);
 }
 
-template<> void Visitor::operator() (const base_type &value)
+template<> void Create::operator() (const Policy::Qcow2::base_type &value)
 {
 	m_cmdLine << "-o" << QString("backing_file=%1").arg(enquote(value));
 }
 
-} // namespace Qcow2
-} // namespace Policy
+} // namespace Command
 
 ///////////////////////////////////////////////////////////////////////////////
 // Qcow2
@@ -329,7 +382,7 @@ PRL_RESULT Qcow2::create(const QString &fileName, const qcow2PolicyList_type &po
 	if (policies.empty())
 		return PRL_ERR_INVALID_ARG;
 
-	Policy::Qcow2::Visitor v(fileName);
+	Command::Create v(fileName);
 	std::for_each(policies.begin(), policies.end(), boost::apply_visitor(v));
 	QStringList cmdLine = v.getCommandLine();
 
@@ -347,6 +400,14 @@ PRL_RESULT Qcow2::create(const QString &fileName, const qcow2PolicyList_type &po
 PRL_RESULT Qcow2::open(const QString &fileName, PRL_DISK_OPEN_FLAGS flags,
                        const policyList_type &policies)
 {
+	return open(fileName, flags, qcow2PolicyList_type(
+				1, Policy::Qcow2::autoDevice_type(true)), policies);
+}
+
+PRL_RESULT Qcow2::open(const QString &fileName, PRL_DISK_OPEN_FLAGS flags,
+                       const qcow2PolicyList_type &qcow2,
+                       const policyList_type &policies)
+{
 	if (m_device)
 	{
 		WRITE_TRACE(DBG_FATAL, "Disk is already opened");
@@ -359,21 +420,17 @@ PRL_RESULT Qcow2::open(const QString &fileName, PRL_DISK_OPEN_FLAGS flags,
 
 	// TODO: Lock disk.
 
-	Nbd::qemu_type device = Nbd::Qemu::create();
-	if (device.isFailed())
-		return device.error().code();
-
-	QSharedPointer<Nbd::Qemu> dev = device.value();
-
-	Command::Visitor v;
+	Command::Open v;
 	std::for_each(policies.begin(), policies.end(), boost::apply_visitor(v));
-	PRL_RESULT res = v.getSetImage()(dev, fileName, !(flags & PRL_DISK_WRITE));
+	std::for_each(qcow2.begin(), qcow2.end(), boost::apply_visitor(v));
+	PRL_RESULT res = v.getSetImage()(fileName, !(flags & PRL_DISK_WRITE));
 	if (PRL_FAILED(res))
 		return res;
 
-	m_device = dev;
+	m_device = v.getSetImage().getDevice();
 
-	if (PRL_FAILED(res = m_file.open(m_device->getDevice(), openFlags.value())))
+	if (!m_device->getDevice().isEmpty() &&
+		PRL_FAILED(res = m_file.open(m_device->getDevice(), openFlags.value())))
 	{
 		closeForce();
 		return res;
