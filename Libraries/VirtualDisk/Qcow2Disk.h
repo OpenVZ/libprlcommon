@@ -74,7 +74,7 @@ struct Qemu
 
 	PRL_RESULT setDevice(const QString &device);
 	PRL_RESULT setImage(const QString &image, bool readOnly,
-	                    PRL_UINT64 offset = 0);
+	                    const QStringList &args = QStringList());
 
 	PRL_RESULT disconnect();
 

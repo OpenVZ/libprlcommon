@@ -172,7 +172,8 @@ qemu_type Qemu::create()
 	return Error::Simple(PRL_ERR_DISK_GENERIC_ERROR);
 }
 
-PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset)
+PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
+                          const QStringList &args)
 {
 	QStringList cmdLine = QStringList()
 		<< QEMU_NBD << "-v" << "-c" << enquote(getDevice())
@@ -180,8 +181,7 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly, PRL_UINT64 offset
 		<< "--cache=none" << "--aio=native" << enquote(image);
 	if (readOnly)
 		cmdLine << "-r";
-	if (offset)
-		cmdLine << "-o" << QString::number(offset);
+	cmdLine << args;
 
 	m_process.start(cmdLine.join(" "));
 	// If something is wrong with image,
@@ -227,7 +227,7 @@ struct SetImage
 	PRL_RESULT operator() (const QSharedPointer<Nbd::Qemu> &dev,
 	                       const QString &image, bool readOnly) const
 	{
-		return dev->setImage(image, readOnly, m_offset);
+		return dev->setImage(image, readOnly, buildArgs());
 	}
 
 	void setOffset(PRL_UINT64 offset)
@@ -236,13 +236,21 @@ struct SetImage
 	}
 
 private:
+	QStringList buildArgs() const
+	{
+		QStringList a;
+		if (m_offset)
+			a << "-o" << QString::number(m_offset);
+		return a;
+	}
+
 	PRL_UINT64 m_offset;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Visitor
+// Open
 
-struct Visitor: boost::static_visitor<>
+struct Open: boost::static_visitor<>
 {
 	template <typename T>
 		void operator() (const T& value)
@@ -259,24 +267,21 @@ private:
 	SetImage m_setImage;
 };
 
-template<> void Visitor::operator() (const Policy::Offset &offset)
+template<> void Open::operator() (const Policy::Offset &offset)
 {
 	m_setImage.setOffset(offset.getData());
 }
 
-} // namespace Command
 
-namespace Policy
 {
-namespace Qcow2
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-// Visitor
+// Create
 
-struct Visitor: boost::static_visitor<>
+struct Create: boost::static_visitor<>
 {
-	explicit Visitor(const QString &fileName);
+	explicit Create(const QString &fileName);
 
 	template <typename T>
 		void operator() (const T &value)
@@ -293,7 +298,7 @@ private:
 	QStringList m_cmdLine;
 };
 
-Visitor::Visitor(const QString &fileName)
+Create::Create(const QString &fileName)
 {
 	m_cmdLine << QEMU_IMG << "create"
 	          << "-f" << "qcow2"
@@ -301,18 +306,17 @@ Visitor::Visitor(const QString &fileName)
 	          << enquote(fileName);
 }
 
-template<> void Visitor::operator() (const size_type &value)
+template<> void Create::operator() (const Policy::Qcow2::size_type &value)
 {
 	m_cmdLine << "-o" << QString("size=%1").arg(value);
 }
 
-template<> void Visitor::operator() (const base_type &value)
+template<> void Create::operator() (const Policy::Qcow2::base_type &value)
 {
 	m_cmdLine << "-o" << QString("backing_file=%1").arg(enquote(value));
 }
 
-} // namespace Qcow2
-} // namespace Policy
+} // namespace Command
 
 ///////////////////////////////////////////////////////////////////////////////
 // Qcow2
@@ -329,7 +333,7 @@ PRL_RESULT Qcow2::create(const QString &fileName, const qcow2PolicyList_type &po
 	if (policies.empty())
 		return PRL_ERR_INVALID_ARG;
 
-	Policy::Qcow2::Visitor v(fileName);
+	Command::Create v(fileName);
 	std::for_each(policies.begin(), policies.end(), boost::apply_visitor(v));
 	QStringList cmdLine = v.getCommandLine();
 
@@ -365,7 +369,7 @@ PRL_RESULT Qcow2::open(const QString &fileName, PRL_DISK_OPEN_FLAGS flags,
 
 	QSharedPointer<Nbd::Qemu> dev = device.value();
 
-	Command::Visitor v;
+	Command::Open v;
 	std::for_each(policies.begin(), policies.end(), boost::apply_visitor(v));
 	PRL_RESULT res = v.getSetImage()(dev, fileName, !(flags & PRL_DISK_WRITE));
 	if (PRL_FAILED(res))
