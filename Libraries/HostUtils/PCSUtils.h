@@ -33,7 +33,7 @@
 typedef int pcs_api_iorequest_t;
 #define PCS_MAX_SYMLINK_SIZE 256
 
-#define PCS_URI "pstorage://"
+#define PCS_URI "vstorage://"
 
 typedef struct s_pcs_api {
 
