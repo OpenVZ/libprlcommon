@@ -192,6 +192,8 @@ void InitializeDispatcherCommandsMaps()
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdGetCPUPoolsList] = PJOC_SRV_CPU_POOLS_LIST_POOLS;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdMoveToCPUPool] = PJOC_SRV_CPU_POOLS_MOVE;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdRecalculateCPUPool] = PJOC_SRV_CPU_POOLS_RECALCULATE;
+	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdJoinCPUPool] = PJOC_SRV_CPU_POOLS_JOIN;
+	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdLeaveCPUPool] = PJOC_SRV_CPU_POOLS_LEAVE;
 
 	DispatcherCmdsToJobTypesMapType::const_iterator _it = DispatcherCommandsToJobTypesMap()->begin();
 	for(; _it != DispatcherCommandsToJobTypesMap()->end(); ++_it)

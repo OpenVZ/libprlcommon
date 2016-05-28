@@ -267,6 +267,8 @@ const char* PVE::DispatcherCommandToString( unsigned int cmd )
 		CASE_DISPATCHER_COMMAND( DspCmdGetCPUPoolsList )
 		CASE_DISPATCHER_COMMAND( DspCmdMoveToCPUPool )
 		CASE_DISPATCHER_COMMAND( DspCmdRecalculateCPUPool )
+		CASE_DISPATCHER_COMMAND( DspCmdJoinCPUPool )
+		CASE_DISPATCHER_COMMAND( DspCmdLeaveCPUPool )
 	}
 	return "Unknown";
 }
