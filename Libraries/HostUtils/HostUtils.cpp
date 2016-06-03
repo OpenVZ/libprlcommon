@@ -970,10 +970,24 @@ PRL_RESULT HostUtils::CopyAccessRights(const QString& oldFile, const QString& ne
 	return PRL_ERR_SUCCESS;
 }
 
+RunCmdResult HostUtils::RunCmdLineUtilityEx(const QStringList& cmdline, QProcess &process, int timeout,
+		void (*afterStartCallback)(QProcess*))
+{
+	QStringList args = cmdline;
+	QString bin = args.takeFirst();
+	process.start(bin, args);
+	return waitProcessResult(process, timeout, afterStartCallback);
+}
+
 RunCmdResult HostUtils::RunCmdLineUtilityEx(const QString &cmdline, QProcess &process, int timeout,
 		void (*afterStartCallback)(QProcess*))
 {
 	process.start(cmdline);
+	return waitProcessResult(process, timeout, afterStartCallback);
+}
+
+RunCmdResult HostUtils::waitProcessResult(QProcess &process, int timeout, void (*afterStartCallback)(QProcess*))
+{
 	if (!process.waitForStarted())
 		return RunCmdResult(QProcess::FailedToStart);
 
@@ -995,7 +1009,6 @@ RunCmdResult HostUtils::RunCmdLineUtilityEx(const QString &cmdline, QProcess &pr
 	return RunCmdResult(process.exitCode());
 }
 
-
 bool HostUtils::RunCmdLineUtility(const QString& qsCmdLine,
 								  QString& qsOutput,
 								  int nFinishTimeout,
@@ -1009,6 +1022,24 @@ bool HostUtils::RunCmdLineUtility(const QString& qsCmdLine,
 
 	DefaultExecHandler handler(*pProcess, qsCmdLine);
 	bool success = HostUtils::RunCmdLineUtilityEx(qsCmdLine, *pProcess, nFinishTimeout,
+			pfnAfterStartCallback)(handler).isSuccess();
+	qsOutput = UTF8_2QSTR(pProcess->readAllStandardOutput());
+	return success;
+}
+
+bool HostUtils::RunCmdLineUtility(const QStringList& argv,
+								  QString& qsOutput,
+								  int nFinishTimeout,
+								  QProcess* pProcess,
+								  void (*pfnAfterStartCallback)(QProcess* ))
+{
+	QProcess local;
+
+	if (pProcess == NULL)
+		pProcess = &local;
+
+	DefaultExecHandler handler(*pProcess, argv.join(" "));
+	bool success = HostUtils::RunCmdLineUtilityEx(argv, *pProcess, nFinishTimeout,
 			pfnAfterStartCallback)(handler).isSuccess();
 	qsOutput = UTF8_2QSTR(pProcess->readAllStandardOutput());
 	return success;

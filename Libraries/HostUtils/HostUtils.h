@@ -401,6 +401,9 @@ public:
 	static PRL_RESULT GetAtaDriveRate(const QString& devName, unsigned  int& rate);
 	static PRL_RESULT GetAtaDriveRate(Qt::HANDLE devHandle, unsigned  int& rate);
 
+	static RunCmdResult RunCmdLineUtilityEx(const QStringList& cmdline,  QProcess &process, int timeout = 0,
+			void (*afterStartCallback)(QProcess*) = 0);
+
 	static RunCmdResult RunCmdLineUtilityEx(const QString &cmdline, QProcess &process, int timeout = 0,
 			void (*afterStartCallback)(QProcess*) = 0);
 
@@ -420,6 +423,13 @@ public:
 								  QProcess* pProcess = 0,
 								  void (*pfnAfterStartCAllback)(QProcess* ) = 0);
 
+	static bool RunCmdLineUtility(const QStringList& qsCmdLine,
+								  QString& qsOutput,
+								  int nFinishTimeout = 0,	// in miliseconds
+								  QProcess* pProcess = 0,
+								  void (*pfnAfterStartCAllback)(QProcess* ) = 0);
+
+
 	static bool isFastRebootNodeAllowed();
 
 	static bool MountPram(bool init, const QString& point, bool bCustomMount = false);
@@ -438,6 +448,7 @@ private:
 	static UINT GetHostCPUMhz();
 	static UINT GetCPUMhzByTscOne();
 	static UINT GetCPUMhzByTsc();
+	static RunCmdResult waitProcessResult(QProcess &process, int timeout, void (*afterStartCallback)(QProcess*));
 };
 
 #endif
