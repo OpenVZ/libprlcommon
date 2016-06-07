@@ -1912,6 +1912,7 @@ public:
 #define EVT_PARAM_BACKUP_CMD_HDD_LIST			"backup_cmd_hdd_list"
 #define EVT_PARAM_BACKUP_CMD_INTERNAL_FLAGS		"backup_cmd_internal_flags"
 #define EVT_PARAM_BACKUP_CMD_BUNDLE_PERMISSIONS		"backup_cmd_backup_bundle_permissions"
+#define EVT_PARAM_BACKUP_CMD_BITMAPS			"backup_cmd_backup_bitmaps"
 
 ////////////////////////////////////////////////////////////////////////////////
 #define EVT_PARAM_SERIAL_NUM_CMD_USER_NAME			"serial_num_cmd_user_name"
