@@ -1502,12 +1502,12 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
         pAddr->sun_family = AF_UNIX;
 
         QByteArray path = host.toUtf8();
-        if( path.size() > PATH_MAX - 1 )
+        if(static_cast<size_t>(path.size()) > sizeof(pAddr->sun_path) - 1)
         {
             WRITE_TRACE(DBG_FATAL, IO_LOG("Too large unix socket path."));
             goto cleanup;
         }
-        ::strncpy(pAddr->sun_path, path.constData(), PATH_MAX - 1);
+        ::strncpy(pAddr->sun_path, path.constData(), sizeof(pAddr->sun_path) - 1);
     }
 #endif
 
