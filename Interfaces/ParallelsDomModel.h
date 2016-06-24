@@ -2092,16 +2092,6 @@ public:
 #define EVT_PARAM_CONVERT_VM_SEARCH_PATH			"convert_vm_search_path"
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Event parameters for PRL_QUESTION_ASK_ENCRYPTED_VM_PASSWORD_ON_REGISTRATION event
-//        Used to send password
-////////////////////////////////////////////////////////////////////////////////
-#define EVT_PARAM_VM_PASSWORD			"encrypted_vm_password"
-
-//  Event parameter event to send hashed password to vm
-#define EVT_PARAM_VM_PASSWORD_HASH					"encrypted_vm_password_hash"
-#define EVT_PARAM_VM_TEST_PLUGINS_DIR_PATH			"encrypted_vm_test_plugins_path"
-
-////////////////////////////////////////////////////////////////////////////////
 //  Event parameters for PET_DSP_EVT_VM_PIS_NOTIFICATION_ASK_TO_INSTALL event
 //        Used to select type of Antivirus
 ////////////////////////////////////////////////////////////////////////////////
