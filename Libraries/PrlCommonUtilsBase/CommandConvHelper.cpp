@@ -127,7 +127,6 @@ void InitializeDispatcherCommandsMaps()
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmSectionValidateConfig] = PJOC_VM_VALIDATE_CONFIG;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmDevConnect] = PJOC_VM_DEV_CONNECT;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmDevDisconnect] = PJOC_VM_DEV_DISCONNECT;
-	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmDevHdCheckPassword] = PJOC_VM_DEV_HD_CHECK_PASSWORD;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdDirCreateImage] = PJOC_VM_DEV_CREATE_IMAGE;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdDirCopyImage] = PJOC_VM_DEV_COPY_IMAGE;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmResizeDisk] = PJOC_VM_RESIZE_DISK_IMAGE;
@@ -158,10 +157,6 @@ void InitializeDispatcherCommandsMaps()
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmChangeSid] = PJOC_VM_CHANGE_SID;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmResetUptime] = PJOC_VM_RESET_UPTIME;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdInstallAppliance] = PJOC_SRV_INSTALL_APPLIANCE;
-	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmAuthorise] = PJOC_VM_AUTHORISE;
-	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmChangePassword] = PJOC_VM_CHANGE_PASSWORD;
-	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmEncrypt] = PJOC_VM_ENCRYPT;
-	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmDecrypt] = PJOC_VM_DECRYPT;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUpdateNetworkClassesConfig] = PJOC_SRV_UPDATE_NETWORK_CLASSES_CONFIG;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdGetNetworkClassesConfig] = PJOC_SRV_GET_NETWORK_CLASSES_LIST;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUpdateNetworkShapingConfig] = PJOC_SRV_UPDATE_NETWORK_SHAPING_CONFIG;
