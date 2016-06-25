@@ -416,17 +416,6 @@ bool ParallelsDirs::isDevelopersBuild()
 	return s_bDevelopersBuild;
 }
 
-bool ParallelsDirs::isServerModePSBM()
-{
-	if (getAppExecuteMode() == PAM_SERVER)
-	{
-		struct stat st;
-		if (!stat("/proc/fairsched2", &st))
-			return true;
-	}
-	return false;
-}
-
 QString ParallelsDirs::getSystemTempDir()
 {
 	return "/tmp";

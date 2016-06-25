@@ -171,9 +171,6 @@ public:
 	// Get path to dispatcher local UNIX socket
 	static QString getDispatcherLocalSocketPath();
 
-	// Returns true if build is run in PSBM environment.
-	static bool isServerModePSBM();
-
 	// returns Vm memory file location (directory)
 	static QString getVmMemoryFileLocation(
 		const QString &sVmUuid,
