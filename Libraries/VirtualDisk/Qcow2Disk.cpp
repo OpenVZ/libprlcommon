@@ -232,7 +232,8 @@ namespace Command
 struct SetImage
 {
 	SetImage():
-		m_offset(0), m_device(QSharedPointer<Nbd::Qemu>(new Nbd::Qemu))
+		m_offset(0), m_compressed(false),
+		m_device(QSharedPointer<Nbd::Qemu>(new Nbd::Qemu))
 	{
 	}
 
@@ -270,16 +271,24 @@ struct SetImage
 		m_device = autoDevice ? Nbd::Qemu::create() : QSharedPointer<Nbd::Qemu>(new Nbd::Qemu);
 	}
 
+	void setCompressed(bool compressed)
+	{
+		m_compressed = compressed;
+	}
+
 private:
 	QStringList buildArgs() const
 	{
 		QStringList a(m_args);
 		if (m_offset)
 			a << "-o" << QString::number(m_offset);
+		if (m_compressed)
+			a << "-C";
 		return a;
 	}
 
 	PRL_UINT64 m_offset;
+	bool m_compressed;
 
 	QStringList m_args;
 	Nbd::qemu_type m_device;
@@ -323,6 +332,11 @@ template<> void Open::operator() (const Policy::Qcow2::port_type &port)
 template<> void Open::operator() (const Policy::Qcow2::autoDevice_type &dev)
 {
 	m_setImage.setAutoDevice(dev);
+}
+
+template<> void Open::operator() (const Policy::Qcow2::compressed_type &c)
+{
+	m_setImage.setCompressed(c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

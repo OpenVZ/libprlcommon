@@ -101,6 +101,7 @@ typedef PRL_UINT64 size_type;
 BOOST_STRONG_TYPEDEF(QString, unix_type)
 BOOST_STRONG_TYPEDEF(PRL_UINT16, port_type)
 BOOST_STRONG_TYPEDEF(bool, autoDevice_type)
+BOOST_STRONG_TYPEDEF(bool, compressed_type)
 
 } // namespace Qcow2
 } // namespace Policy
@@ -110,7 +111,8 @@ typedef boost::variant<
 	Policy::Qcow2::size_type,
 	Policy::Qcow2::unix_type,
 	Policy::Qcow2::port_type,
-	Policy::Qcow2::autoDevice_type
+	Policy::Qcow2::autoDevice_type,
+	Policy::Qcow2::compressed_type
 > qcow2Policy_type;
 typedef std::vector<qcow2Policy_type> qcow2PolicyList_type;
 
