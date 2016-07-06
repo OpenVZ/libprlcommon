@@ -110,23 +110,20 @@ PRL_RESULT CSimpleFileHelper::GetDirSizePrivate( const QString& strDirPath, quin
 	QListIterator< QFileInfo > it( fiList );
 	while( it.hasNext() )
 	{
-		const QFileInfo& fi = it.next();
+		const QFileInfo& x = it.next();
+		// #125021 to prevent infinity recursion by QT bug in QDir::entryInfoList()
+		if (fi == x)
+			continue;
+
 		PRL_RESULT ret = PRL_ERR_SUCCESS;
-
-		if ( fi.isDir() )
-		{
-			// #125021 to prevent infinity recursion by QT bug in QDir::entryInfoList()
-			if( QFileInfo(strDirPath) == fi )
-				continue;
-
-			ret = GetDirSizePrivate( fi.filePath(), pSize );
-		}
+		if (x.isDir())
+			ret = GetDirSizePrivate(x.filePath(), pSize);
 		else
-			*pSize += fi.size();
+			*pSize += x.size();
 
 		if ( ! PRL_SUCCEEDED( ret ) )
 		{
-			WRITE_TRACE(DBG_FATAL, "GetDirSize() failed in dir [%s]", QSTR2UTF8( fi.filePath() ) );
+			WRITE_TRACE(DBG_FATAL, "GetDirSize() failed in dir [%s]", QSTR2UTF8(x.filePath()));
 			return ret;
 		}
 	}//while
