@@ -29,6 +29,9 @@
 #include "Libraries/Logging/Logging.h"
 #include "Libraries/Std/Etrace.h"
 #include <limits>
+#ifndef _WIN_
+#include <poll.h>
+#endif // _WIN_
 
 using namespace IOService;
 
@@ -441,29 +444,6 @@ bool IOService::getPeerInfo ( int sock,
                             hostNameStr, portNumber, errStr );
 }
 
-#ifndef _WIN_ //Unix
-
-SmartPtr<fd_set> IOService::allocFDSet ( int fdNum )
-{
-    fd_set* ptr = reinterpret_cast<fd_set*>(::malloc(FDNUM2SZ(fdNum)));
-    return SmartPtr<fd_set>(ptr, free);
-}
-
-int IOService::getMaxFDNumber ()
-{
-    int fdNum = FD_SETSIZE;
-    rlimit limit;
-    if ( ::getrlimit(RLIMIT_NOFILE, &limit) == 0 ) {
-        fdNum = limit.rlim_max;
-        if ( (quint32)fdNum < FD_SETSIZE )
-            fdNum = FD_SETSIZE;
-        else if ( (quint32)fdNum > MAX_FDNUM )
-            fdNum = MAX_FDNUM;
-    }
-    return fdNum;
-}
-#endif
-
 QList<addrinfo*> IOService::orderAddrInfo ( addrinfo* addrInfo,
                                             OrderPreference orderPref )
 {
@@ -512,11 +492,7 @@ SocketWriteThread::SocketWriteThread (
     m_peerProtoVersion(IOService::IOProtocolVersion),
 #ifdef _WIN_ // Windows
     m_writeEventHandle(WSA_INVALID_EVENT),
-#else // Unix
-    m_maxFDNum(IOService::getMaxFDNumber()),
-    m_rdSet(IOService::allocFDSet(m_maxFDNum)),
-    m_wrSet(IOService::allocFDSet(m_maxFDNum)),
-#endif
+#endif // Unix
     m_threadState(ThreadIsStopped),
     m_stopReason(IOSendJob::ConnClosedByUser),
     m_sockHandle(-1),
@@ -964,24 +940,14 @@ IOSendJob::Result SocketWriteThread::write (
         IOService::timeMark(startMark);
 
     do {
-        // Create params for select
-        int maxfd = (sock > rdEventPipe ? sock : rdEventPipe) + 1;
-        if ( maxfd > m_maxFDNum ) {
-            WRITE_TRACE(DBG_FATAL,
-                        IO_LOG("Out of resources! Descriptor "
-                               "'%d' exceeds max possible '%d'."),
-                        maxfd, m_maxFDNum);
-            return IOSendJob::Fail;
-        }
+        pollfd p[2];
+        p[0].fd = sock;
+        p[0].events = POLLOUT;
+        p[1].fd = rdEventPipe;
+        p[1].events = POLLIN;
 
-        // We can't use FD_ZERO here, because
-        // of not original fd_set size
-        ::memset(m_wrSet.getImpl(), 0, FDNUM2SZ(m_maxFDNum));
-        ::memset(m_rdSet.getImpl(), 0, FDNUM2SZ(m_maxFDNum));
-        FD_SET(sock, m_wrSet.getImpl());
-        FD_SET(rdEventPipe, m_rdSet.getImpl());
-        timeval timeout = {0, 0};
-        timeval* timeo = 0;
+        timespec timeout = {0, 0};
+        timespec* timeo = 0;
 
         // Create timeout
         if ( msecsTimeout != 0 ) {
@@ -997,12 +963,12 @@ IOSendJob::Result SocketWriteThread::write (
 
             // Set timeout
             timeout.tv_sec = msecsToWait / 1000;
-            timeout.tv_usec = (msecsToWait % 1000) * 1000;
+            timeout.tv_nsec = (msecsToWait % 1000) * 1000000;
             timeo = &timeout;
         }
 
         // Do select
-        int res = ::select(maxfd, m_rdSet.getImpl(), m_wrSet.getImpl(), 0, timeo);
+        int res = ::ppoll(p, sizeof(p)/sizeof(p[0]), timeo, NULL);
         if ( res == 0 ) {
             WRITE_TRACE(DBG_FATAL, IO_LOG("Wait for write failed: timeout expired!"));
             return IOSendJob::Timeout;
@@ -1018,7 +984,7 @@ IOSendJob::Result SocketWriteThread::write (
         }
 
         // Check stop in progress
-        if ( FD_ISSET(rdEventPipe, m_rdSet.getImpl()) ) {
+        if (p[1].revents & POLLIN) {
             WRITE_TRACE(DBG_INFO, IO_LOG("Stop in progress for write thread"));
             return IOSendJob::ConnClosedByUser;
         }
@@ -1458,13 +1424,7 @@ void SocketWriteThread::doJob ()
                     native_strerror(errBuff, ErrBuffSize) );
         goto cleanup_and_disconnect;
     }
-#else // Unix
-    // Check allocations
-    if ( ! m_rdSet.isValid() || ! m_wrSet.isValid() ) {
-        WRITE_TRACE(DBG_FATAL, IO_LOG("Can't allocate memory!"));
-        goto cleanup_and_disconnect;
-    }
-#endif
+#endif // Unix
 
     // Check job pool
     if ( ! jobPool.isValid() ) {

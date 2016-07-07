@@ -27,6 +27,9 @@
 #include <Libraries/Std/Etrace.h>
 #include "Socket/SocketServer_p.h"
 #include "IOServer.h"
+#ifndef _WIN_
+#include <poll.h>
+#endif // _WIN_
 
 using namespace IOService;
 
@@ -37,13 +40,10 @@ SocketServerPrivate::SocketServerPrivate ( IOServer* imp,
     m_impl(imp),
     m_ctx(ctx),
     m_state(IOSender::Disconnected),
-    m_threadState(ThreadIsStopped),
+    m_threadState(ThreadIsStopped)
 #ifdef _WIN_
-    m_connectEventHandle(WSA_INVALID_EVENT),
+    , m_connectEventHandle(WSA_INVALID_EVENT),
     m_cleanEventHandle(WSA_INVALID_EVENT)
-#else
-    m_maxFDNum(IOService::getMaxFDNumber()),
-    m_rdSet(IOService::allocFDSet(m_maxFDNum))
 #endif
 	, m_localCredentials(credentials),
 	m_useUnixSockets(useUnixSockets)
@@ -1146,38 +1146,28 @@ void SocketServerPrivate::run ()
             // Create params for select
             int stoppingPipe = m_eventPipes[0];
             int cleaningPipe = m_eventPipes[2];
-            int maxpipe = (stoppingPipe > cleaningPipe ?
-                               stoppingPipe : cleaningPipe);
-            int maxsock = -1;
-
-            // Find max sock
-            for ( quint32 i = 0; i < MaxSocks; ++i ) {
-                maxsock = (servHandles[i] > maxsock ? servHandles[i] : maxsock);
-            }
-            // Get max fd
-            int maxfd = (maxsock > maxpipe ? maxsock : maxpipe) + 1;
-            if ( maxfd > m_maxFDNum ) {
-                WRITE_TRACE(DBG_FATAL,
-                            IO_LOG("Out of resources! Descriptor "
-                                   "'%d' exceeds max possible '%d'."),
-                            maxfd, m_maxFDNum);
-                break;
-            }
 
             // We can't use FD_ZERO here, because
             // of not original fd_set size
-            ::memset(m_rdSet.getImpl(), 0, FDNUM2SZ(m_maxFDNum));
-            FD_SET(stoppingPipe, m_rdSet.getImpl());
-            FD_SET(cleaningPipe, m_rdSet.getImpl());
-
+            std::vector<pollfd> p(2);
+            p[0].fd = stoppingPipe;
+            p[0].events = POLLIN;
+            p[1].fd = cleaningPipe;
+            p[1].events = POLLIN;
+            
             // Set handles
             for ( quint32 i = 0; i < MaxSocks; ++i ) {
                 if ( servHandles[i] > 0 )
-                    FD_SET(servHandles[i], m_rdSet.getImpl());
+                {
+                    pollfd x;
+                    x.fd = servHandles[i];
+                    x.events = POLLIN;
+                    p.push_back(x);
+                }
             }
 
             // Do select
-            int res = ::select( maxfd, m_rdSet.getImpl(), 0, 0, 0 );
+            int res = ::poll(&p[0], p.size(), -1);
             if ( res == 0 ) {
                 // Timeout
                 WRITE_TRACE(DBG_FATAL, IO_LOG("Timeout? Try again."));
@@ -1195,13 +1185,13 @@ void SocketServerPrivate::run ()
             }
 
             // Check stop in progress
-            if ( FD_ISSET(stoppingPipe, m_rdSet.getImpl()) ) {
+            if (p[0].revents & POLLIN) {
                 WRITE_TRACE(DBG_INFO, IO_LOG("Stop in progress for server"));
                 break;
             }
 
             // Check clean request
-            if ( FD_ISSET(cleaningPipe, m_rdSet.getImpl()) ) {
+            if (p[1].revents & POLLIN) {
                 char buff[ 64 ];
                 int err = 0;
                 // Read all data
@@ -1227,6 +1217,43 @@ void SocketServerPrivate::run ()
 
             }
 
+            // Check every sock
+            for ( quint32 i = 2; i < p.size(); ++i ) {
+                if (0 == (p[i].revents & POLLIN))
+                    continue;
+
+                // Client addr
+                sockaddr_storage cli;
+                ::memset(&cli, 0, sizeof(cli));
+                socklen_t cliLen = sizeof(cli);
+
+                // Accepting client
+                int handle = ::accept( p[i].fd,
+                                       reinterpret_cast<sockaddr*>(&cli),
+                                       &cliLen );
+
+                if ( handle < 0 && errno == EINTR ) {
+                    LOG_MESSAGE(DBG_INFO,
+                                IO_LOG("Accept has been interrupted by EINTR"));
+                    continue;
+                }
+                else if ( handle < 0 ) {
+                    WRITE_TRACE(DBG_FATAL,
+                                IO_LOG("Accept error (native error: %s)"),
+                                native_strerror(errBuff, ErrBuffSize));
+                    continue;
+                }
+
+                ETRACE_LOG(p[i].fd & 0xFF, ETRACE_CP_IOSERVICE,
+                    ((quint64)handle << 32) |
+                    (((quint16)m_impl->senderType() & 0xF) << 6) |
+                    (ETRACE_IOS_EVENT_SRV_ACCEPT & 0x3F));
+
+                // Create, append and start client
+                createAndStartNewSockClient(
+                                        handle,
+                                        IOCommunication::DetachedClient() );
+            }
 
 #else // Windows
 
@@ -1298,22 +1325,14 @@ void SocketServerPrivate::run ()
                             native_strerror(errBuff, ErrBuffSize));
                 continue;
             }
-#endif
-
             // Check every sock
             for ( quint32 i = 0; i < MaxSocks; ++i ) {
                 // If not valid
                 if ( servHandles[i] == -1 )
                     continue;
-#ifndef _WIN_ // Unix
-                // Check if sock is active
-                else if ( ! FD_ISSET(servHandles[i], m_rdSet.getImpl()) )
-                    continue;
-#else // Windows
                 // Check if event is signaled
                 else if ( iEvent != i )
                     continue;
-#endif
 
                 // Client addr
                 sockaddr_storage cli;
@@ -1325,15 +1344,6 @@ void SocketServerPrivate::run ()
                                        reinterpret_cast<sockaddr*>(&cli),
                                        &cliLen );
 
-#ifndef _WIN_ // Unix
-
-                if ( handle < 0 && errno == EINTR ) {
-                    LOG_MESSAGE(DBG_INFO,
-                                IO_LOG("Accept has been interrupted by EINTR"));
-                    continue;
-                }
-                else
-#endif
                 if ( handle < 0 ) {
                     WRITE_TRACE(DBG_FATAL,
                                 IO_LOG("Accept error (native error: %s)"),
@@ -1341,16 +1351,18 @@ void SocketServerPrivate::run ()
                     continue;
                 }
 
-				ETRACE_LOG(servHandles[i] & 0xFF, ETRACE_CP_IOSERVICE,
-					((quint64)handle << 32) |
-					(((quint16)m_impl->senderType() & 0xF) << 6) |
-					(ETRACE_IOS_EVENT_SRV_ACCEPT & 0x3F));
+                ETRACE_LOG(servHandles[i] & 0xFF, ETRACE_CP_IOSERVICE,
+                    ((quint64)handle << 32) |
+                    (((quint16)m_impl->senderType() & 0xF) << 6) |
+                    (ETRACE_IOS_EVENT_SRV_ACCEPT & 0x3F));
 
                 // Create, append and start client
                 createAndStartNewSockClient(
                                         handle,
                                         IOCommunication::DetachedClient() );
             }
+#endif
+
         }
         // Attaching server
         else if ( m_ctx == Srv_AttachingContext ) {

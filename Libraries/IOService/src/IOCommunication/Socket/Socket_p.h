@@ -168,18 +168,7 @@ bool getHostInfo ( int sockfd, QString& hostName,
 bool getPeerInfo ( int sockfd, QString& hostName,
                    quint16& portNumber, QString& err );
 
-#ifndef _WIN_ //Unix
-
-#define MAX_FDNUM 65536
-#define FDNUM2SZ(fdNum) ( ((fdNum) + 7) / 8 )
-
-/** Returns max FD size according to RLIMIT_NOFILE resource */
-int getMaxFDNumber ();
-
-/** Returns allocated fd_set according fd num */
-SmartPtr<fd_set> allocFDSet ( int fdNum );
-
-#else //Windows
+#ifdef _WIN_ //Windows
 
 class WSAInitHelper
 {
@@ -359,9 +348,6 @@ private:
     WSAEVENT m_writeEventHandle;
 #else
     int m_eventPipes[2];
-    int m_maxFDNum;
-    SmartPtr<fd_set> m_rdSet;
-    SmartPtr<fd_set> m_wrSet;
 #endif
     volatile ThreadState m_threadState;
     IOSendJob::Result m_stopReason;
