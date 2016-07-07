@@ -137,8 +137,6 @@ private:
     WSAEVENT m_cleanEventHandle;
 #else
     int m_eventPipes[4];
-    int m_maxFDNum;
-    SmartPtr<fd_set> m_rdSet;
 #endif
     QHash<SocketClientPrivate*, SmartPtr<SocketClientPrivate> > m_preAppendClients;
     QHash<IOSender::Handle, SmartPtr<SocketClientPrivate> > m_sockClients;

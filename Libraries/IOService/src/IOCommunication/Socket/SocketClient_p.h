@@ -210,9 +210,6 @@ private:
     WSAOVERLAPPED m_overlappedRead;
 #else
     int m_eventPipes[2];
-    int m_maxFDNum;
-    SmartPtr<fd_set> m_rdSet;
-    SmartPtr<fd_set> m_wrSet;
 #endif
 
     // Server context

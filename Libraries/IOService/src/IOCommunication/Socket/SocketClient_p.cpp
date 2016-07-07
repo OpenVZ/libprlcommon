@@ -29,6 +29,9 @@
 #include "IOSSLInterface.h"
 #include <Libraries/OpenSSL/OpenSSL.h>
 #include <Libraries/Std/Etrace.h>
+#ifndef _WIN_
+#include <poll.h>
+#endif // _WIN_
 
 using namespace IOService;
 
@@ -151,11 +154,7 @@ SocketClientPrivate::SocketClientPrivate (
     m_writeThread(jobManager, senderType, ctx, m_stat, this),
 #ifdef _WIN_ // Windows
     m_readEventHandle(WSA_INVALID_EVENT),
-#else // Unix
-    m_maxFDNum(IOService::getMaxFDNumber()),
-    m_rdSet(IOService::allocFDSet(m_maxFDNum)),
-    m_wrSet(IOService::allocFDSet(m_maxFDNum)),
-#endif
+#endif // Windows
     // SSL members
     m_ssl(0),
     m_sslBio(0),
@@ -727,24 +726,20 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
         }
         // Create params for select
         int pipe = m_eventPipes[0];
-        int maxfd = (sock > pipe ? sock : pipe) + 1;
-        if ( maxfd > m_maxFDNum ) {
-            WRITE_TRACE(DBG_FATAL, IO_LOG("Out of resources! Descriptor "
-                                          "'%d' exceeds max possible '%d'."),
-                        maxfd, m_maxFDNum);
-            return false;
-        }
         // We can't use FD_ZERO here, because
         // of not original fd_set size
-        ::memset(m_rdSet.getImpl(), 0, FDNUM2SZ(m_maxFDNum));
-        FD_SET(sock, m_rdSet.getImpl());
+        pollfd p[2];
+        p[0].fd = sock;
+        p[0].events = POLLIN;
+        p[1].fd = pipe;
+        p[1].events = 0;
 
         // Add pipe event
         if ( readMode != IOGracefulShutdownRead )
-            FD_SET(pipe, m_rdSet.getImpl());
+	    p[1].events = POLLIN;
 
-        timeval timeout = {0, 0};
-        timeval* timeo = 0;
+        timespec timeout = {0, 0};
+        timespec* timeo = 0;
 
         // Calc timeout
         if ( msecsTimeout > 0 ) {
@@ -755,18 +750,18 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
 
             // Set timeout
             timeout.tv_sec = msecsToWait / 1000;
-            timeout.tv_usec = (msecsToWait % 1000) * 1000;
+            timeout.tv_nsec = (msecsToWait % 1000) * 1000000;
             timeo = &timeout;
         }
         // Tests read queue state and returns immediately
         else if ( msecsTimeout < 0 ) {
             timeout.tv_sec = 0;
-            timeout.tv_usec = 0;
+            timeout.tv_nsec = 0;
             timeo = &timeout;
         }
 
         // Do select
-        int res = ::select(maxfd, m_rdSet.getImpl(), 0, 0, timeo);
+        int res = ::ppoll(p, sizeof(p)/sizeof(p[0]), timeo, NULL);
         if ( res == 0 ) {
             WRITE_TRACE(DBG_FATAL,
                         IO_LOG("Wait for read failed: timeout expired!"));
@@ -785,8 +780,7 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
         }
 
         // Check stop in progress
-        if ( readMode != IOGracefulShutdownRead &&
-             FD_ISSET(pipe, m_rdSet.getImpl()) ) {
+        if (readMode != IOGracefulShutdownRead && p[1].revents & POLLIN) {
             WRITE_TRACE(DBG_INFO, IO_LOG("Stop in progress for read thread"));
             return false;
         }
@@ -1589,23 +1583,14 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
             do {
                 // Create params for select
                 int pipe = m_eventPipes[0];
-                int maxfd = (sockHandle > pipe ? sockHandle : pipe) + 1;
-                if ( maxfd > m_maxFDNum ) {
-                    WRITE_TRACE(DBG_FATAL,
-                                IO_LOG("Out of resources! Descriptor "
-                                       "'%d' exceeds max possible '%d'."),
-                                maxfd, m_maxFDNum);
-                    goto cleanup;
-                }
+                pollfd p[2];
+                p[0].fd = sockHandle;
+                p[0].events = POLLOUT;
+                p[1].fd = pipe;
+                p[1].events = POLLIN;
 
-                // We can't use FD_ZERO here, because
-                // of not original fd_set size
-                ::memset(m_wrSet.getImpl(), 0, FDNUM2SZ(m_maxFDNum));
-                ::memset(m_rdSet.getImpl(), 0, FDNUM2SZ(m_maxFDNum));
-                FD_SET(sockHandle, m_wrSet.getImpl());
-                FD_SET(pipe, m_rdSet.getImpl());
-                timeval timeout = {0, 0};
-                timeval* timeo = 0;
+                timespec timeout = {0, 0};
+                timespec* timeo = 0;
 
                 // Calc timeout
                 if ( connTimeout != 0 ) {
@@ -1616,13 +1601,12 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
 
                     // Set timeout
                     timeout.tv_sec = msecsToWait / 1000;
-                    timeout.tv_usec = (msecsToWait % 1000) * 1000;
+                    timeout.tv_nsec = (msecsToWait % 1000) * 1000000;
                     timeo = &timeout;
                 }
 
                 // Do select
-                int res = ::select( maxfd, m_rdSet.getImpl(),
-                                    m_wrSet.getImpl(), 0, timeo );
+                int res = ::ppoll(p, sizeof(p)/sizeof(p[0]), timeo, NULL);
                 if ( res == 0 ) {
                     // Timeout
                     WRITE_TRACE(DBG_FATAL, IO_LOG("Connection timeout "
@@ -1645,7 +1629,7 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
                 }
 
                 // Check stop in progress
-                if ( FD_ISSET(pipe, m_rdSet.getImpl()) ) {
+                if (p[1].revents & POLLIN) {
                     WRITE_TRACE(DBG_INFO, IO_LOG("Stop in progress for "
                                                  "connection"));
                     goto cleanup;
@@ -2025,12 +2009,6 @@ void SocketClientPrivate::doJob ()
         goto cleanup_and_disconnect;
     }
 #else
-    // Check allocations
-    if ( ! m_rdSet.isValid() || ! m_wrSet.isValid() ) {
-        WRITE_TRACE(DBG_FATAL, IO_LOG("Can't allocate memory!"));
-        goto cleanup_and_disconnect;
-    }
-
     // Create pipes
     if ( ::pipe(m_eventPipes) < 0 ) {
         WRITE_TRACE(DBG_FATAL,
