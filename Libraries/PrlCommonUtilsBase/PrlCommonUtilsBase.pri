@@ -36,4 +36,4 @@ win32 {
 	# TODO Check if these to libs are needed really
 	LIBS *= -lNetapi32 -lUserenv -lAdvapi32
 }
-
+LIBS += -larchive
