@@ -703,7 +703,8 @@ void SetLogFileName(const char* path, const char *filename)
 
 	fd = d->fd;
 	d->fd = INVALID_FILE_HANDLE;
-	close(fd);
+	if (fd != INVALID_FILE_HANDLE)
+		close(fd);
 }
 
 
