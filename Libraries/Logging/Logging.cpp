@@ -567,7 +567,7 @@ static FILE_HANDLE __log_open(const char *filename)
 static FILE_HANDLE __log_open(const char *filename)
 {
 	int err;
-	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH;
+	mode_t mode = S_IRUSR | S_IWUSR;
 
 	err = open(filename, O_WRONLY | O_APPEND | O_CREAT, mode);
 	if (err < 0)
