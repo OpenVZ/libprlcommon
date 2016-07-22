@@ -149,7 +149,7 @@ static void Sleep(UINT msec)
 #define LOG_OS_NAME		"Windows"
 #elif defined(_LIN_)
 #define LOG_DEFAULT_DIR	"/var/log"
-#define LOG_USER_DIR	"/.parallels"
+#define LOG_USER_DIR	"/.vz"
 #define LOG_OS_NAME		"Linux"
 #else
 #error Unsupported OS
