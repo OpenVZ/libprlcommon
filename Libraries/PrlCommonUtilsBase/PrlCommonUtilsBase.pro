@@ -49,7 +49,8 @@ HEADERS = ParallelsDirs.h \
             countof.h \
             CHardDiskHelper.h \
             CUrlParser.h \
-            netutils.h
+            netutils.h \
+            Archive.h
 
 
 SOURCES = ParallelsDirs.cpp \
@@ -68,7 +69,8 @@ SOURCES = ParallelsDirs.cpp \
             CommandConvHelper.cpp \
             CHardDiskHelper.cpp \
             CUrlParser.cpp \
-            netutils.cpp
+            netutils.cpp \
+            Archive.cpp
 
 SDK_VALUES = \
     $$SDK_HEADERS/prlsdk/PrlErrorsValues.h \
