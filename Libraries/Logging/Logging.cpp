@@ -149,7 +149,7 @@ static void Sleep(UINT msec)
 #define LOG_OS_NAME		"Windows"
 #elif defined(_LIN_)
 #define LOG_DEFAULT_DIR	"/var/log"
-#define LOG_USER_DIR	"/.parallels"
+#define LOG_USER_DIR	"/.vz"
 #define LOG_OS_NAME		"Linux"
 #else
 #error Unsupported OS
@@ -567,7 +567,7 @@ static FILE_HANDLE __log_open(const char *filename)
 static FILE_HANDLE __log_open(const char *filename)
 {
 	int err;
-	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH;
+	mode_t mode = S_IRUSR | S_IWUSR;
 
 	err = open(filename, O_WRONLY | O_APPEND | O_CREAT, mode);
 	if (err < 0)
@@ -703,7 +703,8 @@ void SetLogFileName(const char* path, const char *filename)
 
 	fd = d->fd;
 	d->fd = INVALID_FILE_HANDLE;
-	close(fd);
+	if (fd != INVALID_FILE_HANDLE)
+		close(fd);
 }
 
 
