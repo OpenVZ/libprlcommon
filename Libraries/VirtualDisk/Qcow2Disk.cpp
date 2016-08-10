@@ -441,6 +441,9 @@ PRL_RESULT Qcow2::open(const QString &fileName, PRL_DISK_OPEN_FLAGS flags,
 		return PRL_ERR_DISK_FILE_OPEN_ERROR;
 	}
 
+	if (flags & PRL_DISK_FAKE_OPEN)
+		return isValid(fileName) ? PRL_ERR_SUCCESS : PRL_ERR_DISK_FILE_OPEN_ERROR;
+
 	flags_type openFlags = convertFlags(flags);
 	if (openFlags.isFailed())
 		return openFlags.error().code();
