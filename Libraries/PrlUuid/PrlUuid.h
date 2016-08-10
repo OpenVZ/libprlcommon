@@ -29,9 +29,10 @@
 
 #include <cstring>
 #include <string>
-
+#include <QThreadStorage>
 #include <prlsdk/PrlTypes.h>
 #include "PrlUuidCommon.h"
+#include <boost/uuid/uuid_generators.hpp>
 
 /**
  * Hash a uuid by internal 128 bits.
@@ -90,6 +91,9 @@ public:
 
 protected:
 	Uuid_t m_uuid;
+
+private:
+	static QThreadStorage<boost::uuids::random_generator> s_generator;
 };
 
 

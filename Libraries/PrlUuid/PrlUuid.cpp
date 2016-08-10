@@ -34,6 +34,7 @@
 #else
 #include "libuuid_unix/uuid.h"
 #endif
+#include <boost/uuid/uuid.hpp>
 
 
 /*****************************************************************************
@@ -268,6 +269,7 @@ static inline void helper_uuid_from_str(Uuid_t uid, const char* str)
 }
 
 /*****************************************************************************/
+QThreadStorage<boost::uuids::random_generator> PrlUuid::s_generator;
 
 PrlUuid::PrlUuid()
 {
@@ -349,13 +351,11 @@ void PrlUuid::generate()
 
 void PrlUuid::generate(Uuid_t uuid)
 {
-#ifdef _WIN_
-	BUILD_BUG_ON( sizeof(GUID) != sizeof(Uuid_t) );
+	if (!s_generator.hasLocalData())
+		s_generator.setLocalData(boost::uuids::random_generator());
 
-	CoCreateGuid((GUID*)uuid);
-#else
-	uuid_generate(uuid);
-#endif
+	boost::uuids::uuid u = s_generator.localData()();
+	std::copy(u.begin(), u.end(), uuid);
 }
 
 void PrlUuid::toGuid(PRL_GUID * pGUID ) const
