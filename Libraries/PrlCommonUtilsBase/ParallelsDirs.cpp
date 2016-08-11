@@ -635,7 +635,7 @@ namespace{
 
 QString ParallelsDirs::getCrashDumpsPath()
 {
-	return getSystemTempDir() + "/parallels_crash_dumps";
+	return getSystemTempDir() + "/virtuozzo_crash_dumps";
 }
 
 QString ParallelsDirs::getSystemLogPath()
