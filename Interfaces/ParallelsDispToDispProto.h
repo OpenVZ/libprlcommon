@@ -91,7 +91,8 @@ enum IDispToDispCommands
 	VmBackupCreateLocalCmd		= PVE::DispToDispRangeStart + 608,
 	VmBackupAttachCmd			= PVE::DispToDispRangeStart + 609,
 	VmBackupConnectSourceCmd	= PVE::DispToDispRangeStart + 610,
-	VmBackupRestoreImage		= PVE::DispToDispRangeStart + 611,
+	VmBackupMountImage		= PVE::DispToDispRangeStart + 611,
+	VmBackupRestoreImage		= PVE::DispToDispRangeStart + 612,
 
 	ABackupProxyRangeStart			= PVE::DispToDispRangeStart + 700,
 	ABackupProxyOpenDirOfFileRequest	= ABackupProxyRangeStart + 1,
