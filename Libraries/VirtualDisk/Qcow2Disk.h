@@ -85,6 +85,8 @@ struct Qemu
 	}
 
 private:
+	PRL_RESULT waitDevice();
+
 	QString m_device;
 	QProcess m_process;
 };
