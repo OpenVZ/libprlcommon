@@ -38,6 +38,7 @@
 
 #include <QStringList>
 #include <QDir>
+#include <QElapsedTimer>
 #include <boost/property_tree/json_parser.hpp>
 
 #include <prlsdk/PrlErrorsValues.h>
@@ -53,7 +54,11 @@ namespace
 {
 
 enum {SECTOR_SIZE = 512};
-enum {CMD_WORK_TIMEOUT = 60 * 60 * 1000, CMD_FAIL_TIMEOUT = 1000};
+enum {
+	CMD_WORK_TIMEOUT = 60 * 60 * 1000,
+	CMD_FAIL_TIMEOUT = 500,
+	CMD_WAIT_TIMEOUT = 60000,
+};
 
 const char MODPROBE[] = "/usr/sbin/modprobe";
 const char QEMU_NBD[] = "/usr/bin/qemu-nbd";
@@ -191,15 +196,7 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
 	cmdLine << args;
 
 	m_process.start(cmdLine.join(" "));
-	// If something is wrong with image,
-	// qemu-nbd will return an error immediately.
-	if (m_process.waitForFinished(CMD_FAIL_TIMEOUT))
-	{
-		WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd");
-		return PRL_ERR_DISK_FILE_OPEN_ERROR;
-	}
-
-	return PRL_ERR_SUCCESS;
+	return waitDevice();
 }
 
 PRL_RESULT Qemu::disconnect()
@@ -218,6 +215,41 @@ PRL_RESULT Qemu::disconnect()
 	}
 	// Wait infinitely to catch disconnect errors.
 	m_process.waitForFinished(-1);
+	return PRL_ERR_SUCCESS;
+}
+
+PRL_RESULT Qemu::waitDevice()
+{
+	IO::File f;
+	PRL_RESULT e = f.open(getDevice(), O_RDONLY);
+	if (PRL_FAILED(e))
+		return e;
+
+	QElapsedTimer t;
+	size_t s = 0;
+	for (t.start(); t.elapsed() < CMD_WAIT_TIMEOUT;)
+	{
+		// check whether block device is ready
+		e = f.ioctl(BLKGETSIZE64, &s);
+		if (PRL_FAILED(e))
+			return e;
+		if (s)
+			break;
+		// maybe qemu-nbd already exited?
+		if (m_process.waitForFinished(CMD_FAIL_TIMEOUT))
+		{
+			WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd");
+			return PRL_ERR_DISK_FILE_OPEN_ERROR;
+		}
+	}
+
+	if (s == 0)
+	{
+		WRITE_TRACE(DBG_FATAL, "Timeout elapsed while waiting for "
+			"nbd device to become ready");
+		return PRL_ERR_DISK_FILE_OPEN_ERROR;
+	}
+
 	return PRL_ERR_SUCCESS;
 }
 
