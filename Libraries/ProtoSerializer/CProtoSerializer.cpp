@@ -469,6 +469,7 @@ CProtoCommandPtr CProtoSerializer::ParseCommand(PVE::IDispatcherCommands nCmdIde
 		case PVE::DspCmdCtlLicenseChange:
 		case PVE::DspCmdMoveToCPUPool:
 		case PVE::DspCmdRecalculateCPUPool:
+		case PVE::DspCmdVmCommitEncryption:
 			pCommand = static_cast<CProtoCommand *>(new CProtoCommandWithOneStrParam(nCmdIdentifier));
 		break;
 
