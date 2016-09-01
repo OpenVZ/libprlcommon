@@ -1423,6 +1423,8 @@ public:
 			DspCmdEndVmBackup		= DspClientToDispatcherCommandRangeStart + 182,
 			DspCmdJoinCPUPool	= DspClientToDispatcherCommandRangeStart + 183,
 			DspCmdLeaveCPUPool	= DspClientToDispatcherCommandRangeStart + 184,
+			DspCmdVmCommitEncryption 	= DspClientToDispatcherCommandRangeStart + 185,
+
 			DspClientToDispatcherCommandRangeEnd = 2999,
 
 
