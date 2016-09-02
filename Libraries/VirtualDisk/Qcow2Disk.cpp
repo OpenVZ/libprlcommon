@@ -183,7 +183,7 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
 	QStringList cmdLine = QStringList()
 		<< QEMU_NBD << "-v"
 		<< "-f" << "qcow2" << "--detect-zeroes=on"
-		<< "--aio=native" << enquote(image);
+		<< enquote(image);
 	if (readOnly)
 		cmdLine << "-r";
 	if (!getDevice().isEmpty())
@@ -264,7 +264,7 @@ namespace Command
 struct SetImage
 {
 	SetImage():
-		m_offset(0), m_compressed(false), m_cache("none"),
+		m_offset(0), m_compressed(false), m_cache("none"), m_aio("native"),
 		m_device(QSharedPointer<Nbd::Qemu>(new Nbd::Qemu))
 	{
 	}
@@ -313,6 +313,11 @@ struct SetImage
 		m_cache = cache;
 	}
 
+	void setAio(const QString& aio)
+	{
+		m_aio = aio;
+	}
+
 private:
 	QStringList buildArgs() const
 	{
@@ -322,6 +327,7 @@ private:
 		if (m_compressed)
 			a << "-C";
 		a << QString("--cache=%1").arg(m_cache);
+		a << QString("--aio=%1").arg(m_aio);
 
 		return a;
 	}
@@ -329,6 +335,7 @@ private:
 	PRL_UINT64 m_offset;
 	bool m_compressed;
 	QString m_cache;
+	QString m_aio;
 
 	QStringList m_args;
 	Nbd::qemu_type m_device;
@@ -382,6 +389,7 @@ template<> void Open::operator() (const Policy::Qcow2::compressed_type &c)
 template<> void Open::operator() (const Policy::Qcow2::cached_type &c)
 {
 	m_setImage.setCache(c ? "writeback" : "none");
+	m_setImage.setAio(c ? "threads" : "native");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
