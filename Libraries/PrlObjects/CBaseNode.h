@@ -33,14 +33,14 @@
 #include <QtXml>
 
 #include "Build/Current.ver"
-#include <prlcommon/Interfaces/ParallelsDomModel.h>
-#include <prlcommon/Interfaces/ParallelsQt.h>
-#include <prlcommon/Interfaces/ParallelsNamespace.h>
+#include "../Interfaces/ParallelsDomModel.h"
+#include "../Interfaces/ParallelsQt.h"
+#include "../Interfaces/ParallelsNamespace.h"
 #include <prlsdk/PrlEnums.h>
 #include <prlsdk/PrlErrors.h>
-#include <prlcommon/PrlUuid/Uuid.h>
-#include <prlcommon/PrlDataSerializer/CPrlOpaqueTypeDataSerializer.h>
-#include <prlcommon/PrlDataSerializer/CPrlStringDataSerializer.h>
+#include "../PrlUuid/Uuid.h"
+#include "../PrlDataSerializer/CPrlOpaqueTypeDataSerializer.h"
+#include "../PrlDataSerializer/CPrlStringDataSerializer.h"
 // For compatibility
 	#include <vector>
 //////

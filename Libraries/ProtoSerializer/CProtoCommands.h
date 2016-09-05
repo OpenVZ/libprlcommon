@@ -30,8 +30,8 @@
 
 #include <QString>
 #include <QStringList>
-#include <prlcommon/Interfaces/ParallelsNamespace.h>
-#include <prlcommon/Std/SmartPtr.h>
+#include <../Interfaces/ParallelsNamespace.h>
+#include <../Std/SmartPtr.h>
 #include <../Messaging/CVmEvent.h>
 #include <../Messaging/CResult.h>
 

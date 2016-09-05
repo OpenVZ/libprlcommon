@@ -27,7 +27,7 @@
 
 #include "CResult.h"
 #include "CVmEvent.h"
-#include <prlcommon/Logging/Logging.h>
+#include "../Logging/Logging.h"
 
 /**
  * @brief Standard class constructor.

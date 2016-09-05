@@ -37,11 +37,11 @@
 #	include <unistd.h>
 #endif
 
-#include <prlcommon/Logging/Logging.h>
-#include <prlcommon/Std/PrlAssert.h>
-#include <prlcommon/HostUtils/HostUtils.h>
-#include <prlcommon/PrlCommonUtilsBase/CSimpleFileHelper.h>
-#include <prlcommon/PrlUuid/Uuid.h>
+#include "../Logging/Logging.h"
+#include "../Std/PrlAssert.h"
+#include "../HostUtils/HostUtils.h"
+#include "../PrlCommonUtilsBase/CSimpleFileHelper.h"
+#include "../PrlUuid/Uuid.h"
 
 
 //////////////

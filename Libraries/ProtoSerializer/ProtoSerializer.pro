@@ -36,6 +36,16 @@ SOURCES += \
 	CProtoSerializer.cpp \
 	CProtoCommands.cpp
 
+iocommunicationLinkTarget.target = ../IOService/IOCommunication/IOProtocol.h
+iocommunicationLinkTarget.depends = FORCE
+iocommunicationLinkTarget.commands = cd ../IOService ; ln -s src/IOCommunication ; cd -
+
+PRE_TARGETDEPS += ../IOService/IOCommunication/IOProtocol.h
+QMAKE_EXTRA_TARGETS += iocommunicationLinkTarget
+
+INCLUDEPATH *= $$PWD $$PWD/../IOService/src
+
 headers.files = $${HEADERS}
 headers.path = $${PREFIX}/include/prlcommon/ProtoSerializer
 INSTALLS += headers
+

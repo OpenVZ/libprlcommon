@@ -26,14 +26,14 @@
 
 
 #include <QTextStream>
-#include <prlcommon/PrlUuid/Uuid.h>
+#include "../PrlUuid/Uuid.h"
 #include "CVmEvent.h"
 #include "CVmEventParameter.h"
 #include "CVmEventParameterList.h"
 #include "CVmBinaryEventParameter.h"
 
-#include <prlcommon/Logging/Logging.h>
-#include <prlcommon/PrlDataSerializer/CPrlStringDataSerializer.h>
+#include "../Logging/Logging.h"
+#include "../PrlDataSerializer/CPrlStringDataSerializer.h"
 
 /**
  * @brief Standard class constructor.

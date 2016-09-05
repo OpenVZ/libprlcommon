@@ -25,6 +25,3 @@
 LIBTARGET = prl_proto_serializer
 PROJ_FILE = $$PWD/ProtoSerializer.pro
 !include(../../Build/qmake/staticlib.pri): error(include error)
-
-INCLUDEPATH *= $$PWD
-
