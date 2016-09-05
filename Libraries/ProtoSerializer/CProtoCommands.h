@@ -30,10 +30,10 @@
 
 #include <QString>
 #include <QStringList>
-#include <../Interfaces/ParallelsNamespace.h>
-#include <../Std/SmartPtr.h>
-#include <../Messaging/CVmEvent.h>
-#include <../Messaging/CResult.h>
+#include "../Interfaces/ParallelsNamespace.h"
+#include "../Std/SmartPtr.h"
+#include "../Messaging/CVmEvent.h"
+#include "../Messaging/CResult.h"
 
 namespace Parallels
 {
