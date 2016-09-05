@@ -30,7 +30,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "AtomicOpsTest.h"
-#include "Tests/CommonTestsUtils.h"
 #include "Libraries/Std/AtomicOps.h"
 
 
