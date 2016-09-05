@@ -26,6 +26,8 @@
 #ifndef __ERROR_SIMPLE_H__
 #define __ERROR_SIMPLE_H__
 
+#include "../Messaging/CVmEvent.h"
+
 namespace Error
 {
 
