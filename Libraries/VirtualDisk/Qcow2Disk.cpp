@@ -196,6 +196,24 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
 	cmdLine << args;
 
 	m_process.start(cmdLine.join(" "));
+	if (!m_process.waitForStarted())
+	{
+		WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd:"
+			"waitForStarted() failed");
+		return PRL_ERR_DISK_FILE_OPEN_ERROR;
+	}
+
+	if (getDevice().isEmpty())
+	{
+		if (m_process.waitForFinished(CMD_FAIL_TIMEOUT))
+		{
+			WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd:"
+				"waitForFinished() failed");
+			return PRL_ERR_DISK_FILE_OPEN_ERROR;
+		}
+		return PRL_ERR_SUCCESS;
+	}
+
 	return waitDevice();
 }
 
