@@ -2363,5 +2363,35 @@ QString CProtoSendProblemReport::GetReportData()
     return GetStringParamValue(EVT_PARAM_SRV_SEND_PROBLEM_REPORT_DATA);
 }
 
+//++++++DspCmdVmCaptureScreen proto command class implementation+++++++++++
+CProtoVmCaptureScreen::CProtoVmCaptureScreen(
+		const QString &vmUuid,
+		const quint32 nWidth,
+		const quint32 nHeight,
+		PRL_UINT32 nFlags
+)
+: CProtoBasicVmCommand(PVE::DspCmdVmCaptureScreen, vmUuid, false, nFlags)
+{
+	SetUnsignedIntParamValue(nWidth, EVT_PARAM_CAPTURE_SCREEN_CMD_WIDTH);
+	SetUnsignedIntParamValue(nHeight, EVT_PARAM_CAPTURE_SCREEN_CMD_HEIGHT);
+}
+
+bool CProtoVmCaptureScreen::IsValid()
+{
+    return CheckWhetherParamPresents(EVT_PARAM_CAPTURE_SCREEN_CMD_WIDTH, PVE::UnsignedInt) &&
+    		CheckWhetherParamPresents(EVT_PARAM_CAPTURE_SCREEN_CMD_HEIGHT, PVE::UnsignedInt) &&
+		CProtoBasicVmCommand::IsValid();
+}
+
+quint32 CProtoVmCaptureScreen::GetWidth()
+{
+    return GetUnsignedIntParamValue(EVT_PARAM_CAPTURE_SCREEN_CMD_WIDTH);
+}
+
+quint32 CProtoVmCaptureScreen::GetHeight()
+{
+    return GetUnsignedIntParamValue(EVT_PARAM_CAPTURE_SCREEN_CMD_HEIGHT);
+}
+
 }//namespace Parallels
 

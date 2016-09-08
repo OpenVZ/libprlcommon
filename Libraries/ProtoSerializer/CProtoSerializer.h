@@ -977,6 +977,20 @@ public:
         const QString &vmUuid,
         PRL_UINT32 nFlags
     );
+
+    /**
+     * Generates protocol DspCmdVmCaptureScreen command
+     * @param VM UUID
+     * @param image width
+     * @param image height
+     * @param flags associated with the command
+     */
+    static CProtoCommandPtr CreateVmCaptureScreenProtoCommand(
+		const QString &vmUuid,
+		const quint32 nWidth,
+		const quint32 nHeight,
+		PRL_UINT32 nFlags
+    );
 };
 
 }//namespace Parallels

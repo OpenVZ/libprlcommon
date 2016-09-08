@@ -1236,6 +1236,7 @@ public:
 			DspCmdVmInternal						= DspClientToVmCommandRangeStart + 57,
 			DspCmdVmConvertDisks					= DspClientToVmCommandRangeStart + 58,
 			DspCmdVmMigrateFinish					= DspClientToVmCommandRangeStart + 59,
+			DspCmdVmCaptureScreen					= DspClientToVmCommandRangeStart + 60,
 
 
    		    DspClientToVmCommandRangeEnd = 1999,

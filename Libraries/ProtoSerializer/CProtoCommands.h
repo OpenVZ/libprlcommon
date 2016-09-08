@@ -2137,6 +2137,37 @@ public:
     QString GetReportData();
 };
 
+/**
+ * Serializer helper class that let to generate and process
+ * CProtoVmCaptureScreen command
+ */
+class CProtoVmCaptureScreen : public CProtoBasicVmCommand
+{
+public:
+	/**
+	 * Class default constructor.
+	 */
+	CProtoVmCaptureScreen()
+		: CProtoBasicVmCommand(PVE::DspCmdVmCaptureScreen)
+	{}
+	/**
+	 * Class constructor.
+	 * @param report's xml data
+	 * @param [optional] vmUuid which report should be attached
+	 * should be supplied if vm report should be also attached to
+	 * the report
+	 * @param flags being associated with the operation
+	 */
+	CProtoVmCaptureScreen(const QString &vmUuid, const quint32 nWidth,
+			const quint32 nHeight, quint32 nFlags);
+
+	/** Overridden method that let to determine whether protocol command valid */
+	bool IsValid();
+
+	quint32 GetWidth();
+	quint32 GetHeight();
+};
+
 
 }//namespace Parallels
 

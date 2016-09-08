@@ -514,9 +514,12 @@ CProtoCommandPtr CProtoSerializer::ParseCommand(PVE::IDispatcherCommands nCmdIde
 		case PVE::DspCmdVmResetUptime:
 			pCommand = static_cast<CProtoCommand *>(new CProtoBasicVmCommand(nCmdIdentifier));
 		break;
-        case PVE::DspCmdSendProblemReport:
-            pCommand = new CProtoSendProblemReport;
-        break;
+		case PVE::DspCmdSendProblemReport:
+			pCommand = new CProtoSendProblemReport;
+		break;
+		case PVE::DspCmdVmCaptureScreen:
+			pCommand = new CProtoVmCaptureScreen;
+		break;
 		case PVE::DspCmdVmStop:
 			pCommand = static_cast<CProtoCommand *>(new CProtoVmCommandStop(nCmdIdentifier));
 		break;
@@ -912,6 +915,13 @@ CProtoCommandPtr CProtoSerializer::CreateSendProblemReportProtoCommand(
 {
     return (CProtoCommandPtr(
         new CProtoSendProblemReport(report, vmUuid, nFlags)));
+}
+
+CProtoCommandPtr CProtoSerializer::CreateVmCaptureScreenProtoCommand(
+	const QString &vmUuid, const quint32 nWidth, const quint32 nHeight,
+	PRL_UINT32 nFlags)
+{
+    return (CProtoCommandPtr(new CProtoVmCaptureScreen(vmUuid, nWidth, nHeight, nFlags)));
 }
 
 }//namespace Parallels
