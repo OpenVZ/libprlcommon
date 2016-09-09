@@ -189,6 +189,7 @@ void InitializeDispatcherCommandsMaps()
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdRecalculateCPUPool] = PJOC_SRV_CPU_POOLS_RECALCULATE;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdJoinCPUPool] = PJOC_SRV_CPU_POOLS_JOIN;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdLeaveCPUPool] = PJOC_SRV_CPU_POOLS_LEAVE;
+	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmCommitEncryption] = PJOC_VM_COMMIT_ENCRYPTION;
 
 	DispatcherCmdsToJobTypesMapType::const_iterator _it = DispatcherCommandsToJobTypesMap()->begin();
 	for(; _it != DispatcherCommandsToJobTypesMap()->end(); ++_it)
