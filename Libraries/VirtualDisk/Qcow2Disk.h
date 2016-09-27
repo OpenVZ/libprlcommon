@@ -54,6 +54,20 @@ private:
 	static PRL_RESULT insertModule();
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// struct Process
+
+struct Process: QProcess
+{
+	void addChannel(int channel_);
+
+protected:
+	void setupChildProcess();
+
+private:
+	QList<int> m_channels;
+};
+
 struct Qemu;
 typedef Prl::Expected<QSharedPointer<Qemu>, Error::Simple> qemu_type;
 
@@ -84,11 +98,16 @@ struct Qemu
 		return m_device;
 	}
 
+	void addFd(quint32 fd_)
+	{
+		m_process.addChannel(fd_);
+	}
+
 private:
 	PRL_RESULT waitDevice();
 
 	QString m_device;
-	QProcess m_process;
+	Process m_process;
 };
 
 } // namespace Nbd
@@ -102,6 +121,7 @@ typedef QString base_type;
 typedef PRL_UINT64 size_type;
 BOOST_STRONG_TYPEDEF(QString, unix_type)
 BOOST_STRONG_TYPEDEF(PRL_UINT16, port_type)
+BOOST_STRONG_TYPEDEF(PRL_INT32, fd_type)
 BOOST_STRONG_TYPEDEF(bool, autoDevice_type)
 BOOST_STRONG_TYPEDEF(bool, compressed_type)
 BOOST_STRONG_TYPEDEF(bool, cached_type)
@@ -114,6 +134,7 @@ typedef boost::variant<
 	Policy::Qcow2::size_type,
 	Policy::Qcow2::unix_type,
 	Policy::Qcow2::port_type,
+	Policy::Qcow2::fd_type,
 	Policy::Qcow2::autoDevice_type,
 	Policy::Qcow2::compressed_type,
 	Policy::Qcow2::cached_type

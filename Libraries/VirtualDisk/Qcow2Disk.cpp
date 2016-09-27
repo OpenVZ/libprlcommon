@@ -141,6 +141,23 @@ QStringList Driver::getDeviceList()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// struct Process
+
+void Process::addChannel(int channel_)
+{
+	m_channels << channel_;
+}
+
+void Process::setupChildProcess()
+{
+	QProcess::setupChildProcess(); // requires vz-built qt version
+	
+	foreach(int fd, m_channels) {
+		fcntl(fd, F_SETFD, ~FD_CLOEXEC);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Qemu
 
 PRL_RESULT Qemu::setDevice(const QString &device)
@@ -316,6 +333,14 @@ struct SetImage
 			m_args = QStringList() << "-p" << QString::number(port);
 	}
 
+	void setFd(PRL_INT32 fd)
+	{
+		if (fd >= 0) {
+			m_args = QStringList() << QString("--server-sock-fd=%1").arg(fd);
+			m_device.value()->addFd(fd);
+		}
+	}
+
 	void setAutoDevice(bool autoDevice)
 	{
 		m_device = autoDevice ? Nbd::Qemu::create() : QSharedPointer<Nbd::Qemu>(new Nbd::Qemu);
@@ -392,6 +417,11 @@ template<> void Open::operator() (const Policy::Qcow2::unix_type &u)
 template<> void Open::operator() (const Policy::Qcow2::port_type &port)
 {
 	m_setImage.setPort(port);
+}
+
+template<> void Open::operator() (const Policy::Qcow2::fd_type &fd)
+{
+	m_setImage.setFd(fd);
 }
 
 template<> void Open::operator() (const Policy::Qcow2::autoDevice_type &dev)
