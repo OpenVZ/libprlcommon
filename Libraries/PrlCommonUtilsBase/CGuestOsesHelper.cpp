@@ -332,6 +332,26 @@ PRL_UINT16 CGuestOsesHelper::GetDefaultOsVersion(PRL_UINT8 nOsType)
 	return (nDefaultOsVersion);
 }
 
+PRL_GUEST_OS_SUPPORT_TYPE CGuestOsesHelper::GetSupportType(PRL_UINT16 nOsVersion)
+{
+	switch( nOsVersion )
+	{
+	case PVS_GUEST_VER_WIN_2008:
+	case PVS_GUEST_VER_WIN_2012:
+	case PVS_GUEST_VER_LIN_CENTOS:
+	case PVS_GUEST_VER_LIN_CENTOS_7:
+	case PVS_GUEST_VER_LIN_VZLINUX:
+	case PVS_GUEST_VER_LIN_VZLINUX_7:
+	case PVS_GUEST_VER_LIN_DEBIAN:
+	case PVS_GUEST_VER_LIN_UBUNTU:
+	case PVS_GUEST_VER_LIN_OPENSUSE:
+	case PVS_GUEST_VER_LIN_FEDORA:
+		return PGS_OS_SUPPORTED;
+	default:
+		return PGS_OS_EXPERIMENTAL;
+	}
+}
+
 bool CGuestOsesHelper::CheckGuestOsType(PRL_UINT8 nOsType)
 {
 	PRL_UINT16 nOsVersion = PRL_UINT16(nOsType)<<8;
@@ -346,6 +366,15 @@ bool CGuestOsesHelper::CheckGuestOsType(PRL_UINT8 nOsType)
 		IS_SOLARIS(nOsVersion)	||
 		IS_OTHER(nOsVersion)
 	);
+}
+
+bool CGuestOsesHelper::CheckGuestOsVersion(PRL_UINT8 nOsType, PRL_UINT16 nOsVersion)
+{
+	if (!CheckGuestOsType(nOsType))
+		return false;
+
+	TOpaqueTypeList<PRL_UINT16> lstVersions = GetSupportedOsesVersions(PHO_UNKNOWN, nOsType);
+	return lstVersions.GetContainer().contains(nOsVersion);
 }
 
 bool CGuestOsesHelper::SupportsEfiBios(PRL_UINT32 uOsVer)
