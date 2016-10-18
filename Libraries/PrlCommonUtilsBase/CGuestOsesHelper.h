@@ -155,9 +155,17 @@ public:
 	 */
 	static PRL_HOST_OS_TYPE GetHostOsType(PRL_HOST_OS_TYPE nPassedOsType);
 	/**
+	 * Return type of support for specified OS version
+	 */
+	static PRL_GUEST_OS_SUPPORT_TYPE GetSupportType(PRL_UINT16 nOsVersion);
+	/**
 	 * Checks whether specified OS type valid
 	 */
 	static bool CheckGuestOsType(PRL_UINT8 nOsType);
+	/**
+	 * Check whether specified OS version valid for specified OS type
+	 */
+	static bool CheckGuestOsVersion(PRL_UINT8 nOsType, PRL_UINT16 nOsVersion);
 	/**
 	 * Checks OS for EFI compatibility
 	 */
