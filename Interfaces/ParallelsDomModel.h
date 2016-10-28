@@ -1791,6 +1791,11 @@ public:
 #define EVT_PARAM_LOGIN_LOCAL_STAGE2_CMD_OPERATION_UUID	"login_local_stage2_cmd_operation_uuid"
 
 ////////////////////////////////////////////////////////////////////////////////
+#define EVT_PARAM_EASY_LOGIN_LOCAL_CMD_OPERATION_UUID		"easy_login_local_cmd_operation_uuid"
+#define EVT_PARAM_EASY_LOGIN_LOCAL_CMD_APPLICATION_MODE		"easy_login_local_cmd_application_mode"
+#define EVT_PARAM_EASY_LOGIN_LOCAL_CMD_SESSION_TO_RESTORE		"easy_login_local_cmd_session_uuid_to_restore"
+
+////////////////////////////////////////////////////////////////////////////////
 #define EVT_PARAM_BASIC_VM_CMD_VM_UUID			"basic_vm_cmd_vm_uuid"
 #define EVT_PARAM_VM_CMD_SECOND_STR_PARAM		"vm_cmd_second_str_param"
 

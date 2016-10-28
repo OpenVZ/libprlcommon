@@ -1425,6 +1425,7 @@ public:
 			DspCmdJoinCPUPool	= DspClientToDispatcherCommandRangeStart + 183,
 			DspCmdLeaveCPUPool	= DspClientToDispatcherCommandRangeStart + 184,
 			DspCmdVmCommitEncryption 	= DspClientToDispatcherCommandRangeStart + 185,
+			DspCmdUserEasyLoginLocal		= DspClientToDispatcherCommandRangeStart + 186,
 
 			DspClientToDispatcherCommandRangeEnd = 2999,
 

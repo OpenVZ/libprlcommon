@@ -268,6 +268,31 @@ public:
 	quint64	GetProcessId();
 };
 
+class CProtoCommandDspCmdUserEasyLoginLocal : public CProtoCommand
+{
+public:
+        /**
+	 * Class default constructor.
+	 */
+	CProtoCommandDspCmdUserEasyLoginLocal()
+	: CProtoCommand(PVE::DspCmdUserEasyLoginLocal)
+	{}
+	/**
+	 * Class constructor.
+	 */
+	CProtoCommandDspCmdUserEasyLoginLocal(
+		PRL_APPLICATION_MODE appMode,
+		const QString& sPrevSessionUuid,
+		quint32 flags
+	);
+	/** Overridden method that let to determine whether protocol command valid */
+	bool IsValid();
+	/** Returns application mode, if none PAM_SERVER will be returned */
+	PRL_APPLICATION_MODE GetApplicationMode();
+	/** Returns uuid of session to restore [ optional ]*/
+	QString GetPrevSessionUuid();
+};
+
 /**
  * Serializer helper class that let to generate and process DspCmdFsGenerateEntryName command
  */
