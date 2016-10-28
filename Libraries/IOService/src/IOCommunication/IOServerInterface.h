@@ -409,6 +409,12 @@ public:
      */
 	virtual void setCredentials(const IOCredentials& credentials) = 0;
 
+	/**
+	 * Set limit of concurrent pending connections for unpriveleged
+	 * user
+	 */
+	virtual void setUserConnectionLimit(unsigned int nLimit) = 0;
+
 protected:
     /** Destructor */
     virtual ~IOServerInterface_ServerSide () {}

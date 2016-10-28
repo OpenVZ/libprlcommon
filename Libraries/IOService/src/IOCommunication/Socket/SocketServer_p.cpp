@@ -47,7 +47,8 @@ SocketServerPrivate::SocketServerPrivate ( IOServer* imp,
     m_cleanEventHandle(WSA_INVALID_EVENT)
 #endif
 	, m_localCredentials(credentials),
-	m_useUnixSockets(useUnixSockets)
+	m_useUnixSockets(useUnixSockets),
+	m_nUserSessionLimit(0)
 {
     INIT_IO_LOG(QString("IO server ctx [accept thr] (sender %1): ").
                 arg(imp->senderType()));
@@ -276,6 +277,13 @@ void SocketServerPrivate::setCredentials (
 	QMutexLocker locker( &m_eventMutex );
 
 	m_localCredentials = credentials;
+}
+
+void SocketServerPrivate::setUserConnectionLimit( unsigned int nLimit )
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	m_nUserSessionLimit = nLimit;
 }
 
 IOCommunication::SocketHandle
@@ -1289,6 +1297,13 @@ void SocketServerPrivate::run ()
 			continue;
 		}
 
+		// DoS protection: unprivileged user can cause 'too many open files, errno 24' by
+		// establishing connections to prl-disp through
+		// unix socket /run/prl_disp_service.socket
+		if (!checkPendingConnection(uid)) {
+			::close(handle);
+			continue;
+		}
 		{
 			// Create, append and start client
 			Prl::Expected<SmartPtr<SocketClientPrivate>, bool> c =
@@ -1662,6 +1677,30 @@ void SocketServerPrivate::wakeupClientsCleaner ()
     else {
         Q_ASSERT(0);
     }
+}
+
+bool SocketServerPrivate::checkPendingConnection ( quint32 uid )
+{
+	if (m_nUserSessionLimit > 0 && uid != 0) {
+		unsigned int connections = 0;
+		QMutexLocker locker( &m_eventMutex );
+		foreach (SmartPtr<SocketClientPrivate> c, m_preAppendClients)
+		{
+			boost::optional<quint32> uid_ = c->peerUid();
+			if (!uid_)
+				continue;
+			if (uid_.get() != uid)
+				continue;
+			++connections;
+		}
+		locker.unlock();
+		if (connections >= m_nUserSessionLimit) {
+			WRITE_TRACE(DBG_FATAL,
+			IO_LOG("Too many pending connections. Please retry later."));
+			return false;
+		}
+	}
+	return true;
 }
 
 /******************************************************************************

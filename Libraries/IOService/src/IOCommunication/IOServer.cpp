@@ -193,6 +193,11 @@ IOSendJob::Handle IOServer::sendDetachedClient (
     return m_sockImpl->sendDetachedClient( h, detachedClient, request );
 }
 
+void  IOServer::setUserConnectionLimit( unsigned int nLimit )
+{
+	m_sockImpl->setUserConnectionLimit(nLimit);
+}
+
 /*****************************************************************************
  * Callbacks
  *****************************************************************************/

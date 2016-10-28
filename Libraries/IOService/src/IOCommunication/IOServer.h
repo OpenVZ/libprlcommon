@@ -272,6 +272,12 @@ public:
                                   const SmartPtr<IOPackage>& request =
                                       IOPackage::Null );
 
+	/**
+	 * Set limit of concurrent pending connections for unpriveleged
+	 * user
+	 */
+	virtual void setUserConnectionLimit( unsigned int nLimit);
+
 private:
     /** Just common init routine */
     void init ();

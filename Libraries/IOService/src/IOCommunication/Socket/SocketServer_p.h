@@ -97,6 +97,8 @@ public:
 
     bool stopClient ( const IOSender::Handle& );
 
+	void setUserConnectionLimit( unsigned int nLimit );
+
 private:
     void run ();
 
@@ -121,6 +123,8 @@ private:
 	Prl::Expected<SmartPtr<SocketClientPrivate>, bool> createAndStartNewSockClient (
 				int cliHandle,
 				IOCommunication::DetachedClient);
+
+	bool checkPendingConnection ( quint32 uid );
 
 private:
     void cleanAllClients ();
@@ -158,6 +162,7 @@ private:
 
     // Use unix sockets for connection
     bool m_useUnixSockets;
+	unsigned int m_nUserSessionLimit;
 };
 
 } //namespace IOService
