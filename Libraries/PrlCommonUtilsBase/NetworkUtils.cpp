@@ -55,11 +55,12 @@ bool NetworkUtils::ParseIpMask(const QString &ip_mask, QString &ip, QString &mas
 
 		if (!ip_addr.setAddress(splited_ip_mask[0]))
 			return false;
-		// parse mask
-		QPair<QHostAddress, int> pair = QHostAddress::parseSubnet(ip_mask);
-		if (pair.second == -1)
-			return false;
+
 		if (ip_addr.protocol() == QAbstractSocket::IPv4Protocol) {
+			// parse mask
+			QPair<QHostAddress, int> pair = QHostAddress::parseSubnet(ip_mask);
+			if (pair.second == -1)
+				return false;
 			quint32 u_mask = 0;
 			for (int i = 0; i < pair.second; i++)
 				u_mask = u_mask | (1 << (31-i));
@@ -69,7 +70,16 @@ bool NetworkUtils::ParseIpMask(const QString &ip_mask, QString &ip, QString &mas
 			mask_addr.setAddress(u_mask);
 			mask = mask_addr.toString();
 		} else {
-			mask = QString("%1").arg(pair.second);
+			QPair<QHostAddress, int> pair = QHostAddress::parseSubnet(ip_mask);
+			if (pair.second == -1)
+			{
+				QHostAddress ip6_mask;
+				if(!ip6_mask.setAddress(splited_ip_mask[1]))
+					return false;
+				mask = ip6_mask.toString();
+			}
+			else
+				mask = QString("%1").arg(pair.second);
 		}
 	} else {
 		if (!ip_addr.setAddress(ip_mask))
