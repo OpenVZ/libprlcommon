@@ -444,6 +444,31 @@ bool IOService::getPeerInfo ( int sock,
                             hostNameStr, portNumber, errStr );
 }
 
+bool IOService::getCredInfo( int sock,
+				qint32& pid,
+				quint32& uid,
+				QString& errStr )
+{
+	struct ucred cr;
+	socklen_t len = sizeof(cr);
+
+	if (getsockopt (sock, SOL_SOCKET, SO_PEERCRED, &cr, &len) == 0 &&
+		len == sizeof(cr))
+	{
+		pid = cr.pid;
+		uid = cr.uid;
+	}
+	else
+	{
+		char errBuff[256];
+		int err = native_error();
+		errStr = "::getsockopt failed (native error: %1";
+		errStr = errStr.arg( native_strerror(err, errBuff, sizeof(errBuff)) );
+		return false;
+	}
+	return true;
+}
+
 QList<addrinfo*> IOService::orderAddrInfo ( addrinfo* addrInfo,
                                             OrderPreference orderPref )
 {

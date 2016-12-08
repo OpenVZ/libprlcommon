@@ -30,6 +30,7 @@
 #ifndef _WIN_
 #include <poll.h>
 #endif // _WIN_
+#include <boost/optional.hpp>
 
 using namespace IOService;
 
@@ -182,6 +183,31 @@ QString SocketServerPrivate::clientHostName (
     return client->peerHostName();
 }
 
+boost::optional<quint32> SocketServerPrivate::clientUid (const IOSender::Handle& h) const
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	const SmartPtr<SocketClientPrivate> client = m_sockClients.value(h);
+	if ( ! client )
+		return boost::none;
+
+	locker.unlock();
+	return client->peerUid();
+}
+
+boost::optional<qint32> SocketServerPrivate::clientPid (const IOSender::Handle& h) const
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	const SmartPtr<SocketClientPrivate> client = m_sockClients.value(h);
+	if ( ! client )
+		return boost::none;
+
+	locker.unlock();
+	return client->peerPid();
+}
+
+
 bool SocketServerPrivate::clientProtocolVersion (
     const IOSender::Handle& h,
     IOCommunication::ProtocolVersion& ver ) const
@@ -267,9 +293,11 @@ SocketServerPrivate::createDetachedClientSocket ()
     }
 
     // Creates, appends and starts new client
-    res = createAndStartNewSockClient( socks[0],
-                                       IOCommunication::DetachedClient() );
-    if ( ! res ) {
+	Prl::Expected<SmartPtr<SocketClientPrivate>, bool> c =
+		createAndStartNewSockClient(
+				socks[0],
+				IOCommunication::DetachedClient() );
+	if ( c.isFailed() ) {
 #ifdef _WIN_ // Windows
         ::closesocket(socks[0]);
         ::closesocket(socks[1]);
@@ -448,7 +476,7 @@ void SocketServerPrivate::__finalizeThread ()
 }
 
 
-bool SocketServerPrivate::createAndStartNewSockClient (
+Prl::Expected<SmartPtr<SocketClientPrivate>, bool> SocketServerPrivate::createAndStartNewSockClient (
     int cliHandle
     , IOCommunication::DetachedClient detachedState
 	)
@@ -533,9 +561,10 @@ bool SocketServerPrivate::createAndStartNewSockClient (
         //      return false. i.e. I mean that now returned 'false'
         //      does not say directly that client thread has not been started
         WRITE_TRACE(DBG_FATAL, IO_LOG("Can't start new client"));
+	return false;
     }
 
-    return res;
+    return client;
 }
 
 IOSendJob::Handle SocketServerPrivate::sendPackage (
@@ -1249,10 +1278,28 @@ void SocketServerPrivate::run ()
                     (((quint16)m_impl->senderType() & 0xF) << 6) |
                     (ETRACE_IOS_EVENT_SRV_ACCEPT & 0x3F));
 
-                // Create, append and start client
-                createAndStartNewSockClient(
-                                        handle,
-                                        IOCommunication::DetachedClient() );
+		quint32 uid;
+		qint32 pid;
+		QString errStr;
+		if ( ! IOService::getCredInfo(handle, pid, uid, errStr) ) {
+			WRITE_TRACE(DBG_FATAL,
+				IO_LOG("Getting of credentials error: %s)"),
+				qPrintable(errStr));
+			::close(handle);
+			continue;
+		}
+
+		{
+			// Create, append and start client
+			Prl::Expected<SmartPtr<SocketClientPrivate>, bool> c =
+				createAndStartNewSockClient(
+						handle,
+						IOCommunication::DetachedClient() );
+			if (!c.isFailed()) {
+				c.value()->setPeerUid(uid);
+				c.value()->setPeerPid(pid);
+			}
+		}
             }
 
 #else // Windows

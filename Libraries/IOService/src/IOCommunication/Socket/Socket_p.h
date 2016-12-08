@@ -168,6 +168,13 @@ bool getHostInfo ( int sockfd, QString& hostName,
 bool getPeerInfo ( int sockfd, QString& hostName,
                    quint16& portNumber, QString& err );
 
+/**
+ * Return numeric uid of user and pid of process
+ */
+bool getCredInfo ( int sockfd, qint32& pid,
+		   quint32& uid,
+		   QString& err );
+
 #ifdef _WIN_ //Windows
 
 class WSAInitHelper

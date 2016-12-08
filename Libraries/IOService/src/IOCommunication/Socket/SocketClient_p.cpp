@@ -370,6 +370,34 @@ bool SocketClientPrivate::peerProtocolVersion (
     return true;
 }
 
+boost::optional<quint32> SocketClientPrivate::peerUid() const
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	return m_peerUid;
+}
+
+void SocketClientPrivate::setPeerUid(quint32 uid)
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	m_peerUid = uid;
+}
+
+boost::optional<qint32> SocketClientPrivate::peerPid() const
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	return m_peerPid;
+}
+
+void SocketClientPrivate::setPeerPid(qint32 pid)
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	m_peerPid = pid;
+}
+
 IOSender::State SocketClientPrivate::waitForConnection (
     quint32 msecs ) const
 {

@@ -27,6 +27,7 @@
 #ifndef IOSERVER_H
 #define IOSERVER_H
 
+#include <boost/optional.hpp>
 #include "IOProtocol.h"
 #include "IOConnection.h"
 #include "IOServerInterface.h"
@@ -154,6 +155,18 @@ public:
      *       assurance.
      */
     virtual QString clientHostName ( const IOSender::Handle& ) const;
+
+	/**
+	 * Returns client uid by client handle,
+	 * if handle is wrong return value will be invalid.
+	 */
+	virtual boost::optional<quint32> clientUid ( const IOSender::Handle& ) const;
+
+	/**
+	 * Returns client pid by client handle,
+	 * if handle is wrong return value will be invalid.
+	 */
+	virtual boost::optional<qint32> clientPid ( const IOSender::Handle& ) const;
 
     /**
      * If client is connected to server, argument will be filled by

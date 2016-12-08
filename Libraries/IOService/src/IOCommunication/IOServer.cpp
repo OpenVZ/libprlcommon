@@ -133,6 +133,16 @@ QString IOServer::clientHostName ( const IOSender::Handle& h ) const
     return m_sockImpl->clientHostName( h );
 }
 
+boost::optional<quint32> IOServer::clientUid ( const IOSender::Handle& h ) const
+{
+	return m_sockImpl->clientUid( h );
+}
+
+boost::optional<qint32> IOServer::clientPid ( const IOSender::Handle& h ) const
+{
+	return m_sockImpl->clientPid( h );
+}
+
 bool IOServer::clientProtocolVersion (
     const IOSender::Handle& h,
     IOCommunication::ProtocolVersion& ver ) const
