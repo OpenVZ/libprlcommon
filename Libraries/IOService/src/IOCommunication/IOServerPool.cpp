@@ -340,6 +340,22 @@ QString IOServerPool::clientHostName ( const IOSender::Handle& h ) const
     return server->clientHostName(h);
 }
 
+boost::optional<quint32> IOServerPool::clientUid ( const IOSender::Handle& h ) const
+{
+	const SmartPtr<IOServerInterface> server = m_imp->getServer(h);
+	if (!server.isValid())
+		return boost::none;
+	return server->clientUid(h);
+}
+
+boost::optional<qint32> IOServerPool::clientPid ( const IOSender::Handle& h ) const
+{
+	const SmartPtr<IOServerInterface> server = m_imp->getServer(h);
+	if (!server.isValid())
+		return boost::none;
+	return server->clientPid(h);
+}
+
 bool IOServerPool::clientProtocolVersion (
     const IOSender::Handle& h,
     IOCommunication::ProtocolVersion& p ) const

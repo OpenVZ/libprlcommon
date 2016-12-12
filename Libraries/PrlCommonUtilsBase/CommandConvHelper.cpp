@@ -44,6 +44,7 @@ void InitializeDispatcherCommandsMaps()
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserLogin] = PJOC_SRV_LOGIN;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserLoginLocal] = PJOC_SRV_LOGIN_LOCAL;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserLoginLocalStage2] = PJOC_SRV_LOGIN_LOCAL;
+	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserEasyLoginLocal] = PJOC_SRV_LOGIN_LOCAL;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserLogoff] = PJOC_SRV_LOGOFF;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdSetNonInteractiveSession] = PJOC_SRV_SET_NON_INTERACTIVE_SESSION;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdSetSessionConfirmationMode] = PJOC_SRV_SET_SESSION_CONFIRMATION_MODE;

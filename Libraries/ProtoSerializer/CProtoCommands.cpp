@@ -269,6 +269,33 @@ PRL_APPLICATION_MODE CProtoCommandDspCmdUserLoginLocal::GetApplicationMode()
 	}
 }
 
+//++++++++++++++++++++++++++++++++++DspCmdUserEasyLoginLocal command class implementation+++++++++++++++++++++++++++++++++++++
+CProtoCommandDspCmdUserEasyLoginLocal::CProtoCommandDspCmdUserEasyLoginLocal(
+		PRL_APPLICATION_MODE appMode,
+		const QString& sPrevSessionUuid,
+		quint32 flags
+)
+: CProtoCommand(PVE::DspCmdUserEasyLoginLocal, false, flags)
+{
+	SetUnsignedIntParamValue(appMode, EVT_PARAM_EASY_LOGIN_LOCAL_CMD_APPLICATION_MODE);
+	SetStringParamValue(sPrevSessionUuid, EVT_PARAM_EASY_LOGIN_LOCAL_CMD_SESSION_TO_RESTORE);
+}
+
+bool CProtoCommandDspCmdUserEasyLoginLocal::IsValid()
+{
+	return (CheckWhetherParamPresents(EVT_PARAM_EASY_LOGIN_LOCAL_CMD_SESSION_TO_RESTORE, PVE::String));
+}
+
+PRL_APPLICATION_MODE CProtoCommandDspCmdUserEasyLoginLocal::GetApplicationMode()
+{
+	return PAM_SERVER;
+}
+
+QString CProtoCommandDspCmdUserEasyLoginLocal::GetPrevSessionUuid()
+{
+	return ( GetStringParamValue( EVT_PARAM_EASY_LOGIN_LOCAL_CMD_SESSION_TO_RESTORE ) );
+}
+
 //+++++++++++++++++++++++++++++++Proto command without params class implementation+++++++++++++++++++++++++++++++++++++
 bool CProtoCommandWithoutParams::IsValid()
 {
@@ -1064,6 +1091,7 @@ PVE::IDspMethodsArgs GetHashIdByOpCode(PVE::IDispatcherCommands nOpCode)
 		case PVE::DspCmdUpdateDeviceInfo: return (PVE::DspCmdUpdateDeviceInfo_strDeviceInfo);
 		case PVE::DspCmdGetNetServiceStatus: return (PVE::DspCmdGetNetServiceStatus_strNetServiceStatus);
 		case PVE::DspCmdUserLogin: return (PVE::DspCmdUserLogin_strLoginInfo);
+		case PVE::DspCmdUserEasyLoginLocal: return (PVE::DspCmdUserLoginLocalStage2_strLoginInfo);
 		case PVE::DspCmdUserLoginLocalStage2: return (PVE::DspCmdUserLoginLocalStage2_strLoginInfo);
 		case PVE::DspCmdPerfomanceStatistics: return (PVE::DspCmdPerfomanceStatistics_strPerfStats) ;
 		default: return PVE::IDspMethodsArgs(0);

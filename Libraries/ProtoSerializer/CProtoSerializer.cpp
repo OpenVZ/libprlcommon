@@ -49,6 +49,15 @@ CProtoCommandPtr CProtoSerializer::CreateDspCmdUserLoginLocalCommand(
 	return CProtoCommandPtr(new CProtoCommandDspCmdUserLoginLocal(nUserId, appMode, nProcessId, flags));
 }
 
+CProtoCommandPtr CProtoSerializer::CreateDspCmdUserEasyLoginLocalCommand(
+		PRL_APPLICATION_MODE appMode,
+		const QString &sPrevSessionUuid,
+		quint32 flags
+)
+{
+	return CProtoCommandPtr(new CProtoCommandDspCmdUserEasyLoginLocal(appMode, sPrevSessionUuid, flags));
+}
+
 CProtoCommandPtr CProtoSerializer::CreateProtoCommandWithoutParams(
 		PVE::IDispatcherCommands nCmdIdentifier,
 		bool bForceQuestionsSign,
@@ -332,6 +341,7 @@ CProtoCommandPtr CProtoSerializer::ParseCommand(PVE::IDispatcherCommands nCmdIde
 	{
 		case PVE::DspCmdUserLogin: pCommand = static_cast<CProtoCommand *>(new CProtoCommandDspCmdUserLogin); break;
 		case PVE::DspCmdUserLoginLocal: pCommand = static_cast<CProtoCommand *>(new CProtoCommandDspCmdUserLoginLocal); break;
+		case PVE::DspCmdUserEasyLoginLocal: pCommand = new CProtoCommandDspCmdUserEasyLoginLocal; break;
 		case PVE::DspWsResponse: pCommand = static_cast<CProtoCommand *>(new CProtoCommandDspWsResponse); break;
 		case PVE::DspCmdDirVmCreate: pCommand = static_cast<CProtoCommand *>(new CProtoVmCreateCommand); break;
 		case PVE::DspCmdDirVmClone: pCommand = static_cast<CProtoCommand *>(new CProtoVmCloneCommand); break;

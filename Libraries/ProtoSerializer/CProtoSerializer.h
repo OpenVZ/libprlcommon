@@ -282,6 +282,17 @@ public:
 		quint32 flags = 0
 	);
 	/**
+	 * Generates DspCmdUserEasyLoginLocal protocol command
+	 * @param application mode
+	 * @param previous session uuid
+	 * @param flags
+	 */
+	static CProtoCommandPtr CreateDspCmdUserEasyLoginLocalCommand(
+		PRL_APPLICATION_MODE appMode,
+		const QString &sPrevSessionUuid,
+		quint32 flags = 0
+	);
+	/**
 	 * Generates protocol command that contains no params (DspCmdUserLogoff, DspCmdDirGetVmList and etc.)
 	 * @param proto command identifier
 	 * @param sign whether questions must be forced during task progress

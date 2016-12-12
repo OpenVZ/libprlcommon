@@ -30,6 +30,7 @@
 #ifndef _WIN_
 #include <poll.h>
 #endif // _WIN_
+#include <boost/optional.hpp>
 
 using namespace IOService;
 
@@ -46,7 +47,8 @@ SocketServerPrivate::SocketServerPrivate ( IOServer* imp,
     m_cleanEventHandle(WSA_INVALID_EVENT)
 #endif
 	, m_localCredentials(credentials),
-	m_useUnixSockets(useUnixSockets)
+	m_useUnixSockets(useUnixSockets),
+	m_nUserSessionLimit(0)
 {
     INIT_IO_LOG(QString("IO server ctx [accept thr] (sender %1): ").
                 arg(imp->senderType()));
@@ -182,6 +184,31 @@ QString SocketServerPrivate::clientHostName (
     return client->peerHostName();
 }
 
+boost::optional<quint32> SocketServerPrivate::clientUid (const IOSender::Handle& h) const
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	const SmartPtr<SocketClientPrivate> client = m_sockClients.value(h);
+	if ( ! client )
+		return boost::none;
+
+	locker.unlock();
+	return client->peerUid();
+}
+
+boost::optional<qint32> SocketServerPrivate::clientPid (const IOSender::Handle& h) const
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	const SmartPtr<SocketClientPrivate> client = m_sockClients.value(h);
+	if ( ! client )
+		return boost::none;
+
+	locker.unlock();
+	return client->peerPid();
+}
+
+
 bool SocketServerPrivate::clientProtocolVersion (
     const IOSender::Handle& h,
     IOCommunication::ProtocolVersion& ver ) const
@@ -252,6 +279,13 @@ void SocketServerPrivate::setCredentials (
 	m_localCredentials = credentials;
 }
 
+void SocketServerPrivate::setUserConnectionLimit( unsigned int nLimit )
+{
+	QMutexLocker locker( &m_eventMutex );
+
+	m_nUserSessionLimit = nLimit;
+}
+
 IOCommunication::SocketHandle
 SocketServerPrivate::createDetachedClientSocket ()
 {
@@ -267,9 +301,11 @@ SocketServerPrivate::createDetachedClientSocket ()
     }
 
     // Creates, appends and starts new client
-    res = createAndStartNewSockClient( socks[0],
-                                       IOCommunication::DetachedClient() );
-    if ( ! res ) {
+	Prl::Expected<SmartPtr<SocketClientPrivate>, bool> c =
+		createAndStartNewSockClient(
+				socks[0],
+				IOCommunication::DetachedClient() );
+	if ( c.isFailed() ) {
 #ifdef _WIN_ // Windows
         ::closesocket(socks[0]);
         ::closesocket(socks[1]);
@@ -448,7 +484,7 @@ void SocketServerPrivate::__finalizeThread ()
 }
 
 
-bool SocketServerPrivate::createAndStartNewSockClient (
+Prl::Expected<SmartPtr<SocketClientPrivate>, bool> SocketServerPrivate::createAndStartNewSockClient (
     int cliHandle
     , IOCommunication::DetachedClient detachedState
 	)
@@ -533,9 +569,10 @@ bool SocketServerPrivate::createAndStartNewSockClient (
         //      return false. i.e. I mean that now returned 'false'
         //      does not say directly that client thread has not been started
         WRITE_TRACE(DBG_FATAL, IO_LOG("Can't start new client"));
+	return false;
     }
 
-    return res;
+    return client;
 }
 
 IOSendJob::Handle SocketServerPrivate::sendPackage (
@@ -1249,10 +1286,35 @@ void SocketServerPrivate::run ()
                     (((quint16)m_impl->senderType() & 0xF) << 6) |
                     (ETRACE_IOS_EVENT_SRV_ACCEPT & 0x3F));
 
-                // Create, append and start client
-                createAndStartNewSockClient(
-                                        handle,
-                                        IOCommunication::DetachedClient() );
+		quint32 uid;
+		qint32 pid;
+		QString errStr;
+		if ( ! IOService::getCredInfo(handle, pid, uid, errStr) ) {
+			WRITE_TRACE(DBG_FATAL,
+				IO_LOG("Getting of credentials error: %s)"),
+				qPrintable(errStr));
+			::close(handle);
+			continue;
+		}
+
+		// DoS protection: unprivileged user can cause 'too many open files, errno 24' by
+		// establishing connections to prl-disp through
+		// unix socket /run/prl_disp_service.socket
+		if (!checkPendingConnection(uid)) {
+			::close(handle);
+			continue;
+		}
+		{
+			// Create, append and start client
+			Prl::Expected<SmartPtr<SocketClientPrivate>, bool> c =
+				createAndStartNewSockClient(
+						handle,
+						IOCommunication::DetachedClient() );
+			if (!c.isFailed()) {
+				c.value()->setPeerUid(uid);
+				c.value()->setPeerPid(pid);
+			}
+		}
             }
 
 #else // Windows
@@ -1615,6 +1677,30 @@ void SocketServerPrivate::wakeupClientsCleaner ()
     else {
         Q_ASSERT(0);
     }
+}
+
+bool SocketServerPrivate::checkPendingConnection ( quint32 uid )
+{
+	if (m_nUserSessionLimit > 0 && uid != 0) {
+		unsigned int connections = 0;
+		QMutexLocker locker( &m_eventMutex );
+		foreach (SmartPtr<SocketClientPrivate> c, m_preAppendClients)
+		{
+			boost::optional<quint32> uid_ = c->peerUid();
+			if (!uid_)
+				continue;
+			if (uid_.get() != uid)
+				continue;
+			++connections;
+		}
+		locker.unlock();
+		if (connections >= m_nUserSessionLimit) {
+			WRITE_TRACE(DBG_FATAL,
+			IO_LOG("Too many pending connections. Please retry later."));
+			return false;
+		}
+	}
+	return true;
 }
 
 /******************************************************************************

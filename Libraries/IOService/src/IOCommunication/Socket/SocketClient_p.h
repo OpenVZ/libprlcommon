@@ -27,6 +27,7 @@
 #ifndef SOCKETCLIENTP_H
 #define SOCKETCLIENTP_H
 
+#include <boost/optional.hpp>
 #include "Socket_p.h"
 #include "../../../Logging/Logging.h"
 
@@ -74,6 +75,12 @@ public:
 	IOSender::SecurityMode securityMode () const;
     QString peerConnectionUuid () const;
     QString peerHostName () const;
+
+	boost::optional<quint32> peerUid() const;
+	void setPeerUid(quint32 uid);
+
+	boost::optional<qint32> peerPid() const;
+	void setPeerPid(qint32 pid);
 
     IOSendJob::Handle sendPackage ( const SmartPtr<IOPackage>& );
     IOSendJob::Handle sendDetachedClient (
@@ -248,6 +255,10 @@ private:
 	// Log limit rate structure
 	LogRateLimit m_rl;
 	bool	m_bLimitErrorLogging;
+
+	// identification of the peer
+	boost::optional<quint32> m_peerUid;
+	boost::optional<qint32> m_peerPid;
 };
 
 } //namespace IOService

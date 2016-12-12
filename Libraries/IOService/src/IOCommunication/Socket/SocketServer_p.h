@@ -28,9 +28,11 @@
 #define SOCKETSERVERP_H
 
 #include <QQueue>
+#include <boost/optional.hpp>
 
 #include "Socket_p.h"
 #include "SocketClient_p.h"
+#include "../../../../PrlCommonUtilsBase/SysError.h"
 
 namespace IOService {
 
@@ -76,6 +78,10 @@ public:
 
     QString clientHostName ( const IOSender::Handle& ) const;
 
+	boost::optional<quint32> clientUid (const IOSender::Handle& ) const;
+
+	boost::optional<qint32> clientPid (const IOSender::Handle& ) const;
+
     bool clientProtocolVersion ( const IOSender::Handle&,
                                  IOCommunication::ProtocolVersion& ) const;
     bool detachClient ( const IOSender::Handle& cliHandle,
@@ -90,6 +96,8 @@ public:
     IOCommunication::SocketHandle createDetachedClientSocket ();
 
     bool stopClient ( const IOSender::Handle& );
+
+	void setUserConnectionLimit( unsigned int nLimit );
 
 private:
     void run ();
@@ -112,8 +120,11 @@ private:
 								 const IOSender::Handle&,
 								 IOSender::State oldState,
 								 IOSender::State newState );
-    bool createAndStartNewSockClient ( int cliHandle,
-                                                                         IOCommunication::DetachedClient);
+	Prl::Expected<SmartPtr<SocketClientPrivate>, bool> createAndStartNewSockClient (
+				int cliHandle,
+				IOCommunication::DetachedClient);
+
+	bool checkPendingConnection ( quint32 uid );
 
 private:
     void cleanAllClients ();
@@ -151,6 +162,7 @@ private:
 
     // Use unix sockets for connection
     bool m_useUnixSockets;
+	unsigned int m_nUserSessionLimit;
 };
 
 } //namespace IOService

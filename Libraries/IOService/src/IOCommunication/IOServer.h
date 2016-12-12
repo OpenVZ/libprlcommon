@@ -27,6 +27,7 @@
 #ifndef IOSERVER_H
 #define IOSERVER_H
 
+#include <boost/optional.hpp>
 #include "IOProtocol.h"
 #include "IOConnection.h"
 #include "IOServerInterface.h"
@@ -155,6 +156,18 @@ public:
      */
     virtual QString clientHostName ( const IOSender::Handle& ) const;
 
+	/**
+	 * Returns client uid by client handle,
+	 * if handle is wrong return value will be invalid.
+	 */
+	virtual boost::optional<quint32> clientUid ( const IOSender::Handle& ) const;
+
+	/**
+	 * Returns client pid by client handle,
+	 * if handle is wrong return value will be invalid.
+	 */
+	virtual boost::optional<qint32> clientPid ( const IOSender::Handle& ) const;
+
     /**
      * If client is connected to server, argument will be filled by
      * server protocol, and true will be returns.
@@ -258,6 +271,12 @@ public:
                                   const IOCommunication::DetachedClient&,
                                   const SmartPtr<IOPackage>& request =
                                       IOPackage::Null );
+
+	/**
+	 * Set limit of concurrent pending connections for unpriveleged
+	 * user
+	 */
+	virtual void setUserConnectionLimit( unsigned int nLimit);
 
 private:
     /** Just common init routine */

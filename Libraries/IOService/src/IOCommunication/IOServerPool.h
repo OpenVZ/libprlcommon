@@ -27,6 +27,7 @@
 #pragma once
 
 #include <memory>
+#include <boost/optional.hpp>
 #include "IOServerInterface.h"
 
 namespace IOService {
@@ -78,6 +79,10 @@ public:
     virtual IOSender::State clientState ( const IOSender::Handle& ) const;
 
     virtual QString clientHostName ( const IOSender::Handle& ) const;
+
+	virtual boost::optional<quint32> clientUid ( const IOSender::Handle& ) const;
+
+	virtual boost::optional<qint32> clientPid ( const IOSender::Handle& ) const;
 
     virtual bool clientProtocolVersion (
                                  const IOSender::Handle&,
