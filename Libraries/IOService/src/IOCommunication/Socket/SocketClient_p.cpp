@@ -229,9 +229,23 @@ SocketClientPrivate::SocketClientPrivate (
                             arg(m_senderType));
             }
             else {
-                INIT_IO_LOG(QString("IO server ctx [read thr] (handle %1, sender %2): ").
+                QString peer;
+                if (!m_useUnixSockets) {
+                    QString errStr;
+                    QString peerHostName;
+                    quint16 peerPortNumber;
+                    if (!IOService::getPeerInfo(m_sockHandle, peerHostName,
+                                                peerPortNumber, errStr)) {
+                         WRITE_TRACE(DBG_FATAL,
+                                     "Getting of peer host name failed, error: %s",
+                                     qPrintable(errStr));
+                    }
+                    peer = QString(" (%1:%2)").arg(qPrintable(peerHostName)).arg(peerPortNumber);
+                }
+                INIT_IO_LOG(QString("IO server ctx [read thr] (handle %1, sender %2)%3: ").
                             arg(m_sockHandle).
-                            arg(m_senderType));
+                            arg(m_senderType).
+                            arg(peer));
             }
         }
         else
