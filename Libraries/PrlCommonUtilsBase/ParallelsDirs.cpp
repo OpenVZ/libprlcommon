@@ -584,6 +584,8 @@ static const char* getShortWinVersion(unsigned int osVersion_)
 		return "8_1";
 	case PVS_GUEST_VER_WIN_2012:
 		return "2012";
+	case PVS_GUEST_VER_WIN_2016:
+		return "2016";
 	}
 	return "";
 }
