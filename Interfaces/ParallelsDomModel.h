@@ -2204,4 +2204,10 @@ public:
 #define EVT_PARAM_CAPTURE_SCREEN_CMD_WIDTH			"capture_screen_cmd_width"
 #define EVT_PARAM_CAPTURE_SCREEN_CMD_HEIGHT			"capture_screen_cmd_height"
 
+////////////////////////////////////////////////////////////////////////////////
+// vcmmd config parameters
+////////////////////////////////////////////////////////////////////////////////
+#define EVT_PARAM_VCMMD_CONFIG_FIELD				"vcmmd_config_field"
+#define EVT_PARAM_VCMMD_CONFIG_VALUE				"vcmmd_config_value"
+
 #endif // PARALLELSDOMMODEL_H

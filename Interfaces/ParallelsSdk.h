@@ -32,6 +32,8 @@
 // keys for SDK calls PrlSrv_StoreValueByKey / PrlVm_StoreValueByKey
 #define PRL_KEY_TO_AUTH_USER				"{09A8CDDF-9C1D-4c2a-BEF0-02071BC72DFA}"
 #define PRL_KEY_SET_VNC_ENCRYPTION_DATA		"{616a72c7-e7cf-4eb8-bb5e-b9c1b37f5fdb}"
+#define PRL_KEY_SET_VCMMD_CONFIG_VALUE		"{375ddc46-9c21-4fa0-8e84-5c4b6612cb64}"
+#define PRL_KEY_GET_VCMMD_CONFIG_VALUE		"{276a8510-575c-4995-9b2c-50551a759820}"
 
 
 static inline int PVS_GUEST_VIRTIO_SUPPORTED(unsigned int nVersion)
