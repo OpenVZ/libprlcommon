@@ -266,6 +266,7 @@ const char* PVE::DispatcherCommandToString( unsigned int cmd )
 		CASE_DISPATCHER_COMMAND( DspCmdJoinCPUPool )
 		CASE_DISPATCHER_COMMAND( DspCmdLeaveCPUPool )
 		CASE_DISPATCHER_COMMAND( DspCmdVmCommitEncryption )
+		CASE_DISPATCHER_COMMAND( DspCmdGetVcmmdConfig )
 	}
 	return "Unknown";
 }
