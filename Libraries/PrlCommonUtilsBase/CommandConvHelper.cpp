@@ -192,6 +192,7 @@ void InitializeDispatcherCommandsMaps()
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdLeaveCPUPool] = PJOC_SRV_CPU_POOLS_LEAVE;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmCommitEncryption] = PJOC_VM_COMMIT_ENCRYPTION;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdGetVcmmdConfig] = PJOC_SRV_GET_VCMMD_CONFIG;
+	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdCtReinstall] = PJOC_CT_REINSTALL;
 
 	DispatcherCmdsToJobTypesMapType::const_iterator _it = DispatcherCommandsToJobTypesMap()->begin();
 	for(; _it != DispatcherCommandsToJobTypesMap()->end(); ++_it)

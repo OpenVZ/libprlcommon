@@ -267,6 +267,7 @@ const char* PVE::DispatcherCommandToString( unsigned int cmd )
 		CASE_DISPATCHER_COMMAND( DspCmdLeaveCPUPool )
 		CASE_DISPATCHER_COMMAND( DspCmdVmCommitEncryption )
 		CASE_DISPATCHER_COMMAND( DspCmdGetVcmmdConfig )
+		CASE_DISPATCHER_COMMAND( DspCmdCtReinstall )
 	}
 	return "Unknown";
 }
