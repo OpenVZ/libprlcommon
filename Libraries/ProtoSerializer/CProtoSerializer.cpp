@@ -589,6 +589,9 @@ CProtoCommandPtr CProtoSerializer::ParseCommand(PVE::IDispatcherCommands nCmdIde
 		case PVE::DspCmdVmStorageSetValue:
 			pCommand = static_cast<CProtoCommand *>(new CProtoDspCmdVmStorageSetValueCommand);
 			break;
+		case PVE::DspCmdCtReinstall:
+			pCommand = new CProtoCommandWithTwoStrParams(nCmdIdentifier);
+			break;
 		case PVE::DspCmdUpdateUsbAssocList:
 			pCommand = static_cast<CProtoCommand *>(new CProtoUpdateUsbAssocListCommand);
 			break;
