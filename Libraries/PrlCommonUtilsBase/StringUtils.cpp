@@ -285,4 +285,10 @@ QString generateDiskSerialNumber()
 	return s;
 }
 
+bool IsSerialNumberValid(const QString& qsSerial)
+{
+	QRegExp re("[A-Za-z0-9_\\.\\+\\-]*");
+	return re.exactMatch(qsSerial);
+}
+
 }
