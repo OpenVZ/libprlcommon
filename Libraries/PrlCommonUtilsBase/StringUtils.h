@@ -119,6 +119,11 @@ uint fromBase26(const QString& value_);
 /** Generate a serial number suitable for HDD */
 QString generateDiskSerialNumber();
 
+/*
+ * Check invalid symbols in HDD's serial number
+ */
+bool IsSerialNumberValid(const QString& qsSerial);
+
 }
 
 #endif
