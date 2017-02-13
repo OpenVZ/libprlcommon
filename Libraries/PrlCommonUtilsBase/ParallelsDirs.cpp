@@ -418,7 +418,7 @@ bool ParallelsDirs::isDevelopersBuild()
 
 QString ParallelsDirs::getSystemTempDir()
 {
-	return "/tmp";
+	return "/vz/tmp";
 }
 
 QString ParallelsDirs::getCurrentUserTempDir()
