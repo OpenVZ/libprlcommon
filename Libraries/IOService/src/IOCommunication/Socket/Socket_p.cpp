@@ -457,6 +457,7 @@ bool IOService::getCredInfo( int sock,
 	{
 		pid = cr.pid;
 		uid = cr.uid;
+		WRITE_TRACE(DBG_DEBUG, "getCredInfo getsockopt: uid = %d, pid = %d", uid, pid);
 	}
 	else
 	{
