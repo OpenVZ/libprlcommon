@@ -1311,8 +1311,12 @@ void SocketServerPrivate::run ()
 						handle,
 						IOCommunication::DetachedClient() );
 			if (!c.isFailed()) {
+				WRITE_TRACE(DBG_DEBUG, IO_LOG("Setting Peer: uid = %d, pid = %d"), uid, pid);
 				c.value()->setPeerUid(uid);
 				c.value()->setPeerPid(pid);
+			}
+			else {
+				WRITE_TRACE(DBG_DEBUG, IO_LOG("createAndStartNewSockClient failed"));
 			}
 		}
             }
