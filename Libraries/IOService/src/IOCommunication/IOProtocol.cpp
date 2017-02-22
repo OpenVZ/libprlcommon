@@ -121,7 +121,8 @@ quint32 IOService::msecsDiffTimeMark ( const IOService::TimeMark& tm1,
 /*****************************************************************************/
 
 enum {
-    ATTACH_BUFFERS_NUMBER = 5
+    ATTACH_BUFFERS_NUMBER = 5,
+    MAX_BUFFERS_COUNT = 1024
 };
 
 SmartPtr<IOPackage> IOCommunication::createAttachClientPackage (
@@ -525,6 +526,11 @@ int IOCommunication::DetachedClientPrivate::takeSocketHandle ()
 
 IOPackage* IOPackage::allocatePackage ( quint32 buffNum )
 {
+    if ( buffNum > MAX_BUFFERS_COUNT ) {
+        WRITE_TRACE(DBG_FATAL, "Buffers number %d exceeds the maximum value of %d",
+            buffNum, MAX_BUFFERS_COUNT);
+        return NULL;
+    }
     return reinterpret_cast<IOPackage*>( ::malloc(IOPACKAGESIZE(buffNum)) );
 }
 
