@@ -133,8 +133,8 @@ qint64 IODataBuffer::writeData ( const char * data, qint64 len )
         else
             m_buffSize = newSize;
     }
-    ::memcpy(m_buffer + m_buffPos, (uchar *)data, int(len));
-    m_buffPos += int(len);
+    ::memcpy(m_buffer + m_buffPos, (uchar *)data, len);
+    m_buffPos += len;
 
     return len;
 }

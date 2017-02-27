@@ -996,14 +996,14 @@ bool IOPackage::fillBuffer ( quint32 index, EncodingType enc,
 
 quint32 IOPackage::buffersSize () const
 {
-    if ( header.buffersNumber == 0 )
-        return 0;
-
     quint32 size = 0;
+    quint32 tmp_size = 0;
     const PODData* ioData = IODATAMEMBERCONST(this);
     for ( quint32 i = 0; i < header.buffersNumber; ++i ) {
-        size += ioData[i].bufferSize;
-
+        tmp_size = size + ioData[i].bufferSize;
+        if ( tmp_size < size )
+            return 0;
+        size = tmp_size;
     }
 
     return size;
@@ -1016,8 +1016,13 @@ quint32 IOPackage::dataSize () const
 
 quint32 IOPackage::fullPackageSize () const
 {
-    return (header.buffersNumber == 0 ? sizeof(IOPackage::PODHeader) :
-            sizeof(IOPackage::PODHeader) + IODATASIZE(this) + buffersSize());
+    if ( header.buffersNumber == 0 )
+        return sizeof(IOPackage::PODHeader);
+
+    quint32 res = buffersSize();
+    if ( ! res )
+        return 0;
+    return (sizeof(IOPackage::PODHeader) + IODATASIZE(this) + res);
 }
 
 quint16 IOPackage::headerChecksumCRC16 () const
@@ -1028,6 +1033,11 @@ quint16 IOPackage::headerChecksumCRC16 () const
 SmartPtr<char> IOPackage::toBuffer ( quint32& size ) const
 {
     size = fullPackageSize();
+
+    if ( ! size ) {
+        WRITE_TRACE(DBG_FATAL, "Buffer size is wrong (possible overflow)!");
+        return SmartPtr<char>();
+    }
 
     bool res = false;
     IODataBuffer buffer;
