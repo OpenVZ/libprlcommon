@@ -860,13 +860,6 @@ void Logger::ResetLogFile( Logger::LOG_RESET_REASON reason /* = LRR_RESTART */ )
 #undef FPRINTF
 }
 
-/*
- * This is callback function to log events from userspace. For prl_vm_app
- * it can be done via shared memory. For guest applications/drivers - via CPUID
- * vmexit.
- */
-void (*etrace_log_func)(PRL_UINT32 src, PRL_UINT32 type, PRL_UINT64 data) = NULL;
-
 // #define SELF_CHECK_ENABLE
 
 #ifdef SELF_CHECK_ENABLE

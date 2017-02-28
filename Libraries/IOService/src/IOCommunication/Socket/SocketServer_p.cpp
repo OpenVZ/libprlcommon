@@ -24,7 +24,6 @@
  */
 
 #include <QCoreApplication>
-#include <Libraries/Std/Etrace.h>
 #include "Socket/SocketServer_p.h"
 #include "IOServer.h"
 #ifndef _WIN_
@@ -1025,10 +1024,6 @@ void SocketServerPrivate::run ()
                 listened = true;
                 listenAddrInfo = ai;
             }
-
-			ETRACE_LOG(servHandles[i] & 0xFF, ETRACE_CP_IOSERVICE,
-				(((quint16)m_impl->senderType() & 0xF) << 6) |
-				(ETRACE_IOS_EVENT_SRV_LISTEN & 0x3F));
         }
 
         // Done.
@@ -1281,11 +1276,6 @@ void SocketServerPrivate::run ()
                     continue;
                 }
 
-                ETRACE_LOG(p[i].fd & 0xFF, ETRACE_CP_IOSERVICE,
-                    ((quint64)handle << 32) |
-                    (((quint16)m_impl->senderType() & 0xF) << 6) |
-                    (ETRACE_IOS_EVENT_SRV_ACCEPT & 0x3F));
-
 		quint32 uid;
 		qint32 pid;
 		QString errStr;
@@ -1417,11 +1407,6 @@ void SocketServerPrivate::run ()
                     continue;
                 }
 
-                ETRACE_LOG(servHandles[i] & 0xFF, ETRACE_CP_IOSERVICE,
-                    ((quint64)handle << 32) |
-                    (((quint16)m_impl->senderType() & 0xF) << 6) |
-                    (ETRACE_IOS_EVENT_SRV_ACCEPT & 0x3F));
-
                 // Create, append and start client
                 createAndStartNewSockClient(
                                         handle,
@@ -1544,9 +1529,6 @@ void SocketServerPrivate::run ()
         for ( uint i = 0; i < MaxSocks; ++i ) {
             if ( servHandles[i] != -1 ) {
                 ::closesocket(servHandles[i]);
-				ETRACE_LOG(servHandles[i] & 0xFF, ETRACE_CP_IOSERVICE,
-					(((quint16)m_impl->senderType() & 0xF) << 6) |
-					(ETRACE_IOS_EVENT_SRV_CLOSE & 0x3F));
                 servHandles[i] = -1;
             }
         }
@@ -1570,9 +1552,6 @@ void SocketServerPrivate::run ()
         for ( uint i = 0; i < MaxSocks; ++i ) {
             if ( servHandles[i] != -1 ) {
                 ::close(servHandles[i]);
-				ETRACE_LOG(servHandles[i] & 0xFF, ETRACE_CP_IOSERVICE,
-					(((quint16)m_impl->senderType() & 0xF) << 6) |
-					(ETRACE_IOS_EVENT_SRV_CLOSE & 0x3F));
                 servHandles[i] = -1;
             }
         }

@@ -27,7 +27,6 @@
 #include "Socket_p.h"
 
 #include "Libraries/Logging/Logging.h"
-#include "Libraries/Std/Etrace.h"
 #include <limits>
 #ifndef _WIN_
 #include <poll.h>
@@ -1805,14 +1804,6 @@ void SocketWriteThread::doJob ()
 
         // Increment statistics value
         AtomicInc64(&m_stat.sentPackages);
-
-		ETRACE_LOG(m_sockHandle & 0xFF, ETRACE_CP_IOSERVICE,
-			((quint64)p->header.type << 32) |
-			(((quint32)sent_sz & 0x3FFFF) << 14) |
-			(((quint16)p->header.buffersNumber & 0xF) << 10) |
-			(((quint16)m_senderType & 0xF) << 6) |
-			((routeName == IORoutingTable::SSLRoute ?
-				 ETRACE_IOS_EVENT_SEND_PKG_SSL : ETRACE_IOS_EVENT_SEND_PKG) & 0x3F));
 
         // After write call
         {

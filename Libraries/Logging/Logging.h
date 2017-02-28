@@ -462,10 +462,4 @@ static __inline int __dummy_log_message__(int xxx, ...)
  */
 #define PUT_RAW_MESSAGE(msg)	Logger::PutMessage(msg, strlen(msg))
 
-#ifdef _WIN_
-extern void (*etrace_log_func)(unsigned int src, unsigned int type, unsigned __int64 data);
-#else
-extern void (*etrace_log_func)(unsigned int src, unsigned int type, unsigned long long data);
-#endif
-
 #endif // __LOGGING_H__
