@@ -28,7 +28,6 @@
 #include "IOClient.h"
 #include "IOSSLInterface.h"
 #include <Libraries/OpenSSL/OpenSSL.h>
-#include <Libraries/Std/Etrace.h>
 #ifndef _WIN_
 #include <poll.h>
 #endif // _WIN_
@@ -36,9 +35,6 @@
 using namespace IOService;
 
 /*****************************************************************************/
-#define IOSRV_ETRACE(m)	ETRACE_LOG(sockHandle & 0xFF, ETRACE_CP_IOSERVICE,\
-			(((quint16)m_senderType & 0xF) << 6) | ((m) & 0x3F))
-
 #define CHECK_SRV_CTX(err_op)                                           \
     do {                                                                \
         Q_ASSERT(m_ctx == Cli_ServerContext);                           \
@@ -1787,9 +1783,6 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
 
                 // Close socket before next try
                 ::closesocket(sockHandle);
-				ETRACE_LOG(sockHandle & 0xFF, ETRACE_CP_IOSERVICE,
-					(((quint16)m_senderType & 0xF) << 6) |
-					(ETRACE_IOS_EVENT_CLI_CLOSE & 0x3F));
                 sockHandle = -1;
 
                 // Try next address
@@ -1808,9 +1801,6 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
 
             // Close socket before next try
             ::closesocket(sockHandle);
-			ETRACE_LOG(sockHandle & 0xFF, ETRACE_CP_IOSERVICE,
-				(((quint16)m_senderType & 0xF) << 6) |
-				(ETRACE_IOS_EVENT_CLI_CLOSE & 0x3F));
             sockHandle = -1;
 
             // Try next address
@@ -1901,9 +1891,6 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
 #else
         ::close(sockHandle);
 #endif
-		ETRACE_LOG(sockHandle & 0xFF, ETRACE_CP_IOSERVICE,
-			(((quint16)m_senderType & 0xF) << 6) |
-			(ETRACE_IOS_EVENT_CLI_CLOSE & 0x3F));
         sockHandle = -1;
     }
 
@@ -2109,7 +2096,6 @@ void SocketClientPrivate::doJob ()
             else
                 Q_ASSERT(sockHandle != -1);
 
-	    IOSRV_ETRACE(ETRACE_IOS_EVENT_SRV_CONNECT);
         }
         // Server context, proxy mode
         else {
@@ -2121,8 +2107,6 @@ void SocketClientPrivate::doJob ()
                 // All logging made from previous call
                 goto cleanup_and_disconnect;
             }
-
-	    IOSRV_ETRACE(ETRACE_IOS_EVENT_SRV_CONNECT_PROXY);
         }
     }
     // Client context
@@ -2149,7 +2133,6 @@ void SocketClientPrivate::doJob ()
 				// Nothing to do
 			}
 
-		IOSRV_ETRACE(ETRACE_IOS_EVENT_CLI_CONNECT);
 		}
         }
         // Client context, proxy mode
@@ -2162,8 +2145,6 @@ void SocketClientPrivate::doJob ()
                 // All logging made from previous call
                 goto cleanup_and_disconnect;
             }
-
-	    IOSRV_ETRACE(ETRACE_IOS_EVENT_CLI_CONNECT_PROXY);
         }
     }
     else
@@ -2233,8 +2214,6 @@ void SocketClientPrivate::doJob ()
                 goto cleanup_and_disconnect;
             }
 
-		IOSRV_ETRACE(ETRACE_IOS_EVENT_SRV_SET_HS);
-
             // Add SSL session and rehandshake
             handshaked = srv_addSSLSessionFromStateAndRehandshake(
                                            sockHandle,
@@ -2244,8 +2223,6 @@ void SocketClientPrivate::doJob ()
                 WRITE_TRACE(DBG_FATAL, IO_LOG("SSL session is wrong!"));
                 goto cleanup_and_disconnect;
             }
-
-	    IOSRV_ETRACE(ETRACE_IOS_EVENT_SRV_SET_HS_SSL);
         }
         // Server context, socket handle is passed as argument
         else {
@@ -2286,8 +2263,6 @@ void SocketClientPrivate::doJob ()
                 goto cleanup_and_disconnect;
             }
 
-	    IOSRV_ETRACE(ETRACE_IOS_EVENT_SRV_SEND_HS);
-
             // Calc timeout
             CALC_TIMEOUT(m_connTimeout, msecsToWait,
                          "Connection timeout expired!",
@@ -2299,8 +2274,6 @@ void SocketClientPrivate::doJob ()
                 WRITE_TRACE(DBG_FATAL, IO_LOG("SSL handshake failed!"));
                 goto cleanup_and_disconnect;
             }
-
-		IOSRV_ETRACE(ETRACE_IOS_EVENT_SRV_SEND_HS_SSL);
         }
     }
     // Client context
@@ -2347,8 +2320,6 @@ void SocketClientPrivate::doJob ()
             goto cleanup_and_disconnect;
         }
 
-	IOSRV_ETRACE(ETRACE_IOS_EVENT_CLI_SEND_HS);
-
         // Calc timeout
         CALC_TIMEOUT(m_connTimeout, msecsToWait,
                      "Connection timeout expired!",
@@ -2360,8 +2331,6 @@ void SocketClientPrivate::doJob ()
             WRITE_TRACE(DBG_FATAL, IO_LOG("SSL handshake failed!"));
             goto cleanup_and_disconnect;
         }
-
-	IOSRV_ETRACE(ETRACE_IOS_EVENT_CLI_SEND_HS_SSL);
         }
     }
     else
@@ -2504,10 +2473,6 @@ void SocketClientPrivate::doJob ()
                 // Anyway writing will be stopped
                 goto cleanup_and_disconnect;
             }
-
-			ETRACE_LOG(sockHandle & 0xFF, ETRACE_CP_IOSERVICE,
-				(((quint16)m_senderType & 0xF) << 6) |
-				(ETRACE_IOS_EVENT_SRV_SEND_REHS_SSL & 0x3F));
 
             if ( ! SSL_session_reused(m_ssl) ) {
                 WRITE_TRACE(DBG_FATAL, IO_LOG("SSL session was not reused!"));
@@ -2666,14 +2631,6 @@ void SocketClientPrivate::doJob ()
 
         // Increment statistics value
         AtomicInc64(&m_stat.receivedPackages);
-
-		// Log to Etrace
-		ETRACE_LOG(sockHandle & 0xFF, ETRACE_CP_IOSERVICE,
-			((quint64)p->header.type << 32) |
-			(((quint32)recv_sz  & 0x3FFFF) << 14) |
-			(((quint16)p->header.buffersNumber & 0xF) << 10) |
-			(((quint16)m_senderType & 0xF) << 6) |
-			(ETRACE_IOS_EVENT_RECV_PKG_SSL & 0x3F));
 
         // Check that is not a management pkg
         if ( p->header.type != IOCommunicationMngPackage::HeartBeat &&
@@ -2880,9 +2837,6 @@ cleanup_and_disconnect:
             __gracefulShutdown(sockHandle,
                                IOCommunication::IOGracefulShutdownTimeout);
         ::closesocket(sockHandle);
-		ETRACE_LOG(sockHandle & 0xFF, ETRACE_CP_IOSERVICE,
-			(((quint16)m_senderType & 0xF) << 6) |
-			(ETRACE_IOS_EVENT_CLI_CLOSE & 0x3F));
         sockHandle = -1;
     }
 
