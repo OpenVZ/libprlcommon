@@ -9,10 +9,18 @@
 /// Description of the structures and constants required
 /// for the API request exchange between Application and Monitor
 ///
-/// Copyright (c) 2010-2015 Parallels IP Holdings GmbH. All rights reserved.
+/// Copyright (c) 2010-2017, Parallels International GmbH. All rights reserved.
 ///
 /// This file is licensed for use in the Linux Kernel under the
 /// terms of the GNU General Public License version 2.
+///
+/// You should have received a copy of the GNU Lesser General Public
+/// License along with this library.  If not, see
+/// <http://www.gnu.org/licenses/> or write to Free Software Foundation,
+/// 51 Franklin Street, Fifth Floor Boston, MA 02110, USA.
+///
+/// Our contact details: Parallels International GmbH, Vordergasse 59, 8200
+/// Schaffhausen, Switzerland.
 ///
 ///
 //////////////////////////////////////////////////////////////////////////

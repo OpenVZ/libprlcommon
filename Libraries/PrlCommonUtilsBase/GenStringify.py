@@ -4,7 +4,7 @@
 #
 # GenStringify.py
 #
-# Copyright (C) 1999-2015 Parallels IP Holdings GmbH
+# Copyright (c) 1999-2017, Parallels International GmbH
 #
 # This file is part of Parallels SDK. Parallels SDK is free
 # software; you can redistribute it and/or modify it under the
@@ -21,7 +21,7 @@
 # License along with this library.  If not, see
 # <http://www.gnu.org/licenses/>.
 #
-# Our contact details: Parallels IP Holdings GmbH, Vordergasse 59, 8200
+# Our contact details: Parallels International GmbH, Vordergasse 59, 8200
 # Schaffhausen, Switzerland.
 #
 
@@ -71,7 +71,7 @@ HEADER_FILE_HEADER = """/*
  * <http://www.gnu.org/licenses/> or write to Free Software Foundation,
  * 51 Franklin Street, Fifth Floor Boston, MA 02110, USA.
  *
- * Our contact details: Parallels IP Holdings GmbH, Vordergasse 59, 8200
+ * Our contact details: Parallels International GmbH, Vordergasse 59, 8200
  * Schaffhausen, Switzerland.
  */
 """
@@ -101,10 +101,10 @@ STRINGIFY_CONSTS_TMPL = """/////////////////////////////////////////////////////
 /// <http://www.gnu.org/licenses/> or write to Free Software Foundation,
 /// 51 Franklin Street, Fifth Floor Boston, MA 02110, USA.
 ///
-/// Our contact details: Parallels IP Holdings GmbH, Vordergasse 59, 8200
+/// Our contact details: Parallels International GmbH, Vordergasse 59, 8200
 /// Schaffhausen, Switzerland.
 ///
-/// Copyright (c) 1999-2015 Parallels IP Holdings GmbH.
+/// Copyright (c) 1999-2017, Parallels International GmbH.
 ///
 ///////////////////////////////////////////////////////////////////////////////
 
