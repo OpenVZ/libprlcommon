@@ -41,7 +41,7 @@
 	};
 
 	/**
-	* generate parallels mac address
+	* generate VZ mac address
 	*/
 	static QString parseMacAddress (const QString& mac);
 	static QString generateMacAddress (HostUtils::MacPrefixType prefix = HostUtils::MAC_PREFIX_VM);
@@ -50,7 +50,7 @@
 	/**
 	* Checks whether specified value is proper MAC address
 	* @param sMacAddress MAC address as string
-	* @param bCheckPrlAddress check on Parallels MAC address group
+	* @param bCheckPrlAddress check on VZ MAC address group
 	*/
 	static bool checkMacAddress(const QString &sMacAddress, bool bCheckPrlAddress);
 

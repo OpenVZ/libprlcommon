@@ -385,7 +385,6 @@ QString ParallelsDirs::getParallelsDriversDir()
 		{
 			path = "/lib/modules/";
 			path += un.release;
-			path += "/extra/parallels";
 		}//if uname
 	}
 
@@ -472,7 +471,7 @@ QString ParallelsDirs::getToolsBaseImagePath(PRL_APPLICATION_MODE mode)
 	QString path;
 
 	if (mode == PAM_SERVER)
-		path = "/usr/share/virtuozzo/";
+		path = "/usr/share/vz-guest-tools/";
 	return path;
 }
 
@@ -485,7 +484,7 @@ QString ParallelsDirs::getToolsImage(PRL_APPLICATION_MODE mode, unsigned int nOs
 	}
 	else if IS_MACOS(nOsVersion)
 	{
-		qsFileName = "prl-tools-mac.iso";
+		qsFileName = "vz-guest-tools-mac.iso";
 	}
 	else if IS_LINUX(nOsVersion)
 	{
@@ -493,7 +492,7 @@ QString ParallelsDirs::getToolsImage(PRL_APPLICATION_MODE mode, unsigned int nOs
 	}
 	else
 	{
-		qsFileName = "prl-tools-other.iso";
+		qsFileName = "vz-guest-tools-other.iso";
 	}
 
 	QString qsToolsImage;
@@ -509,19 +508,19 @@ QString ParallelsDirs::getToolsTarGz(PRL_APPLICATION_MODE mode, unsigned int nOs
 	QString qsFileName;
 	if (IS_WINDOWS(nOsVersion) && (nOsVersion >= PVS_GUEST_VER_WIN_2K))
 	{
-		qsFileName = "prl-tools-win.tar.gz";
+		qsFileName = "vz-guest-tools-win.tar.gz";
 	}
 	else if IS_MACOS(nOsVersion)
 	{
-		qsFileName = "prl-tools-mac.tar.gz";
+		qsFileName = "vz-guest-tools-mac.tar.gz";
 	}
 	else if IS_LINUX(nOsVersion)
 	{
-		qsFileName = "prl-tools-lin.tar.gz";
+		qsFileName = "vz-guest-tools-lin.tar.gz";
 	}
 	else
 	{
-		qsFileName = "prl-tools-other.tar.gz";
+		qsFileName = "vz-guest-tools-other.tar.gz";
 	}
 
 	QString qsToolsImage;
@@ -537,15 +536,15 @@ QString ParallelsDirs::getToolsInstallerName(unsigned int nOsVersion)
 	QString qsFileName;
 	if (IS_WINDOWS(nOsVersion) && (nOsVersion >= PVS_GUEST_VER_WIN_2K))
 	{
-		qsFileName = "prl-tools-win.tar.gz";
+		qsFileName = "vz-guest-tools-win.tar.gz";
 	}
 	else if IS_MACOS(nOsVersion)
 	{
-		qsFileName = "prl-tools-mac.iso";
+		qsFileName = "vz-guest-tools-mac.iso";
 	}
 	else if IS_LINUX(nOsVersion)
 	{
-		qsFileName = "prl-tools-lin.iso";
+		qsFileName = "vz-guest-tools-lin.iso";
 	}
 
 	return qsFileName;
@@ -555,7 +554,7 @@ QString ParallelsDirs::getToolsInstallerName(unsigned int nOsVersion)
 QString ParallelsDirs::getFddToolsImageBaseName( unsigned int uGuestOsType )
 {
 	if (uGuestOsType == PVS_GUEST_TYPE_OS2)
-		return "prl-tools-os2.fdd";
+		return "vz-guest-tools-os2.fdd";
 	else
 		return "";
 }
@@ -594,15 +593,7 @@ QString ParallelsDirs::getWindowsUnattendedFloppy(unsigned int osVersion_)
 {
 	PRL_ASSERT(IS_WINDOWS(osVersion_));
 
-	return QString("/usr/share/virtuozzo/floppy_win%1.vfd").arg(getShortWinVersion(osVersion_));
-}
-
-QString ParallelsDirs::getLinReconfigImage(PRL_APPLICATION_MODE mode)
-{
-	Q_UNUSED(mode);
-
-	// PVS case
-	return "/usr/share/parallels-reconfiguration/reconfiguration.iso";
+	return QString("/usr/share/vz-guest-tools/floppy_win%1.vfd").arg(getShortWinVersion(osVersion_));
 }
 
 namespace{
@@ -637,7 +628,7 @@ namespace{
 
 QString ParallelsDirs::getCrashDumpsPath()
 {
-	return getSystemTempDir() + "/virtuozzo_crash_dumps";
+	return getSystemTempDir() + "/vz_crash_dumps";
 }
 
 QString ParallelsDirs::getSystemLogPath()
@@ -690,15 +681,15 @@ QString ParallelsDirs::getToolsFileName(unsigned int uGuestOsType)
 
 	if (IS_WINDOWS(uGuestOsType))
 	{
-		strToolsPath = "prl-tools-win.iso";
+		strToolsPath = "vz-guest-tools-win.iso";
 	}
 	else if IS_MACOS(uGuestOsType)
 	{
-		strToolsPath = "prl-tools-mac.iso";
+		strToolsPath = "vz-guest-tools-mac.iso";
 	}
 	else if IS_LINUX(uGuestOsType)
 	{
-		strToolsPath = "prl-tools-lin.iso";
+		strToolsPath = "vz-guest-tools-lin.iso";
 	}
 
 	return strToolsPath;
@@ -765,7 +756,7 @@ QString ParallelsDirs::getAppGuiName( PRL_APPLICATION_MODE nAppMode )
 {
 	switch (nAppMode)
 	{
-		case PAM_SERVER: return PRL_PRODUCT_NAME_CONSOLE;
+		case PAM_SERVER: return PRL_PRODUCT_NAME_SERVER;
 		default: return PRL_PRODUCT_NAME_UNKNOWN;
 	}
 }
@@ -800,7 +791,7 @@ QStringList ParallelsDirs::getInstallationLogFilePaths()
 	switch( appMode )
 	{
 		case PAM_SERVER:
-			lstPathes << "/var/log/parallels-server-install.log" << "/var/log/parallels-mc-install.log";
+			lstPathes << "/var/log/yum.log" << "/var/log/anaconda/anaconda.packaging.log";
 			break;
 		default:
 			WRITE_TRACE(DBG_FATAL, "%s:  Not supported appMode = %d"

@@ -112,12 +112,12 @@ namespace IOService {
 
             HandshakeError,          /**< Common error. This happens,
                                           when other side is not a
-                                          parallels product,
+                                          compatible product,
                                           or is a absolutely incompatible
                                           version. */
 
             ProtocolVersionError,    /**< This happens, when other side
-                                          is a parallels product, but
+                                          is a compatible product, but
                                           protocol version differs. */
 
             SSLHandshakeError,       /**< SSL handshake failed. */

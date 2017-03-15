@@ -75,7 +75,7 @@ typedef int __declspec("SAL_nokernel") __declspec("SAL_nodriver") __prefast_flag
 #endif
 
 /**
- * Base types declaration, used by all Parallels software,
+ * Base types declaration, used by all VZ software,
  * including user and kernel space components.
  *
  * NOTE: these types are also defined in winnt.h and ntdef.h; we are lucky that

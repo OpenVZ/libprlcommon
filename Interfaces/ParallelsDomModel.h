@@ -729,8 +729,6 @@ public:
 #define XML_DEFAULT_IP6_ADDRESS						"::1" // loopback
 
 #define XML_DEFAULT_REMOTE_DISPLAY_PORT			6500
-#define XML_DEFAULT_VMDIR_SUFFIX_WIN				"Parallels Virtual Machines"
-#define XML_DEFAULT_VMDIR_SUFFIX_LIN				"parallels-vm"
 #define XML_DEFAULT_VMDIR_PREFIX_WIN				"C:\\Documents and Settings"
 #define XML_DEFAULT_VMDIR_PREFIX_LIN				"/home"
 #define XML_DEFAULT_VMDIR_PREFIX_MAC				"/Users"
@@ -764,8 +762,6 @@ public:
 #define XML_DOC_VERSION_TAG							"xml"
 //#define XML_DOC_VERSION_DATA						"version=\"1.0\" encoding=\"ISO-8859-1\""
 #define XML_DOC_VERSION_DATA						"version=\"1.0\" encoding=\"UTF-8\""
-
-#define XML_DEFAULT_PROBLEM_REP_PREAMBLE			QT_TRANSLATE_NOOP("QObject", "This is a Parallels problem report. Please send this file to Parallels IP Holdings GmbH. mailto:reports@parallels.com")
 
 /**
  * Virtual Machine configuration XML model
@@ -986,7 +982,6 @@ public:
 //
 // XML tree basic elements
 //
-#define XML_VM_DIR_EL_ROOT					"ParallelsVmDirectories"
 #define XML_VM_DIR_EL_SERVER_ID			"ServerIdentification"
 #define XML_VM_DIR_EL_CATALOGUE			"Catalogue"
 #define XML_VM_DIR_EL_VMDIR					"VmDirectory"

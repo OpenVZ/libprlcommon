@@ -57,13 +57,7 @@ void ParallelsDirTest::testGetDispatcherConfigDir()
 
 	switch(getOsType())
 	{
-	case osWinXp: expectedPath="C:/Documents and Settings/All Users/Application Data/Parallels";
-		break;
-	case osWinVista: expectedPath="C:/ProgramData/Parallels";
-		break;
 	case osLinux: expectedPath="/etc/vz";
-		break;
-	case osMac: expectedPath="/Library/Preferences/Parallels";
 		break;
 	default:
 		QFAIL ("Someshit happend.");
@@ -80,10 +74,6 @@ void ParallelsDirTest::testGetCallerUserPreferencesDir()
 
 	switch(getOsType())
 	{
-	case osWinXp: expectedPath=expectedPath + "/Application Data/Parallels";
-		break;
-	case osWinVista: expectedPath=expectedPath + "/AppData/Roaming/Parallels";
-		break;
 	case osLinux: expectedPath=expectedPath + "/.vz";
 		break;
 	default:
@@ -103,13 +93,7 @@ void ParallelsDirTest::testGetDefaultVmCatalogue_serverMode()
 
 	switch(getOsType())
 	{
-	case osWinXp: expectedPath="C:/Documents and Settings/All Users/Documents/Public Parallels";
-		break;
-	case osWinVista: expectedPath="C:/Users/Public/Documents/Public Parallels";
-		break;
 	case osLinux: expectedPath="/vz/vmprivate";
-		break;
-	case osMac: expectedPath="/Users/Shared/Parallels";
 		break;
 	default:
 		QFAIL ("Someshit happend.");
@@ -128,7 +112,7 @@ void ParallelsDirTest::testGetToolsBaseImagePath()
 	// Server
 	mode = PAM_SERVER;
 	path = ParallelsDirs::getToolsBaseImagePath(mode);
-	expectedPath = "/usr/share/virtuozzo/";
+	expectedPath = "/usr/share/vz-guest-tools/";
 	QCOMPARE(path, expectedPath);
 }
 
@@ -142,23 +126,12 @@ void ParallelsDirTest::testGetToolsImage()
 
 	nOsVersion = PVS_GUEST_VER_LIN_OTHER;
 	path = ParallelsDirs::getToolsImage(mode, nOsVersion);
-	expectedPath = "/usr/share/virtuozzo/vz-guest-tools-lin.iso";
+	expectedPath = "/usr/share/vz-guest-tools/vz-guest-tools-lin.iso";
 	QCOMPARE(path, expectedPath);
 
 	nOsVersion = PVS_GUEST_VER_WIN_OTHER;
 	path = ParallelsDirs::getToolsImage(mode, nOsVersion);
-	expectedPath = "/usr/share/virtuozzo/vz-guest-tools-win.iso";
-	QCOMPARE(path, expectedPath);
-}
-
-
-void ParallelsDirTest::testGetLinReconfigImage()
-{
-	QString expectedPath;
-	QString path = ParallelsDirs::getLinReconfigImage(PAM_UNKNOWN);
-
-	expectedPath = "/usr/share/parallels-reconfiguration/reconfiguration.iso";
-
+	expectedPath = "/usr/share/vz-guest-tools/vz-guest-tools-win.iso";
 	QCOMPARE(path, expectedPath);
 }
 
