@@ -265,7 +265,7 @@ SDK_HEADERS = $$(SDK_HEADERS)
 isEmpty(SDK_HEADERS): SDK_HEADERS = /usr/include
 
 !exists($$SDK_HEADERS/prlsdk) {
-	error(There is no Virtuozzo SDK headers at $$SDK_HEADERS! \
+	error(There is no Vz SDK headers at $$SDK_HEADERS! \
 	Please install them or define a proper path to them in SDK_HEADERS environment variable)
 }
 

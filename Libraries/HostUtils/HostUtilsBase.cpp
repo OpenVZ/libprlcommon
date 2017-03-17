@@ -115,7 +115,7 @@ bool HostUtils::checkMacAddress(const QString &sMacAddress, bool bCheckPrlAddres
 	if ((nFirstByte & 1) != 0)
 		return (false);
 
-	//Check whether value belongs to Parallels MAC addresses interval
+	//Check whether value belongs to VZ MAC addresses interval
 	if ( bCheckPrlAddress
 		 && !sMacAddress.startsWith( HostUtils::generateMacAddress().left( 6 ), Qt::CaseInsensitive ) )
 		return (false);

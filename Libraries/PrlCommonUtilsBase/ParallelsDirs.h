@@ -136,9 +136,6 @@ public:
 
 	// get full path to .iso with unattended floppy drivers
 	static QString getWindowsUnattendedFloppy(unsigned int osVersion_);
-	// get reconfiguration image path
-	static QString getLinReconfigImage(PRL_APPLICATION_MODE mode);
-
 	static QString getCrashDumpsPath();
 
 	static QString getSystemLogPath();

@@ -41,7 +41,6 @@
 #define DISPATCHER_CONFIGURATION_SERVER_XML_FILE	"dispatcher.xml"
 
 #define DISPATCHER_SERVICE_COMMON_NAME				"prl_disp_service"
-#define DISPATCHER_SERVICE_WORKSTATION_NAME			"Parallels Virtualization Service"
 
 #define VMDIR_DEFAULT_CATALOGUE_SERVER_FILE			"vmdirectorylist.xml"
 

@@ -52,7 +52,6 @@ private slots:
 	void testGetDefaultVmCatalogue_serverMode();
 	void testGetToolsBaseImagePath();
 	void testGetToolsImage();
-	void testGetLinReconfigImage();
 private:
 	enum OsType {osUnknown=-1, osWinXp, osWinVista, osLinux, osMac};
 

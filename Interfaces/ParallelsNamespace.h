@@ -80,7 +80,7 @@
 #define PRL_KEY_CEP_STATISTICS_APP_SWITCHER_PACKAGES	"Packages"
 #define PRL_KEY_CEP_STATISTICS_LEARN_VIDEO_TIMES		"Learn Video Times"
 #define PRL_VMTIMING_LOGFILENAME						"statistic.log"
-#define PRL_COMMON_LOGFILENAME							"parallels.log"
+#define PRL_COMMON_LOGFILENAME							"vm.log"
 #define PRL_RECONFIGURATION_LOGFILENAME					"reconfiguration.log"
 
 #define UNATTENDED_ISO			"Unattended.iso"
@@ -103,7 +103,7 @@
 #define MIGRATE_DISP_PROTO_V4	4
 /* migration of tracking disk maps  */
 #define MIGRATE_DISP_PROTO_V5   5
-/* Virtuozzo 7.0.0 version */
+/* Vz 7.0.0 version */
 #define MIGRATE_DISP_PROTO_V7   7
 /* current migrate protocol version */
 #define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V7
@@ -133,7 +133,7 @@
 #define PRL_DISP_IO_BUFFER_SIZE				16*1024*1024
 
 /**
- * Parallels return codes
+ * VZ return codes
  */
 #define PRL_VM_CANT_CONNECT_TO_DISPATHER_RETCODE -2
 
@@ -151,7 +151,7 @@
 #define DEFAULT_MOBILE_ICON_HEIGHT	256
 
 /**
- * Parallels environment variables
+ * VZ environment variables
  */
 
 
@@ -196,23 +196,11 @@
 
 #define PRL_VM_REMOTE_DISPAY_MIN_PORT 5900
 
-//GUI aplication name related defines set
-#define PRL_PRODUCT_NAME_CONSOLE        "Parallels Management Console"
-#define PRL_PRODUCT_NAME_DESKTOP        "Parallels Desktop"
-#define PRL_PRODUCT_NAME_PLAYER			"Parallels Desktop Express"
-#define PRL_PRODUCT_NAME_DESKTOP_WL		"Parallels Desktop"
-#define PRL_PRODUCT_NAME_WORKSTATION_EXTREME "Parallels Workstation"
-#define PRL_PRODUCT_NAME_MOBILE         "Parallels Access"
 #define PRL_PRODUCT_NAME_UNKNOWN		"Unknown product"
 
-#define PRL_VENDOR						"Parallels Software"
-#define PRL_VENDOR_URL					"parallels.com"
-
 // app switcher application name
-#define PRL_APP_SWITCHER_NAME		"Parallels Application Switcher"
+#define PRL_APP_SWITCHER_NAME		"Application Switcher"
 #define PRL_APP_LEARN_VIDEO_NAME	"Learn Windows 7"
-
-#define PRL_TAG_VIRTUAL_MACHINE		"Parallels virtual machine"
 
 /**
  * Various enumerations
@@ -559,7 +547,7 @@ public:
 		RealHardDisk = PDT_USE_REAL_DEVICE,
 		HardDiskImage = PDT_USE_IMAGE_FILE,
 		BootCampHardDisk = PDT_USE_OTHER,
-		// Virtuozzo Container vzfs file system
+		// VZFS file system
 		ContainerHardDisk = PDT_USE_FILE_SYSTEM,
 	};
 
