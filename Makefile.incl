@@ -1,0 +1,8 @@
+#define VER_SHORTPRODUCTNAME_STR_PS "Virtuozzo"
+#define VER_COMPANYNAME_STR "Parallels International GmbH"
+#define VER_COMPANYNAME_REGISTRYBRANCH_STR "Parallels"
+#define VER_LEGALTRADEMARKS_STR "Parallels is a trademark of " VER_COMPANYNAME_STR
+#define VER_WEBSITE_STR "virtuozzo.com"
+#define PRL_PRODUCT_NAME_SERVER "Virtuozzo Server"
+#define PRL_VENDOR "Virtuozzo"
+#define PRL_VENDOR_URL "virtuozzo.com"
