@@ -4,6 +4,7 @@ Build/Current-gen.ver
 Libraries/PrlCommonUtilsBase/PrlStringifyConsts.cpp
 **/Makefile*
 !Makefile.version
+!Makefile.incl
 !Libraries/PrlCommonUtils/build.win/Makefile
 z-Build/
 
