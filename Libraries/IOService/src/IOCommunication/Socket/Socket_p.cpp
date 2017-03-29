@@ -444,7 +444,7 @@ bool IOService::getPeerInfo ( int sock,
 }
 
 bool IOService::getCredInfo( int sock,
-				qint32& pid,
+				quint32& pid,
 				quint32& uid,
 				QString& errStr )
 {

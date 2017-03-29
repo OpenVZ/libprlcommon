@@ -57,7 +57,10 @@ public:
                           const IOCommunication::DetachedClient& srv_state,
                           const IOCredentials& credentials,
                           bool useUnixSockets,
-                          bool securePrxMng = false);
+                          quint32 uid = 0,
+                          quint32 pid = 0,
+                          bool securePrxMng = false
+    );
     virtual ~SocketClientPrivate ();
 
     IOSender::State state () const;
@@ -257,8 +260,8 @@ private:
 	bool	m_bLimitErrorLogging;
 
 	// identification of the peer
-	boost::optional<quint32> m_peerUid;
-	boost::optional<qint32> m_peerPid;
+	quint32 m_peerUid;
+	quint32 m_peerPid;
 };
 
 } //namespace IOService

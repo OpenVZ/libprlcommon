@@ -124,6 +124,8 @@ SocketClientPrivate::SocketClientPrivate (
     const IOCommunication::DetachedClient& srv_clientState,
     const IOCredentials& credentials,
     bool useUnixSockets,
+    quint32 uid,
+    quint32 pid,
     bool securePrxMng) :
 
     m_jobManager(jobManager),
@@ -166,7 +168,9 @@ SocketClientPrivate::SocketClientPrivate (
     m_encryptedDataToRead(false),
     m_useUnixSockets(useUnixSockets),
     m_lastfd(-1),
-	m_bLimitErrorLogging(false)
+    m_bLimitErrorLogging(false),
+    m_peerUid(uid),
+    m_peerPid(pid)
 {
 	m_rl.rate = 1;
 	m_rl.last = -1;
