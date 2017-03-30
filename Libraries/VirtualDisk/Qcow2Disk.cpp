@@ -361,6 +361,11 @@ struct SetImage
 		m_aio = aio;
 	}
 
+	void setExportName(const QString& value_)
+	{
+		m_exportName = value_;
+	}
+
 private:
 	QStringList buildArgs() const
 	{
@@ -371,6 +376,8 @@ private:
 			a << "-C";
 		a << QString("--cache=%1").arg(m_cache);
 		a << QString("--aio=%1").arg(m_aio);
+		if (!m_exportName.isEmpty())
+			a << "-x" << m_exportName;
 
 		return a;
 	}
@@ -379,6 +386,7 @@ private:
 	bool m_compressed;
 	QString m_cache;
 	QString m_aio;
+	QString m_exportName;
 
 	QStringList m_args;
 	Nbd::qemu_type m_device;
@@ -438,6 +446,12 @@ template<> void Open::operator() (const Policy::Qcow2::cached_type &c)
 {
 	m_setImage.setCache(c ? "writeback" : "none");
 	m_setImage.setAio(c ? "threads" : "native");
+}
+
+template<>
+void Open::operator() (const Policy::Qcow2::exportName_type& value_)
+{
+	m_setImage.setExportName(value_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
