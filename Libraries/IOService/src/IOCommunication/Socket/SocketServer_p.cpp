@@ -484,8 +484,10 @@ void SocketServerPrivate::__finalizeThread ()
 
 
 Prl::Expected<SmartPtr<SocketClientPrivate>, bool> SocketServerPrivate::createAndStartNewSockClient (
-    int cliHandle
-    , IOCommunication::DetachedClient detachedState
+    int cliHandle,
+    IOCommunication::DetachedClient detachedState,
+    quint32 uid,
+    quint32 pid
 	)
 {
     SmartPtr<SocketClientPrivate> client;
@@ -521,7 +523,9 @@ Prl::Expected<SmartPtr<SocketClientPrivate>, bool> SocketServerPrivate::createAn
                                                 currConnUuid,
                                                 detachedState,
 												credentialsCopy,
-                                                m_useUnixSockets ) );
+                                                m_useUnixSockets,
+												uid,
+												pid ) );
         } catch ( ... ) {}
 
 
@@ -1277,7 +1281,7 @@ void SocketServerPrivate::run ()
                 }
 
 		quint32 uid;
-		qint32 pid;
+		quint32 pid;
 		QString errStr;
 		if ( ! IOService::getCredInfo(handle, pid, uid, errStr) ) {
 			WRITE_TRACE(DBG_FATAL,
@@ -1299,15 +1303,9 @@ void SocketServerPrivate::run ()
 			Prl::Expected<SmartPtr<SocketClientPrivate>, bool> c =
 				createAndStartNewSockClient(
 						handle,
-						IOCommunication::DetachedClient() );
-			if (!c.isFailed()) {
-				WRITE_TRACE(DBG_DEBUG, IO_LOG("Setting Peer: uid = %d, pid = %d"), uid, pid);
-				c.value()->setPeerUid(uid);
-				c.value()->setPeerPid(pid);
-			}
-			else {
-				WRITE_TRACE(DBG_DEBUG, IO_LOG("createAndStartNewSockClient failed"));
-			}
+						IOCommunication::DetachedClient(),
+						uid,
+						pid);
 		}
             }
 

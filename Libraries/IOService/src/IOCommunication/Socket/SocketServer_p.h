@@ -122,7 +122,9 @@ private:
 								 IOSender::State newState );
 	Prl::Expected<SmartPtr<SocketClientPrivate>, bool> createAndStartNewSockClient (
 				int cliHandle,
-				IOCommunication::DetachedClient);
+				IOCommunication::DetachedClient,
+				quint32 uid = 0,
+				quint32 pid = 0);
 
 	bool checkPendingConnection ( quint32 uid );
 

@@ -171,7 +171,7 @@ bool getPeerInfo ( int sockfd, QString& hostName,
 /**
  * Return numeric uid of user and pid of process
  */
-bool getCredInfo ( int sockfd, qint32& pid,
+bool getCredInfo ( int sockfd, quint32& pid,
 		   quint32& uid,
 		   QString& err );
 
