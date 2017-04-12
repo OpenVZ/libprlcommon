@@ -128,6 +128,7 @@ namespace IOService {
 
             HostnameResolveError,    /**< hostname or servname not provided,
                                           or not known. */
+            PacketTooLong,           /**< the package length exceeds the limit */
         };
 
 
