@@ -2583,8 +2583,15 @@ void SocketClientPrivate::doJob ()
                  goto cleanup_and_disconnect;
              }
 
-			 recv_sz += IODATASIZE(p);
-
+             recv_sz += IODATASIZE(p);
+             if ((1<<26) < p->fullPackageSize()) {
+                 m_error = IOSender::PacketTooLong;
+                 WRITE_TRACE(DBG_FATAL,
+                             IO_LOG("Error: packet length %d "
+                                    "exceeds the limit %d"),
+                             p->fullPackageSize(), (1<<26));
+                 goto cleanup_and_disconnect;
+             }
              // Create buffers
              for ( quint32 i = 0; i < p->header.buffersNumber; ++i ) {
                  LOG_MESSAGE(DBG_INFO,
