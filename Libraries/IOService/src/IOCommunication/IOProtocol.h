@@ -189,6 +189,10 @@ namespace IOService {
      */
     class IOPackage {
     public:
+	enum
+	{
+		SIZE_LIMIT = (1 << 26)
+	};
 
         /** Common package type */
         typedef quint32 Type;
@@ -550,6 +554,8 @@ namespace IOService {
 #include "../../Interfaces/unpacked.h"
 
     public:
+	qint32 stowBuffer(quint32 buffer_, const void* data_, const PODData& pod_);
+
         /**
          * Static variant of #IOPackage::headerChecksumCRC16
          * @see #IOPackage::headerChecksumCRC16
@@ -559,6 +565,7 @@ namespace IOService {
         static SmartPtr<char> allocPODBuffer(const IOPackage::PODData& desc);
 
     private: // Special memory alloc/dealloc functions
+	PRL_RESULT setBuffer(quint32 buffer_, const SmartPtr<char>& data_, const PODData& pod_);
 
         // Only allocates memory
         static IOPackage* allocatePackage ( quint32 buffsNumber );
