@@ -2584,12 +2584,12 @@ void SocketClientPrivate::doJob ()
              }
 
              recv_sz += IODATASIZE(p);
-             if ((1<<26) < p->fullPackageSize()) {
+             if (IOPackage::SIZE_LIMIT < p->fullPackageSize()) {
                  m_error = IOSender::PacketTooLong;
                  WRITE_TRACE(DBG_FATAL,
                              IO_LOG("Error: packet length %d "
                                     "exceeds the limit %d"),
-                             p->fullPackageSize(), (1<<26));
+                             p->fullPackageSize(), IOPackage::SIZE_LIMIT);
                  goto cleanup_and_disconnect;
              }
              // Create buffers

@@ -31,6 +31,7 @@
 
 #include <time.h>
 #include <stdlib.h>
+#include <prlsdk/PrlErrors.h>
 
 #ifndef _WIN_
   #include <sys/time.h>
@@ -957,17 +958,14 @@ bool IOPackage::setBuffer ( quint32 index, EncodingType enc,
 bool IOPackage::setBuffer ( quint32 index, EncodingType enc,
                             const SmartPtr<char>& buff, quint32 size )
 {
-    if ( index >= header.buffersNumber ) {
-        return false;
-    }
+	if (index >= header.buffersNumber)
+		return false;
 
-    PODData* ioData = IODATAMEMBER(this);
+	PODData p;
+	p.bufferSize = size;
+	p.bufferEncoding = enc;
 
-    buffers[index] = buff;
-    ioData[index].bufferEncoding = enc;
-    ioData[index].bufferSize = size;
-
-    return true;
+	return PRL_SUCCEEDED(setBuffer(index, buff, p));
 }
 
 bool IOPackage::fillBuffer ( quint32 index, EncodingType enc,
@@ -1115,6 +1113,36 @@ SmartPtr<char> IOPackage::allocPODBuffer ( const PODData& desc )
 
     return SmartPtr<char>( new(std::nothrow) char[ desc.bufferSize ],
                            SmartPtrPolicy::ArrayStorage );
+}
+
+PRL_RESULT IOPackage::setBuffer(quint32 buffer_, const SmartPtr<char>& data_, const PODData& pod_)
+{
+	PODData* d = IODATAMEMBER(this);
+	PODData& b = d[buffer_];
+	register qint64 c = SIZE_LIMIT - fullPackageSize() + b.bufferSize - pod_.bufferSize;
+	if (0 > c)
+		return PRL_ERR_BUFFER_OVERRUN;
+
+	b = pod_;
+	buffers[buffer_] = data_;
+
+	return PRL_ERR_SUCCESS;
+}
+
+qint32 IOPackage::stowBuffer(quint32 buffer_, const void* data_, const PODData& pod_)
+{
+	if (buffer_ >= header.buffersNumber)
+		return -1;
+
+	PODData& b = IODATAMEMBER(this)[buffer_];
+	register qint64 c = SIZE_LIMIT - fullPackageSize() + b.bufferSize;
+	if (0 >= c)
+		return -1;
+
+	if (!fillBuffer(buffer_, pod_.bufferEncoding, data_, qMin(quint32(c), pod_.bufferSize)))
+		return -1;
+
+	return b.bufferSize;
 }
 
 /*****************************************************************************/
