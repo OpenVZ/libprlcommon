@@ -26,6 +26,7 @@
 
 
 #include "CProtoSerializer.h"
+#include <boost/scope_exit.hpp>
 
 namespace Parallels
 {
@@ -613,6 +614,12 @@ CProtoCommandPtr CProtoSerializer::ParseCommand(
     if ( ! p.isValid() )
         return CProtoCommandPtr(new CProtoCommandIllegalCommand());
 
+	QString x = UTF8_2QSTR(p->buffers[0].getImpl());
+	BOOST_SCOPE_EXIT(&x)
+	{
+		x.fill(0);
+	}
+	BOOST_SCOPE_EXIT_END;
     return ParseCommand( (PVE::IDispatcherCommands)p->header.type,
 						 UTF8_2QSTR( p->buffers[0].getImpl() ) );
 }

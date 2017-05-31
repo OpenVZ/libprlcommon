@@ -225,6 +225,8 @@ public:
 		const QString &sPrevSessionUuid,
                 quint32 nFlags
 	);
+	~CProtoCommandDspCmdUserLogin();
+
 	/** Overridden method that let to determine whether protocol command valid */
 	bool IsValid();
 	/** Returns username param value */
