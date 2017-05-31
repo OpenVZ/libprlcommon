@@ -204,6 +204,17 @@ CProtoCommandDspCmdUserLogin::CProtoCommandDspCmdUserLogin(
 	SetStringParamValue( sPrevSessionUuid, EVT_PARAM_LOGIN_CMD_SESSION_TO_RESTORE );
 }
 
+CProtoCommandDspCmdUserLogin::~CProtoCommandDspCmdUserLogin()
+{
+	CVmEventParameter* p = m_pProtoPackage->getEventParameter(EVT_PARAM_LOGIN_CMD_PASSWORD);
+	if (NULL == p)
+		return;
+
+	QString v = p->getParamValue();
+	p->setParamValue(QString());
+	v.fill(0);
+}
+
 bool CProtoCommandDspCmdUserLogin::IsValid()
 {
 	return CheckWhetherParamPresents(EVT_PARAM_LOGIN_CMD_USERNAME, PVE::String)
