@@ -840,6 +840,12 @@ namespace IOService {
 	( (ver).majorNumber > 6 || ((ver).majorNumber == 6 && (ver).minorNumber >= 8) )
 
 /**
+ * Returns true if protocol version supports new logging scheme.
+ */
+#define IOPROTOCOL_NEW_LOGIN_SUPPORT(ver) \
+	( (ver).majorNumber > 6 || ((ver).majorNumber == 6 && (ver).minorNumber >= 9) )
+
+/**
  * IO protocol internal macroses
  */
 
