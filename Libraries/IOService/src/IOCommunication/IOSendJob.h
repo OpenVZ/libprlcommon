@@ -42,14 +42,14 @@
 
 #include "IOProtocol.h"
 #include "BlockingQueue.h"
-#include <Libraries/Std/noncopyable.h>
+#include <boost/noncopyable.hpp>
 
 namespace IOService {
 
 class IOJobManager;
 class IOSendJobInterface;
 
-class IOSendJob: noncopyable
+class IOSendJob: boost::noncopyable
 {
 public:
     enum Result
