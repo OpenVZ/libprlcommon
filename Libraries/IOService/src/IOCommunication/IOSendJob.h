@@ -41,13 +41,15 @@
 #include <QWaitCondition>
 
 #include "IOProtocol.h"
+#include "BlockingQueue.h"
+#include <Libraries/Std/noncopyable.h>
 
 namespace IOService {
 
 class IOJobManager;
 class IOSendJobInterface;
 
-class IOSendJob
+class IOSendJob: noncopyable
 {
 public:
     enum Result
@@ -114,8 +116,6 @@ public:
     ~IOSendJob ();
 
     /** Set all members to default values */
-    void reinit ();
-
     void registerPackageUuid ( const Uuid_t );
     const Uuid& getPackageUuid () const;
 
@@ -132,7 +132,6 @@ public:
     IOSendJob::Result getSendResult () const;
 
     IOSendJob::Response takeResponse ();
-    bool clearResponse ();
     bool sendWaitingsWereWaken () const;
     bool responseWaitingsWereWaken () const;
 
@@ -140,10 +139,7 @@ public:
     quint32 getResponseWaitingsNumber () const;
 
 private:
-    bool m_isSendUrgentlyWaked;
-    bool m_isResponseUrgentlyWaked;
     Result m_sendResult;
-    Response m_response;
 
     mutable QMutex m_mutex;
     mutable QWaitCondition m_sendWait;
@@ -153,6 +149,10 @@ private:
     volatile mutable qint32 m_responseWaitingsNum;
 
     Uuid m_packageUuid;
+    Cancellation::Sink m_sendSink;
+    Cancellation::Sink m_responseSink;
+    Cancellation::Token m_token;
+    mutable BlockingQueue<Response, 31> m_throttle;
 };
 
 class IOJobManager

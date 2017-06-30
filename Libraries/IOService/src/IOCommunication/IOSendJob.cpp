@@ -58,24 +58,27 @@ IOSendJob::Handle IOSendJob::InvalidHandle;
 /*****************************************************************************/
 
 IOSendJob::IOSendJob () :
-    m_isSendUrgentlyWaked(false),
-    m_isResponseUrgentlyWaked(false),
     m_sendResult(SendPended),
-    m_sendWaitingsNum(0),
-    m_responseWaitingsNum(0)
-{}
+    m_sendWaitingsNum(),
+    m_responseWaitingsNum(),
+    m_sendSink(m_mutex, m_sendWait),
+    m_responseSink(m_mutex, m_responseWait)
+{
+    bool x;
+    x = m_sendSink.connect(&m_token, SIGNAL(cancel()), SLOT(do_()), Qt::DirectConnection);
+    Q_ASSERT(x);
+    x = m_responseSink.connect(&m_token, SIGNAL(cancel()), SLOT(do_()), Qt::DirectConnection);
+    Q_ASSERT(x);
+    Q_UNUSED(x);
+}
 
 IOSendJob::~IOSendJob ()
-{}
-
-void IOSendJob::reinit ()
 {
-    m_sendResult = SendPended;
-    m_response = Response();
-    m_packageUuid = Uuid();
-
     Q_ASSERT( m_sendWaitingsNum == 0 );
     Q_ASSERT( m_responseWaitingsNum == 0 );
+
+    m_token.disconnect(&m_sendSink);
+    m_token.disconnect(&m_responseSink);
 }
 
 void IOSendJob::registerPackageUuid ( const Uuid_t pkgUuid )
@@ -99,16 +102,10 @@ bool IOSendJob::isResponsibleForPackageUuid ( const Uuid_t uuid ) const
 
 bool IOSendJob::waitForSend ( quint32 timeout, bool& urgentlyWaked )
 {
-    QMutexLocker locker( &m_mutex );
-
-    urgentlyWaked = false;
-
-    if ( m_isSendUrgentlyWaked ) {
-        m_isSendUrgentlyWaked = false;
-        urgentlyWaked = true;
+    if ((urgentlyWaked = m_token.isCancelled())) {
         return true;
     }
-
+    QMutexLocker locker( &m_mutex );
     if ( m_sendResult != SendPended ) {
         return true;
     }
@@ -124,27 +121,17 @@ bool IOSendJob::waitForSend ( quint32 timeout, bool& urgentlyWaked )
 
     --m_sendWaitingsNum;
 
-    if ( m_isSendUrgentlyWaked ) {
-        m_isSendUrgentlyWaked = false;
-        urgentlyWaked = true;
-    }
-
+    urgentlyWaked = m_token.isCancelled();
     return res;
 }
 
 bool IOSendJob::waitForResponse ( quint32 timeout, bool& urgentlyWaked )
 {
-    QMutexLocker locker( &m_mutex );
-
-    urgentlyWaked = false;
-
-    if ( m_isResponseUrgentlyWaked ) {
-        m_isResponseUrgentlyWaked = false;
-        urgentlyWaked = true;
+    if ((urgentlyWaked = m_token.isCancelled())) {
         return true;
     }
-
-    if ( m_response.responseResult != NoResponse ) {
+    QMutexLocker locker( &m_mutex );
+    if (!m_throttle.empty()) {
         return true;
     }
 
@@ -159,11 +146,7 @@ bool IOSendJob::waitForResponse ( quint32 timeout, bool& urgentlyWaked )
 
     --m_responseWaitingsNum;
 
-    if ( m_isResponseUrgentlyWaked ) {
-        m_isResponseUrgentlyWaked = false;
-        urgentlyWaked = true;
-    }
-
+    urgentlyWaked = m_token.isCancelled();
     return res;
 }
 
@@ -171,14 +154,14 @@ void IOSendJob::wakeSendWaitings ( IOSendJob::Result res )
 {
     Q_ASSERT(res != SendPended);
 
-    QMutexLocker locker( &m_mutex );
-    // Urgently waking
-    if ( res == UrgentlyWaked )
-        m_isSendUrgentlyWaked = true;
-    // Generic result set
-    else
+    if (UrgentlyWaked == res) {
+        m_token.signal();
+    } else {
+        QMutexLocker locker( &m_mutex );
+        // Generic result set
         m_sendResult = res;
-    m_sendWait.wakeAll();
+        m_sendWait.wakeAll();
+    }
 }
 
 void IOSendJob::wakeResponseWaitings ( IOSendJob::Result res,
@@ -187,17 +170,22 @@ void IOSendJob::wakeResponseWaitings ( IOSendJob::Result res,
 {
     Q_ASSERT(res != NoResponse);
 
-    QMutexLocker locker( &m_mutex );
-    // Urgently waking
-    if ( res == UrgentlyWaked )
-        m_isResponseUrgentlyWaked = true;
-    // Generic result set
-    else {
-        m_response.responseResult = res;
-        m_response.senderHandle = h;
-        m_response.responsePackages.append( p );
+    if (UrgentlyWaked == res) {
+        m_token.signal();
+        return;
     }
-    m_responseWait.wakeAll();
+    Response x;
+    x.senderHandle = h;
+    x.responseResult = res;
+    x.responsePackages.append(p);
+    if (!m_throttle.add(x, m_token)) {
+        return;
+    }
+    QMutexLocker locker( &m_mutex );
+    if (!m_throttle.empty()) {
+        // Generic result set
+        m_responseWait.wakeAll();
+    }
 }
 
 IOSendJob::Result IOSendJob::getSendResult () const
@@ -209,27 +197,11 @@ IOSendJob::Result IOSendJob::getSendResult () const
 IOSendJob::Response IOSendJob::takeResponse ()
 {
     Response response;
-
     QMutexLocker locker( &m_mutex );
-    // Make a copy
-    response = m_response;
-    // Clean all responses
-    m_response.responsePackages.clear();
-    // Again no responses
-    m_response.responseResult = NoResponse;
-
+    if (!m_throttle.empty()) {
+        m_throttle.take(response, m_token);
+    }
     return response;
-}
-
-bool IOSendJob::clearResponse ()
-{
-    QMutexLocker locker( &m_mutex );
-    // Clean all responses
-    m_response.responsePackages.clear();
-    // Again no responses
-    m_response.responseResult = NoResponse;
-
-    return true;
 }
 
 bool IOSendJob::sendWaitingsWereWaken () const
@@ -241,7 +213,7 @@ bool IOSendJob::sendWaitingsWereWaken () const
 bool IOSendJob::responseWaitingsWereWaken () const
 {
     QMutexLocker locker( &m_mutex );
-    return (m_response.responseResult != NoResponse);
+    return !m_throttle.empty();
 }
 
 quint32 IOSendJob::getSendWaitingsNumber () const
@@ -362,7 +334,7 @@ bool IOJobManager::initActiveJob (
     // Try to free
     else {
         // Reinit free send job
-        freeJob->sendJob->reinit();
+        freeJob->sendJob = SmartPtr<IOSendJob>(new IOSendJob());
 
         // Remove some free elements
         if ( jobPool->jobList.size() > OptimalPoolSize ) {
