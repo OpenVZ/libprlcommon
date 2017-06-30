@@ -198,20 +198,6 @@ public:
     }
 
     /**
-     * Clears all gathered response packages.
-     * This method should be called every time in 'onResponsePackageReceived',
-     * if we do not use '#takeResponse' call. This will prevent us from
-     * response packages accumulation.
-     */
-    inline bool clearResponse ( IOSendJob::Handle& h ) const
-    {
-        if ( ! h.m_job.isValid() )
-            return false;
-
-        return h.m_job->clearResponse();
-    }
-
-    /**
      * Returns number of threads, which are waiting for send results
      */
     inline quint32 getSendWaitingsNumber ( const IOSendJob::Handle& h ) const

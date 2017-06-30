@@ -42,6 +42,8 @@ HEADERS = \
           IOServer.h \
           IOServerInterface.h \
           IOServerPool.h \
+	  BlockingQueue.h \
+	  Cancellation.h \
           \
           Socket/SocketClient_p.h \
           Socket/SocketListeners_p.h \
@@ -77,6 +79,7 @@ SOURCES = \
           IOSendJob.cpp \
           IOServer.cpp \
           IOServerPool.cpp \
+	  Cancellation.cpp \
           \
           Socket/SocketClient_p.cpp \
           Socket/SocketServer_p.cpp \
