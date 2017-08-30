@@ -39,6 +39,7 @@
 #include <QStringList>
 #include <QDir>
 #include <QElapsedTimer>
+#include <QtGlobal>
 #include <boost/property_tree/json_parser.hpp>
 
 #include <prlsdk/PrlErrorsValues.h>
@@ -150,11 +151,29 @@ void Process::addChannel(int channel_)
 
 void Process::setupChildProcess()
 {
+	int x = 3;
+
 	QProcess::setupChildProcess(); // requires vz-built qt version
-	
+
+	if (m_channels.empty())
+		return;
+
+	qSort(m_channels);
 	foreach(int fd, m_channels) {
-		fcntl(fd, F_SETFD, ~FD_CLOEXEC);
+		if (x != fd)
+		{
+			if (dup2(fd, x) == -1)
+			{
+				WRITE_TRACE(DBG_FATAL, "dup2(%d,%d) failed: %m", fd, x);
+				return;
+			}
+		}
+		fcntl(x, F_SETFD, ~FD_CLOEXEC);
+		x++;
 	}
+
+	qputenv("LISTEN_FDS", QString::number(m_channels.count()).toUtf8());
+	qputenv("LISTEN_PID", QString::number(getpid()).toUtf8());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -336,7 +355,6 @@ struct SetImage
 	void setFd(PRL_INT32 fd)
 	{
 		if (fd >= 0) {
-			m_args = QStringList() << QString("--server-sock-fd=%1").arg(fd);
 			m_device.value()->addFd(fd);
 		}
 	}
