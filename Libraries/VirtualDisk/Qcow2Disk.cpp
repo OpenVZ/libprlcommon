@@ -665,9 +665,8 @@ Parameters::disk_type Qcow2::getInfo()
 bool Qcow2::isValid(const QString &fileName)
 {
 	QStringList cmdLine = QStringList()
-		<< QEMU_IMG << "info" << "--image-opts" << "--output=json"
-		<< QString("file.read-only=on,file.locking=off,file.filename=")
-			.append(fileName);
+		<< QEMU_IMG << "info" << "--force-share" << "--output=json"
+		<< fileName;
 	QString out;
 	if (!HostUtils::RunCmdLineUtility(
 			cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
