@@ -154,8 +154,10 @@ bool generateCredentials(const QString& userId,
 	if( !rsaKey )
 		return false;
 
-	if (!RSA_generate_key_ex(rsaKey, bits, e.get(), NULL))
+	if (!RSA_generate_key_ex(rsaKey, bits, e.get(), NULL)) {
+		RSA_free(rsaKey);
 		return false;
+	}
 
 	if (!EVP_PKEY_assign_RSA(privateKey.get(), rsaKey))
 	{
