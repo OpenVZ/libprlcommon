@@ -60,7 +60,9 @@ private slots:
 
 private:
 
-	SmartPtr<RSA>	 m_rsa;
+	SmartPtr<EVP_PKEY> m_pk;
+	// m_rsa cleaned by m_pk destructor
+	RSA		 *m_rsa;
 	SmartPtr<X509>	 m_cert;
 };
 

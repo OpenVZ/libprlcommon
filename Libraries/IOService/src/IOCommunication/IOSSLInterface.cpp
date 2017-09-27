@@ -147,10 +147,17 @@ bool generateCredentials(const QString& userId,
 	if ( !privateKey )
 		return false;
 
-	RSA *rsaKey = RSA_generate_key(bits, RSA_3, NULL, NULL);
+	SmartPtr<BIGNUM> e = SmartPtr<BIGNUM>(BN_new(), BN_free);
+	BN_set_word(e.get(), 65537);
+	RSA *rsaKey  = RSA_new();
 
 	if( !rsaKey )
 		return false;
+
+	if (!RSA_generate_key_ex(rsaKey, bits, e.get(), NULL)) {
+		RSA_free(rsaKey);
+		return false;
+	}
 
 	if (!EVP_PKEY_assign_RSA(privateKey.get(), rsaKey))
 	{
@@ -171,7 +178,11 @@ bool generateCredentials(const QString& userId,
 
 	X509_gmtime_adj(X509_get_notAfter(x509cert.get()), (long) 60 * 60 * 24 * days);
 
-	X509_set_pubkey(x509cert.get(), privateKey.get());
+	if (!X509_set_pubkey(x509cert.get(), privateKey.get()))
+		return false;
+
+	if (!X509_sign(x509cert.get(), privateKey.get(), EVP_sha1()))
+		return false;
 
 	if (!userId.isEmpty())
 	{
