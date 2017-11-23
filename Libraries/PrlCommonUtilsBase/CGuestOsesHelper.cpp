@@ -68,19 +68,6 @@ TOpaqueTypeList<PRL_UINT8> CGuestOsesHelper::GetSupportedOsesTypes(PRL_HOST_OS_T
 		ADD_OS_TYPE( PVS_GUEST_TYPE_LINUX )
 		ADD_OS_TYPE( PVS_GUEST_TYPE_FREEBSD )
 
-#ifdef EXTERNALLY_AVAILABLE_BUILD
-	// MacOS Guest Support EULA Enforcement
-	// (not allowed to run on non-apple platform)
-#ifdef PSBM_MAC
-		if ( nProcessedHostOsType == PHO_MAC ||
-			PAM_SERVER == ParallelsDirs::getAppExecuteMode())
-#else
-		if ( nProcessedHostOsType == PHO_MAC )
-#endif
-#endif
-			ADD_OS_TYPE( PVS_GUEST_TYPE_MACOS )
-
-#ifndef EXTERNALLY_AVAILABLE_BUILD
 		ADD_OS_TYPE( PVS_GUEST_TYPE_CHROMEOS )
 		ADD_OS_TYPE( PVS_GUEST_TYPE_ANDROID )
 		ADD_OS_TYPE( PVS_GUEST_TYPE_OS2 )
@@ -88,18 +75,6 @@ TOpaqueTypeList<PRL_UINT8> CGuestOsesHelper::GetSupportedOsesTypes(PRL_HOST_OS_T
 		ADD_OS_TYPE( PVS_GUEST_TYPE_NETWARE )
 		ADD_OS_TYPE( PVS_GUEST_TYPE_SOLARIS )
 		ADD_OS_TYPE( PVS_GUEST_TYPE_OTHER )
-#else
-		if (PAM_SERVER != ParallelsDirs::getAppExecuteMode())
-		{
-			ADD_OS_TYPE( PVS_GUEST_TYPE_CHROMEOS )
-			ADD_OS_TYPE( PVS_GUEST_TYPE_ANDROID )
-			ADD_OS_TYPE( PVS_GUEST_TYPE_OS2 )
-			ADD_OS_TYPE( PVS_GUEST_TYPE_MSDOS )
-			ADD_OS_TYPE( PVS_GUEST_TYPE_SOLARIS )
-			ADD_OS_TYPE( PVS_GUEST_TYPE_OTHER )
-		}
-#endif
-
 #undef ADD_OS_TYPE
 	}
 
@@ -112,26 +87,13 @@ TOpaqueTypeList<PRL_UINT16> CGuestOsesHelper::GetSupportedOsesVersions(PRL_HOST_
 	TOpaqueTypeList<PRL_UINT16> _result;
 	if (PHO_UNKNOWN != nProcessedHostOsType)
 	{
-#ifdef EXTERNALLY_AVAILABLE_BUILD
-		PRL_APPLICATION_MODE nAppMode = ParallelsDirs::getAppExecuteMode();
-#endif
-
 #define ADD_OS_VER( ver ) _result.GetContainer().append( ver );
 
 		switch ( nOsType )
 		{
 			case PVS_GUEST_TYPE_MACOS:
-#ifdef EXTERNALLY_AVAILABLE_BUILD
-#ifdef PSBM_MAC
-			if ( PHO_MAC == nProcessedHostOsType ||
-				PAM_SERVER == nAppMode )
-#else
 			if ( PHO_MAC == nProcessedHostOsType )
-#endif
-#endif
-			{
 				ADD_OS_VER( PVS_GUEST_VER_MACOS_UNIVERSAL )
-			}
 			break;
 
 			case PVS_GUEST_TYPE_WINDOWS:
