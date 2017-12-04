@@ -23,9 +23,15 @@
 #include <prlsdk/PrlErrorsValues.h>
 #include <prlsdk/PrlErrors.h>
 #include "Libraries/Std/BitOps.h"
+#include "Libraries/PrlUuid/Uuid.h"
 #include "Libraries/Std/sparse_bitmap.h"
 #include "SparseBitmap.h"
 #include <errno.h>
+
+
+CSparseBitmap::CSparseBitmap() :  m_Uid(new Uuid)
+{
+}
 
 /* Constructors and assignment are private, use static Create instead */
 CSparseBitmap::~CSparseBitmap()
@@ -72,7 +78,7 @@ CSparseBitmap *CSparseBitmap::Create(UINT64 size, UINT32 granularity,
 
 bool CSparseBitmap::CheckUid(const Uuid &uid) const
 {
-	return uid == m_Uid;
+	return uid == *m_Uid;
 }
 
 UINT32 CSparseBitmap::GetGranularity() const
@@ -82,12 +88,12 @@ UINT32 CSparseBitmap::GetGranularity() const
 
 const Uuid & CSparseBitmap::GetUid() const
 {
-	return m_Uid;
+	return *m_Uid;
 }
 
 void CSparseBitmap::SetUid(const Uuid &uid)
 {
-	m_Uid = uid;
+	m_Uid.reset(new Uuid(uid));
 }
 
 UINT64 CSparseBitmap::GetSize() const
@@ -217,7 +223,7 @@ PRL_RESULT CSparseBitmap::Init(UINT64 size, UINT32 granularity,
 
 	m_GranularityBits = BitFindLowestSet(granularity);
 	m_Size = size;
-	m_Uid = uid;
+	m_Uid.reset(new Uuid(uid));
 	m_WaitParts = waitParts;
 	m_Bitmap = sp_bitmap_create((m_Size + granularity - 1) >> m_GranularityBits);
 
