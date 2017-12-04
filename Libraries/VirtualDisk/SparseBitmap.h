@@ -23,8 +23,8 @@
 #define CSPARCEBITMAP_H
 
 #include <prlsdk/PrlTypes.h>
-#include <prlcommon/PrlUuid/Uuid.h>
 
+class Uuid;
 struct sp_bitmap;
 class CSparseBitmap {
 public:
@@ -67,7 +67,7 @@ public:
 	void PartComplete();
 
 private:
-	CSparseBitmap() {};
+	CSparseBitmap();
 	CSparseBitmap(const CSparseBitmap &);
 	CSparseBitmap & operator=(const CSparseBitmap &);
 
@@ -79,7 +79,7 @@ private:
 	sp_bitmap *m_Bitmap;
 	UINT32 m_GranularityBits;
 	UINT64 m_Size;
-	Uuid m_Uid;
+	std::auto_ptr<Uuid> m_Uid;
 	UINT32 m_WaitParts;
 };
 
