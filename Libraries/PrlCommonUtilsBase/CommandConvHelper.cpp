@@ -29,6 +29,14 @@
 #include <QHash>
 #include "CommandConvHelper.h"
 
+#ifndef PJOC_SRV_BEGIN_VM_BACKUP
+#define PJOC_SRV_BEGIN_VM_BACKUP	((PRL_JOB_OPERATION_CODE)202)
+#endif
+
+#ifndef PJOC_VM_END_BACKUP
+#define PJOC_VM_END_BACKUP		((PRL_JOB_OPERATION_CODE)203)
+#endif
+
 //*********************************Dispatcher commands converter implementation******************************
 Q_GLOBAL_STATIC(QMutex, DispatcherCommandsAndJobTypesMapsMutex)
 typedef QHash<PVE::IDispatcherCommands, PRL_JOB_OPERATION_CODE> DispatcherCmdsToJobTypesMapType;
