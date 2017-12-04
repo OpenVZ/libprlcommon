@@ -698,4 +698,18 @@ bool Qcow2::isValid(const QString &fileName)
 	return *format == "qcow2";
 }
 
+CSparseBitmap *Qcow2::getUsedBlocksBitmap(UINT32 granularity,
+                PRL_RESULT &err)
+{
+	Q_UNUSED(granularity)
+	Q_UNUSED(err)
+
+	return NULL;
+}
+
+CSparseBitmap *Qcow2::getTrackingBitmap()
+{
+	return NULL;
+}
+
 } // namespace VirtualDisk

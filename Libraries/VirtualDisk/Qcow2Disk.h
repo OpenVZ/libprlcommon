@@ -171,7 +171,9 @@ struct Qcow2: Format
 	virtual Parameters::disk_type getInfo();
 	virtual PRL_RESULT close(void);
 	static bool isValid(const QString &fileName);
-
+	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
+			PRL_RESULT &err);
+	virtual CSparseBitmap *getTrackingBitmap();	
 private:
 	void closeForce();
 

@@ -28,6 +28,8 @@
 #include "VirtualDisk.h"
 #include "Util.h"
 
+class CSparseBitmap;
+
 namespace VirtualDisk
 {
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,7 +53,9 @@ struct Ploop : Format
 	virtual PRL_RESULT close(void);
 	PRL_RESULT create(const QString &fileName,
 			const Parameters::Disk &params);
-
+	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
+			PRL_RESULT &err);
+	virtual CSparseBitmap *getTrackingBitmap();
 private:
 	struct ploop_disk_images_data *m_di;
 	struct ploop_functions *m_ploop;

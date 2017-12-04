@@ -32,6 +32,7 @@
 #include "../PrlCommonUtilsBase/SysError.h"
 #include "../PrlCommonUtilsBase/ErrorSimple.h"
 
+class CSparseBitmap;
 namespace VirtualDisk
 {
 namespace Parameters
@@ -254,6 +255,9 @@ struct Format : boost::noncopyable
 			PRL_UINT64 offSec) = 0;
 	virtual Parameters::disk_type getInfo(void) = 0;
 	virtual PRL_RESULT close(void) = 0;
+	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
+			PRL_RESULT &err) = 0;
+	virtual CSparseBitmap *getTrackingBitmap() = 0;
 };
 
 Format* detectImageFormat(const QString &image);

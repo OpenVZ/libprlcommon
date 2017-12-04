@@ -482,11 +482,13 @@ CProtoCommandPtr CProtoSerializer::ParseCommand(PVE::IDispatcherCommands nCmdIde
 		case PVE::DspCmdMoveToCPUPool:
 		case PVE::DspCmdRecalculateCPUPool:
 		case PVE::DspCmdVmCommitEncryption:
-			pCommand = static_cast<CProtoCommand *>(new CProtoCommandWithOneStrParam(nCmdIdentifier));
+		case PVE::DspCmdEndVmBackup:
+			pCommand = new CProtoCommandWithOneStrParam(nCmdIdentifier);
 		break;
 
 		case PVE::DspCmdRemoveCtTemplate:
-			pCommand = static_cast<CProtoCommand *>(new CProtoCommandWithTwoStrParams(nCmdIdentifier));
+		case PVE::DspCmdBeginVmBackup:
+			pCommand = new CProtoCommandWithTwoStrParams(nCmdIdentifier);
 		break;
 
 		case PVE::DspCmdVmStart:

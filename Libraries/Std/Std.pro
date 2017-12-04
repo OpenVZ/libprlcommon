@@ -19,3 +19,4 @@ INCLUDEPATH += ../../..
 
 	linux-*:SOURCES += \
 			PrlTime_lin.cpp \
+			sparse_bitmap.c
