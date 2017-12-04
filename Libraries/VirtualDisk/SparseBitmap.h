@@ -23,7 +23,7 @@
 #define CSPARCEBITMAP_H
 
 #include <prlsdk/PrlTypes.h>
-#include <prlcommon/PrlUuid/Uuid.h>
+#include "Libraries/PrlUuid/Uuid.h"
 
 struct sp_bitmap;
 class CSparseBitmap {
