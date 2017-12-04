@@ -31,7 +31,6 @@
 #ifndef _STD_BITOPS_H_
 #define _STD_BITOPS_H_
 
-
 #include "../Interfaces/ParallelsTypes.h"
 #include "AtomicOps.h"
 
@@ -79,6 +78,19 @@ static __inline void BMAP_SET_BLOCK(void* bmap, unsigned int Start, unsigned int
 
 	for (; Start < End; Start++)
 		BMAP_SET(bmap, Start);
+}
+
+static __inline void BMAP_MERGE(void* dest, void* src, unsigned int Size)
+{
+	unsigned i, n = Size >> 6;
+	UINT64 *d = (UINT64 *)dest, *s = (UINT64 *)src;
+	for (i = 0; i < n; ++i) {
+		*d++ |= *s++;
+	}
+
+	for (i = n << 6; i < Size; ++i)
+		if (BMAP_GET(src, i))
+			BMAP_SET(dest, i);
 }
 
 // Clear a bit of a bitmap
@@ -267,6 +279,37 @@ static __inline int BitFindLowestClear64(UINT64 uVal)
 	return BitFindLowestSet64(~uVal);
 }
 
+/**
+ * @brief Find the most significant bit
+ * @param uVal
+ * @return 	position of the most significant bit set,
+ *	and -1 if all bits are 0
+ */
+static __inline int BitFindHighestSet64(UINT64 uVal)
+{
+#if defined(__GNUC__) || defined(__clang__)
+	if (0 == uVal) {
+		return -1;
+	}
+	int zeroCount = __builtin_clzll(uVal);
+	return (63 - zeroCount);
+#else
+	// not-optimized fallback variant
+	// XXX: little-endian specific code
+	UINT32* v = (UINT32*)&uVal;
+	int     rv = BitFindHighestSet(v[1]);
+	if (0 == uVal) {
+		return -1;
+	}
+	if (-1 != rv)
+		return rv + 32;
+	rv = BitFindHighestSet(v[0]);
+	if (-1 != rv)
+		return rv;
+	return -1;
+#endif
+}
+
 #define BITS_PER_UINT64	(sizeof(UINT64) << 3)
 #define BIT_MASK_UINT64	((UINT64)0x3F)
 #define BIT2POS64(pos)	((pos) / BITS_PER_UINT64)
@@ -391,6 +434,66 @@ check_tail:
 
 found:
 	return pos + BitFindLowestClear64(val);
+}
+
+/**
+ * @brief BitFindLastSet64 - backward search in bit range [bitOff, bitSize)
+ * @param bmap	- pointer to a bit array
+ * @param bitSize	- size of a bitmap in bits(!)
+ * @param bitOff	- position to finish in bits(!)
+ * @return	- position of the most bit is set, or -1 if all bits are cleared
+ * @warning If bmap is NULL or bitOff is greater than bitSize -1 will be returned.
+ *
+ * Function perform backward seach starting from bitSize-1 bit and finishing at
+ * bitOff bit.
+ */
+static __inline LONG64 BitFindLastSet64(UINT64 const* bmap,
+										  UINT32 bitSize,
+										  UINT32 bitOff)
+{
+	UINT32	off = bitSize & BIT_MASK_UINT64;
+	LONG64	idx = bitSize / BITS_PER_UINT64;
+	LONG64	start = bitOff / BITS_PER_UINT64;
+	UINT64	val;
+
+	if (NULL == bmap)
+		return -1;
+	if (bitOff >= bitSize)
+		return -1;
+
+	// buffer tail
+	if (off != 0) {
+		val = bmap[idx];
+		val &= BIT_ALL_SET64 >> (BITS_PER_UINT64 - off);
+		if (idx == start) {
+			goto head;
+		}
+		if (val != 0) {
+			goto found;
+		}
+	}
+
+	idx--;
+
+	// buffer body
+	while (idx > start) {
+		val = bmap[idx];
+		if (val != 0) {
+			goto found;
+		}
+		idx--;
+	}
+
+	// buffer head
+	val = bmap[idx];
+
+head:
+	off = bitOff & BIT_MASK_UINT64;
+	val &= BIT_ALL_SET64 << off;
+	if (0 == val)
+		return -1;
+found:
+	return (idx * BITS_PER_UINT64 + BitFindHighestSet64(val));
 }
 
 /*

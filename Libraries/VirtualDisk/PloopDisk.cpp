@@ -37,6 +37,8 @@
 
 #include "PloopDisk.h"
 #include "Libraries/Logging/Logging.h"
+#include "Libraries/VirtualDisk/SparseBitmap.h"
+
 typedef void (* resolve_functions)(struct ploop_functions *);
 
 namespace VirtualDisk
@@ -266,6 +268,41 @@ PRL_RESULT Ploop::close(void)
 	m_di = NULL;
 
 	return PRL_ERR_SUCCESS;
+}
+
+CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
+		PRL_RESULT &err)
+{
+
+	UINT64 sectors = m_di->size;
+	CSparseBitmap *res = CSparseBitmap::Create(sectors, granularity, err);
+	if (res == NULL)
+		return NULL;
+
+	err = res->SetAll();
+	if (PRL_FAILED(err)) {
+		delete res;
+		return NULL;
+	}
+
+	return res;
+}
+
+CSparseBitmap *Ploop::getTrackingBitmap()
+{
+	PRL_RESULT err;
+	UINT64 sectors = m_di->size;
+	CSparseBitmap *res = CSparseBitmap::Create(sectors, 1 << 7, err);
+	if (res == NULL)
+		return NULL;
+
+	err = res->SetAll();
+	if (PRL_FAILED(err)) {
+		delete res;
+		return NULL;
+	}
+
+	return res;
 }
 
 } // namespace VirtualDisk
