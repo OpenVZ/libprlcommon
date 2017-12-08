@@ -170,6 +170,8 @@ struct Qcow2: Format
 	                         PRL_UINT64 offSec);
 	virtual Parameters::disk_type getInfo();
 	virtual PRL_RESULT close(void);
+	virtual PRL_RESULT cloneState(const QString &uuid,
+			const QString &target);
 	static bool isValid(const QString &fileName);
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err);

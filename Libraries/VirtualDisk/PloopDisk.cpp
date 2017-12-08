@@ -100,7 +100,7 @@ Q_GLOBAL_STATIC(LibPloop, getLibPloop)
 // struct Ploop
 
 Ploop::Ploop() :
-	m_di(NULL), m_wasMmounted(false)
+	m_flags(PRL_DISK_NOTHING), m_di(NULL), m_wasMmounted(false)
 {
 	m_ploop = getLibPloop()->getFunctions();
 }
@@ -115,14 +115,75 @@ QString Ploop::getDescriptorPath(const QString &fileName)
 	return fileName + "/DiskDescriptor.xml";
 }
 
+PRL_RESULT Ploop::umount()
+{
+	if (!m_wasMmounted)
+		return PRL_ERR_SUCCESS;
+
+	if (m_ploop->umount_image(m_di))
+	{
+		WRITE_TRACE(DBG_FATAL, "ploop_mount_image: %s",
+				m_ploop->get_last_error());
+		return PRL_ERR_FAILURE;
+
+	}
+	m_wasMmounted = false;
+
+	return PRL_ERR_SUCCESS;
+}
+
+PRL_RESULT Ploop::mount()
+{
+	PRL_RESULT rc;
+	char dev[PATH_MAX];
+
+	if (m_ploop == NULL)
+		return PRL_ERR_UNINITIALIZED;
+
+	if (m_wasMmounted)
+		return PRL_ERR_SUCCESS;
+
+	rc = m_ploop->get_dev(m_di, dev, sizeof(dev));
+	if (rc == -1)
+	{
+		WRITE_TRACE(DBG_FATAL, "ploop_get_dev: %s",
+				m_ploop->get_last_error());
+		return PRL_ERR_FAILURE;
+	}
+
+	if (rc)
+	{
+		struct ploop_mount_param p = ploop_mount_param();
+
+		m_ploop->set_component_name(m_di, "prl-e1871f4a");
+		if (m_flags & PRL_DISK_READ)
+			p.ro = 1;
+
+		if (m_ploop->mount_image(m_di, &p))
+		{
+			WRITE_TRACE(DBG_FATAL, "ploop_mount_image: %s",
+					m_ploop->get_last_error());
+
+			return PRL_ERR_FAILURE;
+		}
+
+		snprintf(dev, sizeof(dev), "%s", p.device);
+		m_wasMmounted = true;
+	}
+
+	rc = m_file.open(dev, O_DIRECT | (m_flags & PRL_DISK_READ ? O_RDONLY : O_RDWR));
+	if (rc)
+		WRITE_TRACE(DBG_FATAL, "Failed to open %s", dev);
+
+	return rc;
+}
+
 PRL_RESULT Ploop::open(const QString &fileName,
 		const PRL_DISK_OPEN_FLAGS flags,
 		const policyList_type &policies)
 {
 	Q_UNUSED(policies);
 
-	char dev[PATH_MAX];
-	PRL_RESULT rc;
 
 	if (m_di != NULL)
 		return PRL_ERR_INVALID_ARG;
@@ -137,39 +198,17 @@ PRL_RESULT Ploop::open(const QString &fileName,
 		return PRL_ERR_FAILURE;
 	}
 
-	rc = m_ploop->get_dev(m_di, dev, sizeof(dev));
-	if (rc == -1)
+	if (m_ploop->read_dd(m_di))
 	{
-		WRITE_TRACE(DBG_FATAL, "ploop_get_dev: %s",
-				m_ploop->get_last_error());
 		close();
+		WRITE_TRACE(DBG_FATAL, "ploop_read_dd: %s",
+				m_ploop->get_last_error());
 		return PRL_ERR_FAILURE;
 	}
 
-	if (rc)
-	{
-		struct ploop_mount_param p = ploop_mount_param();
+	m_flags = flags;
 
-		if (m_ploop->mount_image(m_di, &p))
-		{
-			WRITE_TRACE(DBG_FATAL, "ploop_mount_image: %s",
-					m_ploop->get_last_error());
-
-			close();
-			return PRL_ERR_FAILURE;
-		}
-
-		snprintf(dev, sizeof(dev), "%s", p.device);
-		m_wasMmounted = true;
-	}
-
-	int f = O_DIRECT | (flags & PRL_DISK_READ ? O_RDONLY : O_RDWR);
-
-	rc = m_file.open(dev, f);
-	if (rc)
-		close();
-
-	return rc;
+	return PRL_ERR_SUCCESS;
 }
 
 PRL_RESULT Ploop::create(const QString &fileName,
@@ -205,6 +244,9 @@ PRL_RESULT Ploop::read(void *data, PRL_UINT32 sizeBytes,
 	if (m_di == NULL)
 		return PRL_ERR_UNINITIALIZED;
 
+	if (!m_wasMmounted && mount())
+		return PRL_ERR_FAILURE;
+
 	return m_file.pread(data, sizeBytes, offSec * 512);
 }
 
@@ -213,6 +255,9 @@ PRL_RESULT Ploop::write(const void *data, PRL_UINT32 sizeBytes,
 {
 	if (m_di == NULL)
 		return PRL_ERR_UNINITIALIZED;
+
+	if (!m_wasMmounted && mount())
+		return PRL_ERR_FAILURE;
 
 	return m_file.pwrite(data, sizeBytes, offSec * 512);
 }
@@ -253,17 +298,6 @@ PRL_RESULT Ploop::close(void)
 	/* release device first */
 	m_file.close();
 
-	if (m_wasMmounted)
-	{
-		if (m_ploop->umount_image(m_di))
-		{
-			WRITE_TRACE(DBG_FATAL, "ploop_mount_image: %s",
-					m_ploop->get_last_error());
-		}
-		m_wasMmounted = false;
-
-	}
-
 	m_ploop->close_dd(m_di);
 	m_di = NULL;
 
@@ -273,6 +307,8 @@ PRL_RESULT Ploop::close(void)
 CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
 		PRL_RESULT &err)
 {
+	if (m_ploop == NULL || m_di == NULL)
+		return NULL;
 
 	UINT64 sectors = m_di->size;
 	CSparseBitmap *res = CSparseBitmap::Create(sectors, granularity, err);
@@ -303,6 +339,23 @@ CSparseBitmap *Ploop::getTrackingBitmap()
 	}
 
 	return res;
+}
+
+PRL_RESULT Ploop::cloneState(const QString &uuid, const QString &target)
+{
+	if (m_ploop == NULL || m_di == NULL || m_ploop->clone_dd == NULL)
+		return PRL_ERR_UNINITIALIZED;
+
+	if (m_ploop->clone_dd(m_di, uuid.toUtf8().constData(),
+				target.toUtf8().constData()))
+	{
+		WRITE_TRACE(DBG_FATAL, "ploop_clone_dd(%s): %s",
+				target.toUtf8().constData(),
+				m_ploop->get_last_error());
+		return PRL_ERR_FAILURE;
+	}
+
+	return PRL_ERR_SUCCESS;
 }
 
 } // namespace VirtualDisk

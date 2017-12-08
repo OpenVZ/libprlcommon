@@ -255,6 +255,8 @@ struct Format : boost::noncopyable
 			PRL_UINT64 offSec) = 0;
 	virtual Parameters::disk_type getInfo(void) = 0;
 	virtual PRL_RESULT close(void) = 0;
+	virtual PRL_RESULT cloneState(const QString &uuid,
+			const QString &target) = 0;
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err) = 0;
 	virtual CSparseBitmap *getTrackingBitmap() = 0;
