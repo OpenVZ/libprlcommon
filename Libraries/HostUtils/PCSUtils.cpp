@@ -35,10 +35,13 @@
 
 #include "Interfaces/ParallelsTypes.h"
 #include "Libraries/Std/std_list.h"
+#include "Libraries/Std/PrlTime.h"
 #include "Libraries/HostUtils/PCSUtils.h"
 #include "Libraries/Logging/Logging.h"
 
 #define LIBPCS_CLIENT	"libpcs_client.so.1"
+
+const PRL_UINT64 LOAD_TIMEOUT = PRL_UINT64(6)*60*1000000;
 
 static pcs_api_t pcs_api;
 static int api_valid = 0;
@@ -162,7 +165,7 @@ static int init()
 {
 	int i;
 	void *dlhandle;
-	static int pcs_present = 1;
+	static PRL_UINT64 last_load_error = 0;
 
 	struct _api {
 		const char *name;
@@ -188,18 +191,19 @@ static int init()
 		{ NULL, NULL }
 	};
 
-	if (!pcs_present)
-		return -ENOENT;
-
 	if (api_valid)
 		return 0;
 
+	if (last_load_error) {
+		PRL_UINT64 load_time = PrlGetTimeMonotonic();
+		if (LOAD_TIMEOUT > load_time - last_load_error)
+			return -ENOENT;
+		last_load_error = load_time;
+	}
+
 	dlhandle = dlopen(LIBPCS_CLIENT, RTLD_LAZY);
 	if (dlhandle == NULL) {
-
-		if (errno == ENOENT)
-			pcs_present = 0; // Suppress flooding
-
+		last_load_error = PrlGetTimeMonotonic();
 		WRITE_TRACE(DBG_FATAL, "Failed to load %s: %s", LIBPCS_CLIENT, dlerror());
 		return -EAGAIN;
 	}
@@ -209,6 +213,7 @@ static int init()
 	for (i=0; funcs[i].name; ++i) {
 		*(funcs[i].pptr) = dlsym(dlhandle, funcs[i].name);
 		if (*(funcs[i].pptr) == NULL) {
+			last_load_error = PrlGetTimeMonotonic();
 			WRITE_TRACE(DBG_FATAL,"PCS API: function %s isn't available - %s",
 					funcs[i].name, dlerror());
 			dlclose(dlhandle);
