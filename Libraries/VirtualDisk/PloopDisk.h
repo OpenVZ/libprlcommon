@@ -51,6 +51,8 @@ struct Ploop : Format
 			PRL_UINT64 offSec);
 	virtual Parameters::disk_type getInfo(void);
 	virtual PRL_RESULT close(void);
+	virtual PRL_RESULT cloneState(const QString &uuid,
+			const QString &target);
 	PRL_RESULT create(const QString &fileName,
 			const Parameters::Disk &params);
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,

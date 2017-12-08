@@ -712,4 +712,11 @@ CSparseBitmap *Qcow2::getTrackingBitmap()
 	return NULL;
 }
 
+PRL_RESULT Qcow2::cloneState(const QString &uuid, const QString &target)
+{
+	Q_UNUSED(uuid)
+	Q_UNUSED(target)
+	return PRL_ERR_UNIMPLEMENTED;
+}
+
 } // namespace VirtualDisk

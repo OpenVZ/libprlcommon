@@ -273,6 +273,8 @@ PRL_RESULT Ploop::close(void)
 CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
 		PRL_RESULT &err)
 {
+	if (m_ploop == NULL || m_di == NULL)
+		return PRL_ERR_UNINITIALIZED;
 
 	UINT64 sectors = m_di->size;
 	CSparseBitmap *res = CSparseBitmap::Create(sectors, granularity, err);
@@ -303,6 +305,23 @@ CSparseBitmap *Ploop::getTrackingBitmap()
 	}
 
 	return res;
+}
+
+PRL_RESULT Ploop::cloneState(const QString &uuid, const QString &target)
+{
+	if (m_ploop == NULL || m_di == NULL || m_ploop->clone_dd == NULL)
+		return PRL_ERR_UNINITIALIZED;
+
+	if (m_ploop->clone_dd(m_di, uuid.toUtf8().constData(),
+				target.toUtf8().constData()))
+	{
+		WRITE_TRACE(DBG_FATAL, "ploop_clone_dd(%s): %s",
+				target.toUtf8().constData(),
+				m_ploop->get_last_error());
+		return PRL_ERR_FAILURE;
+	}
+
+	return PRL_ERR_SUCCESS;
 }
 
 } // namespace VirtualDisk
