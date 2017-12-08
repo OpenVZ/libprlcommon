@@ -58,7 +58,13 @@ struct Ploop : Format
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err);
 	virtual CSparseBitmap *getTrackingBitmap();
+
 private:
+	PRL_RESULT mount();
+	PRL_RESULT umount();
+
+private:
+	PRL_DISK_OPEN_FLAGS m_flags;
 	struct ploop_disk_images_data *m_di;
 	struct ploop_functions *m_ploop;
 	IO::File m_file;
