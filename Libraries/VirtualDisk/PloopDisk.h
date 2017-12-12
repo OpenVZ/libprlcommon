@@ -28,6 +28,7 @@
 #include "VirtualDisk.h"
 #include "Util.h"
 
+struct ploop_bitmap;
 class CSparseBitmap;
 
 namespace VirtualDisk
@@ -60,6 +61,8 @@ struct Ploop : Format
 	virtual CSparseBitmap *getTrackingBitmap();
 
 private:
+	CSparseBitmap *getSparceBitmap(const struct ploop_bitmap *b,
+			UINT32 granularity);
 	PRL_RESULT mount();
 	PRL_RESULT umount();
 

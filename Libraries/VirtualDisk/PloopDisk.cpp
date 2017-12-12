@@ -38,6 +38,7 @@
 #include "PloopDisk.h"
 #include "Libraries/Logging/Logging.h"
 #include "Libraries/VirtualDisk/SparseBitmap.h"
+#include "Libraries/Std/BitOps.h"
 
 typedef void (* resolve_functions)(struct ploop_functions *);
 
@@ -304,14 +305,14 @@ PRL_RESULT Ploop::close(void)
 	return PRL_ERR_SUCCESS;
 }
 
-CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
-		PRL_RESULT &err)
+CSparseBitmap *Ploop::getSparceBitmap(const struct ploop_bitmap *b,
+		UINT32 granularity)
 {
-	if (m_ploop == NULL || m_di == NULL)
-		return NULL;
+	PRL_RESULT err;
+	UINT32 n = 0;
+	UINT64 block_bits, block_size;
 
-	UINT64 sectors = m_di->size;
-	CSparseBitmap *res = CSparseBitmap::Create(sectors, granularity, err);
+	CSparseBitmap *res = CSparseBitmap::Create(b->size_sec, granularity, err);
 	if (res == NULL)
 		return NULL;
 
@@ -320,6 +321,44 @@ CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
 		delete res;
 		return NULL;
 	}
+
+	block_bits = (b->cluster_sec << 9) * 8;
+	block_size = block_bits * b->granularity_sec;
+	for (UINT64 offset = 0; offset < b->size_sec;
+			offset += b->granularity_sec, ++n)
+	{
+		UINT64 end = b->size_sec;
+		UINT32 pid = n / block_bits;
+
+		if (b->map[pid] > 0) {
+			if (!BMAP_GET((void *)b->map[pid], n % block_bits))
+
+				res->ClearRange(offset, MIN((offset + b->granularity_sec), end));
+		}
+		else if (b->map[pid] == 0)
+			res->ClearRange(offset, MIN((offset + block_size), end));
+	}
+
+	return res;
+}
+
+CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
+		PRL_RESULT &err)
+{
+	Q_UNUSED(err)
+
+	if (m_ploop == NULL || m_di == NULL || m_ploop->get_used_bitmap_from_image == NULL)
+		return NULL;
+
+	ploop_bitmap *b = m_ploop->get_used_bitmap_from_image(m_di, NULL);
+	if (b == NULL) {
+		WRITE_TRACE(DBG_FATAL, "ploop_get_used_bitmap: %s",
+				m_ploop->get_last_error());
+		return NULL;
+	}
+
+	CSparseBitmap *res = getSparceBitmap(b, granularity);
+	m_ploop->release_bitmap(b);
 
 	return res;
 }
