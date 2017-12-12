@@ -73,24 +73,6 @@ QString enquote(const QString &s)
 	return QString("\"%1\"").arg(s);
 }
 
-typedef Prl::Expected<int, Error::Simple> flags_type;
-
-flags_type convertFlags(PRL_DISK_OPEN_FLAGS flags)
-{
-	int openFlags = O_DIRECT;
-	// We have to read during aligned write, so do not use O_WRONLY.
-	if (flags & PRL_DISK_WRITE)
-		openFlags |= O_RDWR;
-	else if (flags & PRL_DISK_READ)
-		openFlags |= O_RDONLY;
-	else
-	{
-		WRITE_TRACE(DBG_FATAL, "Invalid flags");
-		return Error::Simple(PRL_ERR_INVALID_ARG);
-	}
-	return openFlags;
-}
-
 bool isAligned(PRL_UINT64 value)
 {
 	return !(value % SECTOR_SIZE);

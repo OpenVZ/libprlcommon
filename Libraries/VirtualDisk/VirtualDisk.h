@@ -245,6 +245,8 @@ typedef std::vector<policy_type> policyList_type;
 
 struct Format : boost::noncopyable
 {
+	typedef Prl::Expected<int, Error::Simple> flags_type;
+
 	virtual ~Format() {};
 	virtual PRL_RESULT open(const QString &fileName,
 			const PRL_DISK_OPEN_FLAGS flags,
@@ -260,6 +262,9 @@ struct Format : boost::noncopyable
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err) = 0;
 	virtual CSparseBitmap *getTrackingBitmap() = 0;
+
+protected:
+	static flags_type convertFlags(PRL_DISK_OPEN_FLAGS flags);
 };
 
 Format* detectImageFormat(const QString &image);

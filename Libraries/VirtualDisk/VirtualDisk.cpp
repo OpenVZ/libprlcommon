@@ -20,6 +20,8 @@
  * Our contact details: Parallels International GmbH, Vordergasse 59, 8200
  * Schaffhausen, Switzerland.
  */
+
+#include <fcntl.h>
 #include "../Logging/Logging.h"
 
 #include "PloopDisk.h"
@@ -144,6 +146,22 @@ Format* detectImageFormat(const QString &fname)
 		return new (std::nothrow) Ploop;
 
 	return new (std::nothrow) Qcow2;
+}
+
+Format::flags_type Format::convertFlags(PRL_DISK_OPEN_FLAGS flags)
+{
+	int openFlags = O_DIRECT;
+	// We have to read during aligned write, so do not use O_WRONLY.
+	if (flags & PRL_DISK_WRITE)
+		openFlags |= O_RDWR;
+	else if (flags & PRL_DISK_READ)
+		openFlags |= O_RDONLY;
+	else
+	{
+		WRITE_TRACE(DBG_FATAL, "Invalid flags");
+		return Error::Simple(PRL_ERR_INVALID_ARG);
+	}
+	return openFlags;
 }
 
 } // namespace VirtualDisk

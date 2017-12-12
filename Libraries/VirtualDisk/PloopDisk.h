@@ -67,7 +67,7 @@ private:
 	PRL_RESULT umount();
 
 private:
-	PRL_DISK_OPEN_FLAGS m_flags;
+	int m_flags;
 	struct ploop_disk_images_data *m_di;
 	struct ploop_functions *m_ploop;
 	IO::File m_file;

@@ -101,7 +101,7 @@ Q_GLOBAL_STATIC(LibPloop, getLibPloop)
 // struct Ploop
 
 Ploop::Ploop() :
-	m_flags(PRL_DISK_NOTHING), m_di(NULL), m_wasMmounted(false)
+	m_flags(0), m_di(NULL), m_wasMmounted(false)
 {
 	m_ploop = getLibPloop()->getFunctions();
 }
@@ -157,7 +157,7 @@ PRL_RESULT Ploop::mount()
 		struct ploop_mount_param p = ploop_mount_param();
 
 		m_ploop->set_component_name(m_di, "prl-e1871f4a");
-		if (m_flags & PRL_DISK_READ)
+		if (!(m_flags & (O_WRONLY | O_RDWR)))
 			p.ro = 1;
 
 		if (m_ploop->mount_image(m_di, &p))
@@ -172,7 +172,7 @@ PRL_RESULT Ploop::mount()
 		m_wasMmounted = true;
 	}
 
-	rc = m_file.open(dev, O_DIRECT | (m_flags & PRL_DISK_READ ? O_RDONLY : O_RDWR));
+	rc = m_file.open(dev, O_DIRECT | m_flags);
 	if (rc)
 		WRITE_TRACE(DBG_FATAL, "Failed to open %s", dev);
 
@@ -192,6 +192,11 @@ PRL_RESULT Ploop::open(const QString &fileName,
 	if (m_ploop == NULL)
 		return PRL_ERR_UNINITIALIZED;
 
+	flags_type f = convertFlags(flags);
+	if (f.isFailed())
+		return f.error().code();
+
+	m_flags = f.value();
 	if (m_ploop->open_dd(&m_di, getDescriptorPath(fileName).toUtf8().constData()))
 	{
 		WRITE_TRACE(DBG_FATAL, "ploop_open_dd: %s",
@@ -206,8 +211,6 @@ PRL_RESULT Ploop::open(const QString &fileName,
 				m_ploop->get_last_error());
 		return PRL_ERR_FAILURE;
 	}
-
-	m_flags = flags;
 
 	return PRL_ERR_SUCCESS;
 }
