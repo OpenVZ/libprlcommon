@@ -309,13 +309,13 @@ PRL_RESULT Ploop::close(void)
 }
 
 CSparseBitmap *Ploop::getSparceBitmap(const struct ploop_bitmap *b,
-		UINT32 granularity)
+		UINT32 granularity, const Uuid &uuid)
 {
 	PRL_RESULT err;
 	UINT32 n = 0;
 	UINT64 block_bits, block_size;
 
-	CSparseBitmap *res = CSparseBitmap::Create(b->size_sec, granularity, err);
+	CSparseBitmap *res = CSparseBitmap::Create(b->size_sec, granularity, uuid, err);
 	if (res == NULL)
 		return NULL;
 
@@ -333,9 +333,9 @@ CSparseBitmap *Ploop::getSparceBitmap(const struct ploop_bitmap *b,
 		UINT64 end = b->size_sec;
 		UINT32 pid = n / block_bits;
 
-		if (b->map[pid] > 0) {
+		if (b->map[pid] > 1)
+		{
 			if (!BMAP_GET((void *)b->map[pid], n % block_bits))
-
 				res->ClearRange(offset, MIN((offset + b->granularity_sec), end));
 		}
 		else if (b->map[pid] == 0)
@@ -360,7 +360,7 @@ CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
 		return NULL;
 	}
 
-	CSparseBitmap *res = getSparceBitmap(b, granularity);
+	CSparseBitmap *res = getSparceBitmap(b, granularity, Uuid());
 	m_ploop->release_bitmap(b);
 
 	return res;
@@ -368,17 +368,19 @@ CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
 
 CSparseBitmap *Ploop::getTrackingBitmap()
 {
-	PRL_RESULT err;
-	UINT64 sectors = m_di->size;
-	CSparseBitmap *res = CSparseBitmap::Create(sectors, 1 << 7, err);
-	if (res == NULL)
+	if (m_ploop == NULL || m_di == NULL || m_ploop->get_tracking_bitmap_from_image == NULL)
 		return NULL;
 
-	err = res->SetAll();
-	if (PRL_FAILED(err)) {
-		delete res;
+	ploop_bitmap *b = m_ploop->get_tracking_bitmap_from_image(m_di, NULL);
+	if (b == NULL) {
+		WRITE_TRACE(DBG_FATAL, "ploop_get_tracking_bitmap_from_image: %s",
+				m_ploop->get_last_error());
 		return NULL;
 	}
+
+	CSparseBitmap *res = getSparceBitmap(b, b->granularity_sec,
+				Uuid::toUuid(b->uuid));
+	m_ploop->release_bitmap(b);
 
 	return res;
 }
