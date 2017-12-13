@@ -348,8 +348,7 @@ CSparseBitmap *Ploop::getSparceBitmap(const struct ploop_bitmap *b,
 CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
 		PRL_RESULT &err)
 {
-	Q_UNUSED(err)
-
+	err = PRL_ERR_FAILURE;
 	if (m_ploop == NULL || m_di == NULL || m_ploop->get_used_bitmap_from_image == NULL)
 		return NULL;
 
@@ -363,6 +362,7 @@ CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
 	CSparseBitmap *res = getSparceBitmap(b, granularity, Uuid());
 	m_ploop->release_bitmap(b);
 
+	err = PRL_ERR_SUCCESS;
 	return res;
 }
 
