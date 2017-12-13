@@ -62,7 +62,7 @@ struct Ploop : Format
 
 private:
 	CSparseBitmap *getSparceBitmap(const struct ploop_bitmap *b,
-			UINT32 granularity);
+			UINT32 granularity, const Uuid &uuid);
 	PRL_RESULT mount();
 	PRL_RESULT umount();
 
