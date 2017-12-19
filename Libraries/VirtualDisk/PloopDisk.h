@@ -25,6 +25,9 @@
 
 #include <QString>
 
+#include <boost/logic/tribool.hpp>
+
+
 #include "VirtualDisk.h"
 #include "Util.h"
 
@@ -71,7 +74,7 @@ private:
 	struct ploop_disk_images_data *m_di;
 	struct ploop_functions *m_ploop;
 	IO::File m_file;
-	bool m_wasMmounted;
+	boost::logic::tribool m_wasMmounted;
 };
 
 } // namespace VirtualDisk
