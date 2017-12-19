@@ -101,7 +101,7 @@ Q_GLOBAL_STATIC(LibPloop, getLibPloop)
 // struct Ploop
 
 Ploop::Ploop() :
-	m_flags(0), m_di(NULL), m_wasMmounted(false)
+	m_flags(0), m_di(NULL), m_wasMmounted(boost::logic::indeterminate)
 {
 	m_ploop = getLibPloop()->getFunctions();
 }
@@ -135,16 +135,13 @@ PRL_RESULT Ploop::umount()
 
 PRL_RESULT Ploop::mount()
 {
-	PRL_RESULT rc;
-	char dev[PATH_MAX];
+	if (!boost::logic::indeterminate(m_wasMmounted))
+		return PRL_ERR_SUCCESS;
 
 	if (m_ploop == NULL)
 		return PRL_ERR_UNINITIALIZED;
-
-	if (m_wasMmounted)
-		return PRL_ERR_SUCCESS;
-
-	rc = m_ploop->get_dev(m_di, dev, sizeof(dev));
+	char dev[PATH_MAX];
+	PRL_RESULT rc = m_ploop->get_dev(m_di, dev, sizeof(dev));
 	if (rc == -1)
 	{
 		WRITE_TRACE(DBG_FATAL, "ploop_get_dev: %s",
@@ -156,7 +153,6 @@ PRL_RESULT Ploop::mount()
 	{
 		struct ploop_mount_param p = ploop_mount_param();
 
-		m_ploop->set_component_name(m_di, "prl-e1871f4a");
 		if (!(m_flags & (O_WRONLY | O_RDWR)))
 			p.ro = 1;
 
@@ -170,7 +166,8 @@ PRL_RESULT Ploop::mount()
 
 		snprintf(dev, sizeof(dev), "%s", p.device);
 		m_wasMmounted = true;
-	}
+	} else
+		m_wasMmounted = false;
 
 	rc = m_file.open(dev, O_DIRECT | m_flags);
 	if (rc)
@@ -212,6 +209,8 @@ PRL_RESULT Ploop::open(const QString &fileName,
 		return PRL_ERR_FAILURE;
 	}
 
+	m_ploop->set_component_name(m_di, "prl-e1871f4a");
+
 	return PRL_ERR_SUCCESS;
 }
 
@@ -248,7 +247,7 @@ PRL_RESULT Ploop::read(void *data, PRL_UINT32 sizeBytes,
 	if (m_di == NULL)
 		return PRL_ERR_UNINITIALIZED;
 
-	if (!m_wasMmounted && mount())
+	if (mount())
 		return PRL_ERR_FAILURE;
 
 	return m_file.pread(data, sizeBytes, offSec * 512);
@@ -260,7 +259,7 @@ PRL_RESULT Ploop::write(const void *data, PRL_UINT32 sizeBytes,
 	if (m_di == NULL)
 		return PRL_ERR_UNINITIALIZED;
 
-	if (!m_wasMmounted && mount())
+	if (mount())
 		return PRL_ERR_FAILURE;
 
 	return m_file.pwrite(data, sizeBytes, offSec * 512);
@@ -301,6 +300,8 @@ PRL_RESULT Ploop::close(void)
 
 	/* release device first */
 	m_file.close();
+
+	umount();
 
 	m_ploop->close_dd(m_di);
 	m_di = NULL;
