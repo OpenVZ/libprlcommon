@@ -209,7 +209,8 @@ PRL_RESULT Ploop::open(const QString &fileName,
 		return PRL_ERR_FAILURE;
 	}
 
-	m_ploop->set_component_name(m_di, "prl-e1871f4a");
+	QString c = getComponentName(m_di->top_guid ?: "");
+	m_ploop->set_component_name(m_di, c.toStdString().data());
 
 	return PRL_ERR_SUCCESS;
 }
@@ -401,6 +402,16 @@ PRL_RESULT Ploop::cloneState(const QString &uuid, const QString &target)
 	}
 
 	return PRL_ERR_SUCCESS;
+}
+
+const char *Ploop::getComponentName()
+{
+	return "prl_backup";
+}
+
+QString Ploop::getComponentName(const QString &uuid)
+{
+	return QString(getComponentName()).append(".").append(uuid);
 }
 
 } // namespace VirtualDisk

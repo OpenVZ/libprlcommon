@@ -62,6 +62,9 @@ struct Ploop : Format
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err);
 	virtual CSparseBitmap *getTrackingBitmap();
+	static const char *getComponentName();
+	static QString getComponentName(const QString &uuid);
+
 
 private:
 	CSparseBitmap *getSparceBitmap(const struct ploop_bitmap *b,
