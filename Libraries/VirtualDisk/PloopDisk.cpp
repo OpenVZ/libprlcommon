@@ -101,7 +101,7 @@ Q_GLOBAL_STATIC(LibPloop, getLibPloop)
 // struct Ploop
 
 Ploop::Ploop() :
-	m_flags(0), m_di(NULL), m_wasMmounted(boost::logic::indeterminate)
+	m_flags(0), m_di(NULL), m_wasMounted(boost::logic::indeterminate)
 {
 	m_ploop = getLibPloop()->getFunctions();
 }
@@ -118,7 +118,7 @@ QString Ploop::getDescriptorPath(const QString &fileName)
 
 PRL_RESULT Ploop::umount()
 {
-	if (m_wasMmounted)
+	if (m_wasMounted)
 	{
 		if (m_ploop->umount_image(m_di))
 		{
@@ -126,7 +126,7 @@ PRL_RESULT Ploop::umount()
 					m_ploop->get_last_error());
 			return PRL_ERR_FAILURE;
 		}
-		m_wasMmounted = false;
+		m_wasMounted = false;
 	}
 
 	return PRL_ERR_SUCCESS;
@@ -134,7 +134,7 @@ PRL_RESULT Ploop::umount()
 
 PRL_RESULT Ploop::mount()
 {
-	if (!boost::logic::indeterminate(m_wasMmounted))
+	if (!boost::logic::indeterminate(m_wasMounted))
 		return PRL_ERR_SUCCESS;
 
 	if (m_ploop == NULL)
@@ -164,9 +164,9 @@ PRL_RESULT Ploop::mount()
 		}
 
 		snprintf(dev, sizeof(dev), "%s", p.device);
-		m_wasMmounted = true;
+		m_wasMounted = true;
 	} else
-		m_wasMmounted = false;
+		m_wasMounted = false;
 
 	rc = m_file.open(dev, O_DIRECT | m_flags);
 	if (rc)
