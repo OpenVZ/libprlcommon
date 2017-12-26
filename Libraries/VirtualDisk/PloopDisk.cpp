@@ -118,17 +118,16 @@ QString Ploop::getDescriptorPath(const QString &fileName)
 
 PRL_RESULT Ploop::umount()
 {
-	if (!m_wasMmounted)
-		return PRL_ERR_SUCCESS;
-
-	if (m_ploop->umount_image(m_di))
+	if (m_wasMmounted)
 	{
-		WRITE_TRACE(DBG_FATAL, "ploop_mount_image: %s",
-				m_ploop->get_last_error());
-		return PRL_ERR_FAILURE;
-
+		if (m_ploop->umount_image(m_di))
+		{
+			WRITE_TRACE(DBG_FATAL, "ploop_umount_image: %s",
+					m_ploop->get_last_error());
+			return PRL_ERR_FAILURE;
+		}
+		m_wasMmounted = false;
 	}
-	m_wasMmounted = false;
 
 	return PRL_ERR_SUCCESS;
 }
