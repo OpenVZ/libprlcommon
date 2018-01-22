@@ -72,11 +72,13 @@ enum IDispToDispCommands
 	VmMigrateFillDiskMapCmd		= PVE::DispToDispRangeStart + 511,
 	VmMigrateMakeDiskMapCmd		= PVE::DispToDispRangeStart + 512,
 
-	VmMigrateLibvirtTunnelChunk     = PVE::DispToDispRangeStart + 513,
-	VmMigrateQemuStateTunnelChunk   = PVE::DispToDispRangeStart + 514,
-	VmMigrateConnectQemuStateCmd    = PVE::DispToDispRangeStart + 515,
-	VmMigrateQemuDiskTunnelChunk    = PVE::DispToDispRangeStart + 516,
-	VmMigrateConnectQemuDiskCmd     = PVE::DispToDispRangeStart + 517,
+	VmMigrateTunnelRangeStart	= PVE::DispToDispRangeStart + 513,
+	VmMigrateLibvirtTunnelChunk     = VmMigrateTunnelRangeStart + 0,
+	VmMigrateQemuStateTunnelChunk   = VmMigrateTunnelRangeStart + 1,
+	VmMigrateConnectQemuStateCmd    = VmMigrateTunnelRangeStart + 2,
+	VmMigrateQemuDiskTunnelChunk    = VmMigrateTunnelRangeStart + 3,
+	VmMigrateConnectQemuDiskCmd     = VmMigrateTunnelRangeStart + 4,
+	VmMigrateTunnelRangeEnd		= VmMigrateConnectQemuDiskCmd,
 
 	VmMigrateRangeEnd		= PVE::DispToDispRangeStart + 599,
 
