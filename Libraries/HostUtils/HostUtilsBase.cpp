@@ -90,7 +90,7 @@ QString HostUtils::generateHostInterfaceName(const QString& mac)
 	if (!checkMacAddress(mac, false))
 		return QString();
 
-	return QString("vme") + mac.mid(4).toLower();
+	return QString("vme") + mac.toLower();
 }
 
 bool HostUtils::checkMacAddress(const QString &sMacAddress, bool bCheckPrlAddress)
