@@ -480,7 +480,7 @@ Create::Create(const QString &fileName)
 {
 	m_cmdLine << QEMU_IMG << "create"
 	          << "-f" << "qcow2"
-	          << "-o" << "lazy_refcounts=on"
+	          << "-o" << "cluster_size=1M,lazy_refcounts=on"
 	          << enquote(fileName);
 }
 
@@ -491,7 +491,8 @@ template<> void Create::operator() (const Policy::Qcow2::size_type &value)
 
 template<> void Create::operator() (const Policy::Qcow2::base_type &value)
 {
-	m_cmdLine << "-o" << QString("backing_file=%1").arg(enquote(value));
+	m_cmdLine << "-o" << QString("backing_fmt=qcow2,backing_file=%1")
+		.arg(enquote(value));
 }
 
 } // namespace Command
