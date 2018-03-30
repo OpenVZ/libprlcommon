@@ -467,21 +467,24 @@ struct Create: boost::static_visitor<>
 		Q_UNUSED(value);
 	}
 
-	const QStringList& getCommandLine() const
+	QStringList getCommandLine() const
 	{
-		return m_cmdLine;
+		return QStringList() << QEMU_IMG << "create"
+			<< "-f" << "qcow2"
+			<< "-o" << QString("cluster_size=%1,lazy_refcounts=on")
+				.arg(m_clusterSize)
+			<< m_cmdLine;
 	}
 
 private:
 	QStringList m_cmdLine;
+	PRL_UINT32 m_clusterSize;
 };
 
-Create::Create(const QString &fileName)
+Create::Create(const QString &fileName) :
+		m_clusterSize(1024 * 1024)
 {
-	m_cmdLine << QEMU_IMG << "create"
-	          << "-f" << "qcow2"
-	          << "-o" << "cluster_size=1M,lazy_refcounts=on"
-	          << enquote(fileName);
+	m_cmdLine << enquote(fileName);
 }
 
 template<> void Create::operator() (const Policy::Qcow2::size_type &value)
@@ -493,6 +496,11 @@ template<> void Create::operator() (const Policy::Qcow2::base_type &value)
 {
 	m_cmdLine << "-o" << QString("backing_fmt=qcow2,backing_file=%1")
 		.arg(enquote(value));
+}
+
+template<> void Create::operator() (const Policy::Qcow2::clusterSize_type &value)
+{
+	m_clusterSize = value;
 }
 
 } // namespace Command
