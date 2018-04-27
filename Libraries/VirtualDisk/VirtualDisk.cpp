@@ -26,6 +26,7 @@
 
 #include "PloopDisk.h"
 #include "Qcow2Disk.h"
+#include "NbdDisk.h"
 
 namespace VirtualDisk
 {
@@ -139,6 +140,9 @@ PRL_RESULT Disk::fillBuffer(void *data, PRL_UINT32 bufSize) const
 
 Format* detectImageFormat(const QString &fname)
 {
+	if (fname.contains("nbd"))
+		return new (std::nothrow) NbdDisk;
+
 	if (!QFileInfo(fname).exists())
 		return NULL;
 
