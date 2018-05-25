@@ -26,7 +26,9 @@
 
 
 #ifdef _LIN_
-#       include <sys/errno.h>
+#	include <sys/stat.h>
+#	include <sys/errno.h>
+#	include <sys/types.h>
 #endif
 
 #include <QFile>
@@ -34,13 +36,13 @@
 #include <QFileInfo>
 #include <QString>
 #include <QByteArray>
-
 #include "CSimpleFileHelper.h"
 
 #include "Libraries/Logging/Logging.h"
 #include <prlsdk/PrlErrorsValues.h>
 #include <prlsdk/PrlErrors.h>
 #include "Interfaces/ParallelsQt.h"
+#include <boost/utility/value_init.hpp>
 #include "Libraries/PrlCommonUtilsBase/SysError.h"
 #include "Libraries/Std/PrlAssert.h"
 
@@ -116,10 +118,12 @@ PRL_RESULT CSimpleFileHelper::GetDirSizePrivate( const QString& strDirPath, quin
 			continue;
 
 		PRL_RESULT ret = PRL_ERR_SUCCESS;
-		if (x.isDir())
+		boost::value_initialized<struct stat> b;
+		::stat(qPrintable(x.filePath()), &b.data());
+		if (S_ISDIR(b.data().st_mode))
 			ret = GetDirSizePrivate(x.filePath(), pSize);
 		else
-			*pSize += x.size();
+			*pSize += b.data().st_blocks * 512ll;
 
 		if ( ! PRL_SUCCEEDED( ret ) )
 		{
