@@ -140,7 +140,7 @@ PRL_RESULT Disk::fillBuffer(void *data, PRL_UINT32 bufSize) const
 
 Format* detectImageFormat(const QString &fname)
 {
-	if (fname.contains("nbd"))
+	if (QUrl(fname).scheme() == "nbd")
 		return new (std::nothrow) NbdDisk;
 
 	if (!QFileInfo(fname).exists())

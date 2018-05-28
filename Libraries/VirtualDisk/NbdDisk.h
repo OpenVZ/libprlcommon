@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 1999-2016 Parallels IP Holdings GmbH
+ * Copyright (c) 2018 Virtuozzo International GmbH.  All rights reserved.
  *
- * This file is part of Parallels SDK. Parallels SDK is free
- * software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License,
- * or (at your option) any later version.
+ * This file is part of OpenVZ. OpenVZ is free software;
+ * you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation;
+ * either version 2 of the License, or (at your option) any later
+ * version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.  If not, see
- * <http://www.gnu.org/licenses/> or write to Free Software Foundation,
- * 51 Franklin Street, Fifth Floor Boston, MA 02110, USA.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
  *
- * Our contact details: Parallels IP Holdings GmbH, Vordergasse 59, 8200
+ * Our contact details: Virtuozzo International GmbH, Vordergasse 59, 8200
  * Schaffhausen, Switzerland.
  */
 #ifndef __VIRTUAL_DISK_NBD__
@@ -30,6 +30,8 @@
 
 struct nbd_client;
 struct nbd_functions;
+
+class CSparseBitmap;
 
 namespace VirtualDisk
 {
@@ -58,11 +60,15 @@ struct NbdDisk : Format
 	virtual CSparseBitmap *getTrackingBitmap();
 
 private:
+	CSparseBitmap* getBitmap(const char *metactx, UINT32 size,
+		const Uuid &uuid, PRL_RESULT &err);
+
 	struct nbd_client    *m_clnt;
 	struct nbd_functions *m_nbd;
 
-	QString m_fileName;
-	bool m_connected;
+
+	QUrl	m_url;
+	QString	m_uuid;
 };
 
 } // namespace VirtualDisk
