@@ -314,11 +314,11 @@ CSparseBitmap *NbdDisk::getUsedBlocksBitmap(UINT32 granularity, PRL_RESULT &err)
 	return getBitmap("base:allocation", granularity, Uuid(), err);
 }
 
-CSparseBitmap *NbdDisk::getTrackingBitmap()
+CSparseBitmap *NbdDisk::getTrackingBitmap(const QString& uuid)
 {
 	PRL_RESULT err;
-	QString name = QString("qemu-dirty-bitmap:") + m_uuid;
-	return getBitmap(qPrintable(name), DEFAULT_GRANULARITY, m_uuid, err);
+	QString name = QString("qemu-dirty-bitmap:") + uuid;
+	return getBitmap(qPrintable(name), DEFAULT_GRANULARITY, uuid, err);
 }
 
 PRL_RESULT NbdDisk::cloneState(const QString &uuid, const QString &target)

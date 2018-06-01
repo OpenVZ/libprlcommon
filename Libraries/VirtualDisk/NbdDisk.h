@@ -57,7 +57,7 @@ struct NbdDisk : Format
 			const QString &target);
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err);
-	virtual CSparseBitmap *getTrackingBitmap();
+	virtual CSparseBitmap *getTrackingBitmap(const QString& uuid);
 
 private:
 	CSparseBitmap* getBitmap(const char *metactx, UINT32 size,

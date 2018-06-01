@@ -61,7 +61,7 @@ struct Ploop : Format
 			const Parameters::Disk &params);
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err);
-	virtual CSparseBitmap *getTrackingBitmap();
+	virtual CSparseBitmap *getTrackingBitmap(const QString &uuid);
 	static const char *getComponentName();
 	static QString getComponentName(const QString &uuid);
 
