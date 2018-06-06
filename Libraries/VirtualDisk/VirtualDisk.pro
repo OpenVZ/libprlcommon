@@ -31,13 +31,15 @@ HEADERS = PloopDisk.h \
           VirtualDisk.h \
           Util.h \
           Qcow2Disk.h \
-	  SparseBitmap.h
+	  SparseBitmap.h \
+          NbdDisk.h
 
 SOURCES = PloopDisk.cpp \
           VirtualDisk.cpp \
           Util.cpp \
           Qcow2Disk.cpp \
-	  SparseBitmap.cpp
+	  SparseBitmap.cpp \
+          NbdDisk.cpp
 
 headers.files = $${HEADERS}
 headers.path = $${PREFIX}/include/prlcommon/VirtualDisk

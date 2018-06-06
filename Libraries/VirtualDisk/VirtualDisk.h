@@ -261,7 +261,7 @@ struct Format : boost::noncopyable
 			const QString &target) = 0;
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err) = 0;
-	virtual CSparseBitmap *getTrackingBitmap() = 0;
+	virtual CSparseBitmap *getTrackingBitmap(const QString &uuid) = 0;
 
 protected:
 	static flags_type convertFlags(PRL_DISK_OPEN_FLAGS flags);

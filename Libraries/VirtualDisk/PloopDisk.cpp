@@ -367,8 +367,10 @@ CSparseBitmap *Ploop::getUsedBlocksBitmap(UINT32 granularity,
 	return res;
 }
 
-CSparseBitmap *Ploop::getTrackingBitmap()
+CSparseBitmap *Ploop::getTrackingBitmap(const QString &uuid)
 {
+	Q_UNUSED(uuid);
+
 	if (m_ploop == NULL || m_di == NULL || m_ploop->get_tracking_bitmap_from_image == NULL)
 		return NULL;
 

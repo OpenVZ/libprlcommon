@@ -698,8 +698,9 @@ CSparseBitmap *Qcow2::getUsedBlocksBitmap(UINT32 granularity,
 	return NULL;
 }
 
-CSparseBitmap *Qcow2::getTrackingBitmap()
+CSparseBitmap *Qcow2::getTrackingBitmap(const QString &uuid)
 {
+	Q_UNUSED(uuid);
 	return NULL;
 }
 

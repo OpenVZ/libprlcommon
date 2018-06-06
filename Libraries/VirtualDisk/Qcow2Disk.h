@@ -177,7 +177,7 @@ struct Qcow2: Format
 	static bool isValid(const QString &fileName);
 	virtual CSparseBitmap *getUsedBlocksBitmap(UINT32 granularity,
 			PRL_RESULT &err);
-	virtual CSparseBitmap *getTrackingBitmap();	
+	virtual CSparseBitmap *getTrackingBitmap(const QString &uuid);
 private:
 	void closeForce();
 
