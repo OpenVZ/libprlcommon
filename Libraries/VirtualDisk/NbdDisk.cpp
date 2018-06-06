@@ -265,60 +265,62 @@ PRL_RESULT NbdDisk::close(void)
 
 static void get_bitmap_cb(u64 offs, u32 size, u32 flags, void *arg)
 {
-	CSparseBitmap *b =  (CSparseBitmap *) arg;
-	
 	//WRITE_TRACE(DBG_FATAL, "get_bitmap_cb offs %ld size %d flags %x", (long)offs, (int)size, (int)flags);
 
 	/* skip zero-allocated holes */
 	if (flags == (NBD_STATE_HOLE|NBD_STATE_ZERO))
 		return;
 
-	b->SetRange(offs/SECTOR_SIZE, (offs + size)/SECTOR_SIZE);
+	static_cast<CSparseBitmap* >(arg)->
+		SetRange(offs/SECTOR_SIZE, (offs + size)/SECTOR_SIZE);
 }
 
-CSparseBitmap * NbdDisk::getBitmap(
-	const char *metactx, UINT32 granularity, const Uuid &uuid, PRL_RESULT &err)
+PRL_RESULT NbdDisk::Bitmap::operator()(const char *metactx,
+	UINT32 granularity, const Uuid &uuid)
 {
-	if (m_clnt == NULL) {
-		err = PRL_ERR_FAILURE;
-		return NULL;
-	}
+	reset();
+
+	if (m_clnt == NULL)
+		return PRL_ERR_FAILURE;
 
 	u64 size;
 	u32 blksize;
 	m_nbd->nbd_client_getsize(m_clnt, &blksize, &size);
 
-	err = PRL_ERR_SUCCESS;
-	CSparseBitmap *res = CSparseBitmap::Create(size/SECTOR_SIZE, granularity, uuid, err);
-
-	if (res == NULL)
-		return NULL;
+	PRL_RESULT err = PRL_ERR_SUCCESS;
+	QScopedPointer<CSparseBitmap> bitmap(CSparseBitmap::Create(
+		size/SECTOR_SIZE, granularity, uuid, err));
+	if (bitmap.isNull())
+		return err;
 
 	u64 offs = 0;
 	while (offs < size) {
 		u32 len = qMin<u64>(size - offs, blksize);
-		int rc = m_nbd->nbd_client_blk_status(m_clnt, metactx, offs, len, get_bitmap_cb, res);
-		if (rc < 0) {
-			delete res;
-			err = PRL_ERR_FAILURE;
-			return NULL;
-		}
+		int rc = m_nbd->nbd_client_blk_status(m_clnt, metactx, offs, len,
+				get_bitmap_cb, bitmap.data());
+		if (rc < 0)
+			return PRL_ERR_FAILURE;
 		offs += rc;
 	}
 
-	return res;
+	reset(bitmap.take());
+
+	return err;
 }
 
 CSparseBitmap *NbdDisk::getUsedBlocksBitmap(UINT32 granularity, PRL_RESULT &err)
 {
-	return getBitmap("base:allocation", granularity, Uuid(), err);
+	NbdDisk::Bitmap bitmap(m_clnt, m_nbd);
+	err = bitmap("base:allocation", granularity, Uuid());
+	return bitmap.take();
 }
 
 CSparseBitmap *NbdDisk::getTrackingBitmap(const QString& uuid)
 {
-	PRL_RESULT err;
 	QString name = QString("qemu-dirty-bitmap:") + uuid;
-	return getBitmap(qPrintable(name), DEFAULT_GRANULARITY, uuid, err);
+	NbdDisk::Bitmap bitmap(m_clnt, m_nbd);
+	bitmap(qPrintable(name), DEFAULT_GRANULARITY, uuid);
+	return bitmap.take();
 }
 
 PRL_RESULT NbdDisk::cloneState(const QString &uuid, const QString &target)

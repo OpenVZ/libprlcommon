@@ -24,14 +24,14 @@
 #define __VIRTUAL_DISK_NBD__
 
 #include <QString>
+#include <QScopedPointer>
 
 #include "VirtualDisk.h"
+#include "SparseBitmap.h"
 #include "Util.h"
 
 struct nbd_client;
 struct nbd_functions;
-
-class CSparseBitmap;
 
 namespace VirtualDisk
 {
@@ -60,12 +60,19 @@ struct NbdDisk : Format
 	virtual CSparseBitmap *getTrackingBitmap(const QString& uuid);
 
 private:
-	CSparseBitmap* getBitmap(const char *metactx, UINT32 size,
-		const Uuid &uuid, PRL_RESULT &err);
+	struct Bitmap : private QScopedPointer<CSparseBitmap>
+	{
+		Bitmap(struct nbd_client *clnt, struct nbd_functions *nbd)
+			: m_clnt(clnt), m_nbd(nbd) { }
+		PRL_RESULT operator()(const char *metactx, UINT32 size, const Uuid &uuid); 
+		using QScopedPointer<CSparseBitmap>::take;
+	private:
+		struct nbd_client    *m_clnt;
+		struct nbd_functions *m_nbd;
+	};
 
 	struct nbd_client    *m_clnt;
 	struct nbd_functions *m_nbd;
-
 
 	QUrl	m_url;
 	QString	m_uuid;
