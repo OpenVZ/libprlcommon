@@ -22,8 +22,6 @@
  */
 #include <dlfcn.h>
 
-#include <pcs-core/nbd_clnt.h>
-
 #include "NbdDisk.h"
 #include "Libraries/Logging/Logging.h"
 #include "Libraries/VirtualDisk/SparseBitmap.h"
@@ -34,16 +32,24 @@ enum {
 	DEFAULT_GRANULARITY = 128,
 };
 
+enum {
+	NBD_STATE_HOLE = 1,
+	NBD_STATE_ZERO = 2,
+	NBD_STATE_DIRTY = 1,
+};
+
 extern "C" {
+
+typedef void (*nbd_blk_status_cb)(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg);
 
 struct nbd_functions {
 	struct nbd_client * (*nbd_client_init) (void);
 	int  (*nbd_client_connect) (struct nbd_client *clnt, const char *addr, const char *exp_name);
 	int  (*nbd_client_disconnect) (struct nbd_client *clnt);
-	void (*nbd_client_getsize) (struct nbd_client *clnt, u32 *blksize, u64 *size);
-	int  (*nbd_client_read) (struct nbd_client *clnt, u64 offs, void *buf, u32 size);
-	int  (*nbd_client_write) (struct nbd_client *clnt, u64 offs, const void *buf, u32 size);
-	int  (*nbd_client_blk_status) (struct nbd_client *clnt, const char *meta_ctx, u64 offs, u32 size, nbd_blk_status_cb cb, void *cb_arg);
+	void (*nbd_client_getsize) (struct nbd_client *clnt, PRL_UINT32 *blksize, PRL_UINT64 *size);
+	int  (*nbd_client_read) (struct nbd_client *clnt, PRL_UINT64 offs, void *buf, PRL_UINT32 size);
+	int  (*nbd_client_write) (struct nbd_client *clnt, PRL_UINT64 offs, const void *buf, PRL_UINT32 size);
+	int  (*nbd_client_blk_status) (struct nbd_client *clnt, const char *meta_ctx, PRL_UINT64 offs, PRL_UINT32 size, nbd_blk_status_cb cb, void *cb_arg);
 	void (*nbd_client_fini) (struct nbd_client *clnt);
 };
 
@@ -97,13 +103,13 @@ void LibNbd::load()
 		dlsym(m_Handle, "nbd_client_connect");
 	m_func.nbd_client_disconnect = (int (*)(nbd_client*))
 		dlsym(m_Handle, "nbd_client_disconnect");
-	m_func.nbd_client_getsize = (void (*)(nbd_client*, u32*, u64*))
+	m_func.nbd_client_getsize = (void (*)(nbd_client*, PRL_UINT32*, PRL_UINT64*))
 		dlsym(m_Handle, "nbd_client_getsize");
-	m_func.nbd_client_read = (int (*)(nbd_client*, u64, void*, u32))
+	m_func.nbd_client_read = (int (*)(nbd_client*, PRL_UINT64, void*, PRL_UINT32))
 		dlsym(m_Handle, "nbd_client_read");
-	m_func.nbd_client_write = (int (*)(nbd_client*, u64, const void*, u32))
+	m_func.nbd_client_write = (int (*)(nbd_client*, PRL_UINT64, const void*, PRL_UINT32))
 		dlsym(m_Handle, "nbd_client_write");
-	m_func.nbd_client_blk_status = (int (*) (struct nbd_client*, const char*, u64, u32, nbd_blk_status_cb, void*))
+	m_func.nbd_client_blk_status = (int (*) (struct nbd_client*, const char*, PRL_UINT64, PRL_UINT32, nbd_blk_status_cb, void*))
 		dlsym(m_Handle, "nbd_client_blk_status");
 
 	if (m_func.nbd_client_init == NULL ||
@@ -186,7 +192,7 @@ PRL_RESULT NbdDisk::read(void *data, PRL_UINT32 sizeBytes,
 	if (m_clnt == NULL)
 		return PRL_ERR_UNINITIALIZED;
 
-	u64 bytes = 0;
+	PRL_UINT64 bytes = 0;
 	while (bytes < sizeBytes) {
 		int rc = m_nbd->nbd_client_read(m_clnt, offSec * SECTOR_SIZE + bytes,
 			(char*)data + bytes, sizeBytes - bytes);
@@ -206,7 +212,7 @@ PRL_RESULT NbdDisk::write(const void *data, PRL_UINT32 sizeBytes,
 	if (m_clnt == NULL)
 		return PRL_ERR_UNINITIALIZED;
 
-	u64 bytes = 0;
+	PRL_UINT64 bytes = 0;
 	while (bytes < sizeBytes) {
 		int rc = m_nbd->nbd_client_write(m_clnt, offSec * SECTOR_SIZE + bytes,
 			(char*)data + bytes, sizeBytes - bytes);
@@ -227,8 +233,8 @@ Parameters::disk_type NbdDisk::getInfo(void)
 
 	Parameters::Disk disk;
 
-	u64 size;
-	u32 blksize;
+	PRL_UINT64 size;
+	PRL_UINT32 blksize;
 
 	m_nbd->nbd_client_getsize(m_clnt, &blksize, &size);
 
@@ -263,7 +269,7 @@ PRL_RESULT NbdDisk::close(void)
 	return PRL_ERR_SUCCESS;
 }
 
-static void get_bitmap_cb(u64 offs, u32 size, u32 flags, void *arg)
+static void get_bitmap_cb(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg)
 {
 	//WRITE_TRACE(DBG_FATAL, "get_bitmap_cb offs %ld size %d flags %x", (long)offs, (int)size, (int)flags);
 
@@ -283,8 +289,8 @@ PRL_RESULT NbdDisk::Bitmap::operator()(const char *metactx,
 	if (m_clnt == NULL)
 		return PRL_ERR_FAILURE;
 
-	u64 size;
-	u32 blksize;
+	PRL_UINT64 size;
+	PRL_UINT32 blksize;
 	m_nbd->nbd_client_getsize(m_clnt, &blksize, &size);
 
 	PRL_RESULT err = PRL_ERR_SUCCESS;
@@ -293,9 +299,9 @@ PRL_RESULT NbdDisk::Bitmap::operator()(const char *metactx,
 	if (bitmap.isNull())
 		return err;
 
-	u64 offs = 0;
+	PRL_UINT64 offs = 0;
 	while (offs < size) {
-		u32 len = qMin<u64>(size - offs, blksize);
+		PRL_UINT32 len = qMin<PRL_UINT64>(size - offs, blksize);
 		int rc = m_nbd->nbd_client_blk_status(m_clnt, metactx, offs, len,
 				get_bitmap_cb, bitmap.data());
 		if (rc < 0)
