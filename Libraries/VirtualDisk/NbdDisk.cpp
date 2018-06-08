@@ -269,7 +269,7 @@ PRL_RESULT NbdDisk::close(void)
 	return PRL_ERR_SUCCESS;
 }
 
-static void get_bitmap_cb(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg)
+void NbdDisk::Bitmap::setRange(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg)
 {
 	//WRITE_TRACE(DBG_FATAL, "get_bitmap_cb offs %ld size %d flags %x", (long)offs, (int)size, (int)flags);
 
@@ -303,7 +303,7 @@ PRL_RESULT NbdDisk::Bitmap::operator()(const char *metactx,
 	while (offs < size) {
 		PRL_UINT32 len = qMin<PRL_UINT64>(size - offs, blksize);
 		int rc = m_nbd->nbd_client_blk_status(m_clnt, metactx, offs, len,
-				get_bitmap_cb, bitmap.data());
+				setRange, bitmap.data());
 		if (rc < 0)
 			return PRL_ERR_FAILURE;
 		offs += rc;
@@ -323,7 +323,7 @@ CSparseBitmap *NbdDisk::getUsedBlocksBitmap(UINT32 granularity, PRL_RESULT &err)
 
 CSparseBitmap *NbdDisk::getTrackingBitmap(const QString& uuid)
 {
-	QString name = QString("qemu-dirty-bitmap:") + uuid;
+	QString name = QString("qemu:dirty-bitmap:") + uuid;
 	NbdDisk::Bitmap bitmap(m_clnt, m_nbd);
 	bitmap(qPrintable(name), DEFAULT_GRANULARITY, uuid);
 	return bitmap.take();

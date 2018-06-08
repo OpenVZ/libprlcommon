@@ -67,6 +67,8 @@ private:
 		PRL_RESULT operator()(const char *metactx, UINT32 size, const Uuid &uuid); 
 		using QScopedPointer<CSparseBitmap>::take;
 	private:
+		static void setRange(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg);
+
 		struct nbd_client    *m_clnt;
 		struct nbd_functions *m_nbd;
 	};
