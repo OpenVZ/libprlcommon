@@ -23,20 +23,10 @@
 #include <dlfcn.h>
 
 #include "NbdDisk.h"
+#include "SparseBitmap.h"
+
 #include "Libraries/Logging/Logging.h"
-#include "Libraries/VirtualDisk/SparseBitmap.h"
 #include "Libraries/Std/BitOps.h"
-
-enum { 
-	SECTOR_SIZE = 512,
-	DEFAULT_GRANULARITY = 128,
-};
-
-enum {
-	NBD_STATE_HOLE = 1,
-	NBD_STATE_ZERO = 2,
-	NBD_STATE_DIRTY = 1,
-};
 
 extern "C" {
 
@@ -49,7 +39,8 @@ struct nbd_functions {
 	void (*nbd_client_getsize) (struct nbd_client *clnt, PRL_UINT32 *blksize, PRL_UINT64 *size);
 	int  (*nbd_client_read) (struct nbd_client *clnt, PRL_UINT64 offs, void *buf, PRL_UINT32 size);
 	int  (*nbd_client_write) (struct nbd_client *clnt, PRL_UINT64 offs, const void *buf, PRL_UINT32 size);
-	int  (*nbd_client_blk_status) (struct nbd_client *clnt, const char *meta_ctx, PRL_UINT64 offs, PRL_UINT32 size, nbd_blk_status_cb cb, void *cb_arg);
+	PRL_INT64  (*nbd_client_blk_status) (struct nbd_client *clnt, const char *meta_ctx,
+		PRL_UINT64 offs, PRL_UINT32 size, nbd_blk_status_cb cb, void *cb_arg);
 	void (*nbd_client_fini) (struct nbd_client *clnt);
 };
 
@@ -109,7 +100,8 @@ void LibNbd::load()
 		dlsym(m_Handle, "nbd_client_read");
 	m_func.nbd_client_write = (int (*)(nbd_client*, PRL_UINT64, const void*, PRL_UINT32))
 		dlsym(m_Handle, "nbd_client_write");
-	m_func.nbd_client_blk_status = (int (*) (struct nbd_client*, const char*, PRL_UINT64, PRL_UINT32, nbd_blk_status_cb, void*))
+	m_func.nbd_client_blk_status = (PRL_INT64 (*) (struct nbd_client*, const char*,
+			PRL_UINT64, PRL_UINT32, nbd_blk_status_cb, void*))
 		dlsym(m_Handle, "nbd_client_blk_status");
 
 	if (m_func.nbd_client_init == NULL ||
@@ -269,20 +261,23 @@ PRL_RESULT NbdDisk::close(void)
 	return PRL_ERR_SUCCESS;
 }
 
+template <class T>
 void NbdDisk::Bitmap::setRange(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg)
 {
+	std::pair<T*, CSparseBitmap*> *a =
+		static_cast<std::pair<T*, CSparseBitmap*>* > (arg);
+
 	//WRITE_TRACE(DBG_FATAL, "get_bitmap_cb offs %ld size %d flags %x", (long)offs, (int)size, (int)flags);
 
-	/* skip zero-allocated holes */
-	if (flags == (NBD_STATE_HOLE|NBD_STATE_ZERO))
+	/* filter range with unwanted flags */
+	if ((*a->first)(flags))
 		return;
 
-	static_cast<CSparseBitmap* >(arg)->
-		SetRange(offs/SECTOR_SIZE, (offs + size)/SECTOR_SIZE);
+	a->second->SetRange(offs/SECTOR_SIZE, (offs + size)/SECTOR_SIZE);
 }
 
-PRL_RESULT NbdDisk::Bitmap::operator()(const char *metactx,
-	UINT32 granularity, const Uuid &uuid)
+template <class T>
+PRL_RESULT NbdDisk::Bitmap::operator()(T policy, int granularity)
 {
 	reset();
 
@@ -295,15 +290,19 @@ PRL_RESULT NbdDisk::Bitmap::operator()(const char *metactx,
 
 	PRL_RESULT err = PRL_ERR_SUCCESS;
 	QScopedPointer<CSparseBitmap> bitmap(CSparseBitmap::Create(
-		size/SECTOR_SIZE, granularity, uuid, err));
+		size/SECTOR_SIZE, granularity, policy.getUuid(), err));
 	if (bitmap.isNull())
 		return err;
 
 	PRL_UINT64 offs = 0;
 	while (offs < size) {
-		PRL_UINT32 len = qMin<PRL_UINT64>(size - offs, blksize);
-		int rc = m_nbd->nbd_client_blk_status(m_clnt, metactx, offs, len,
-				setRange, bitmap.data());
+		PRL_UINT32 len = qMin<PRL_UINT64>(size - offs, DEFAULT_BLK_STATUS_RANGE);
+		std::pair<T*, CSparseBitmap*> a(&policy, bitmap.data());
+
+		//WRITE_TRACE(DBG_FATAL, "nbd_client_blk_status %ld size %d", (long)offs, (int)len);
+
+		PRL_INT64 rc = m_nbd->nbd_client_blk_status(
+			m_clnt, policy.getName(), offs, len, &setRange<T>, &a);
 		if (rc < 0)
 			return PRL_ERR_FAILURE;
 		offs += rc;
@@ -317,15 +316,14 @@ PRL_RESULT NbdDisk::Bitmap::operator()(const char *metactx,
 CSparseBitmap *NbdDisk::getUsedBlocksBitmap(UINT32 granularity, PRL_RESULT &err)
 {
 	NbdDisk::Bitmap bitmap(m_clnt, m_nbd);
-	err = bitmap("base:allocation", granularity, Uuid());
+	err = bitmap(Allocation(), granularity);
 	return bitmap.take();
 }
 
 CSparseBitmap *NbdDisk::getTrackingBitmap(const QString& uuid)
 {
-	QString name = QString("qemu:dirty-bitmap:") + uuid;
 	NbdDisk::Bitmap bitmap(m_clnt, m_nbd);
-	bitmap(qPrintable(name), DEFAULT_GRANULARITY, uuid);
+	bitmap(Dirty(uuid));
 	return bitmap.take();
 }
 
