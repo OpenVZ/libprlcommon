@@ -33,6 +33,12 @@
 struct nbd_client;
 struct nbd_functions;
 
+enum {
+	SECTOR_SIZE = 512,
+	DEFAULT_GRANULARITY = 128,
+	DEFAULT_BLK_STATUS_RANGE = 2*1024*1024*1024U,
+};
+
 namespace VirtualDisk
 {
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,13 +66,65 @@ struct NbdDisk : Format
 	virtual CSparseBitmap *getTrackingBitmap(const QString& uuid);
 
 private:
+	/* Policy base:allocation*/
+	struct Allocation
+	{
+		enum {
+			NBD_STATE_HOLE = 1,
+			NBD_STATE_ZERO = 2,
+		};
+
+		const char *getName() const
+		{
+			return "base:allocation";
+		}
+		const Uuid& getUuid() const
+		{
+			return m_uuid;
+		}
+		bool operator()(int flags) const
+		{
+			return flags == NBD_STATE_HOLE;
+		}
+	private:
+		Uuid m_uuid;
+	};
+	/* Policy qemu:dirty-bitmap */
+	struct Dirty
+	{
+		enum {
+			NBD_STATE_DIRTY = 1,
+		};
+
+		explicit Dirty(const QString& uuid) : m_uuid(uuid)
+		{
+			m_name = QString("qemu:dirty-bitmap:").append(uuid).toUtf8();
+		}
+		const char *getName() const
+		{
+			return m_name.constData();
+		}
+		const Uuid& getUuid() const
+		{
+			return m_uuid;
+		}
+		bool operator()(int flags) const
+		{
+			return flags != NBD_STATE_DIRTY;
+		}
+	private:
+		QByteArray m_name;
+		Uuid m_uuid;
+	};
 	struct Bitmap : private QScopedPointer<CSparseBitmap>
 	{
 		Bitmap(struct nbd_client *clnt, struct nbd_functions *nbd)
 			: m_clnt(clnt), m_nbd(nbd) { }
-		PRL_RESULT operator()(const char *metactx, UINT32 size, const Uuid &uuid); 
+		template <class T>
+		PRL_RESULT operator()(T, int granularity = DEFAULT_GRANULARITY);
 		using QScopedPointer<CSparseBitmap>::take;
 	private:
+		template <class T>
 		static void setRange(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg);
 
 		struct nbd_client    *m_clnt;
