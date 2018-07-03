@@ -21,6 +21,7 @@
  * Schaffhausen, Switzerland.
  */
 #include <dlfcn.h>
+#include <errno.h>
 
 #include "NbdDisk.h"
 #include "SparseBitmap.h"
@@ -82,9 +83,11 @@ void LibNbd::load()
 	if (m_Handle != NULL)
 		return;
 
-	m_Handle = dlopen("libpcs_nbd.so", RTLD_LAZY);
-	if (m_Handle == NULL)
+	m_Handle = dlopen("libpcs_nbd.so.1", RTLD_LAZY);
+	if (m_Handle == NULL) {
+		WRITE_TRACE(DBG_FATAL, "Failed to load libpcs_nbd.so: %s", strerror(errno));
 		return;
+	}
 
 	m_func.nbd_client_init = (struct nbd_client *(*)(void))
 		dlsym(m_Handle, "nbd_client_init");
@@ -146,24 +149,32 @@ PRL_RESULT NbdDisk::open(const QString &fileName,
 
 	int rc;
 
-	if (m_clnt != NULL)
+	if (m_clnt != NULL) {
+		WRITE_TRACE(DBG_FATAL, "Nbd client already connected");
 		return PRL_ERR_INVALID_ARG;
+	}
 
-	if (m_nbd == NULL)
+	if (m_nbd == NULL) {
+		WRITE_TRACE(DBG_FATAL, "libpcs_nbd.so initialization failed");
 		return PRL_ERR_UNINITIALIZED;
+	}
 
 	m_url = fileName;
 
-	if (!m_url.isValid() || m_url.scheme() != "nbd")
+	if (!m_url.isValid() || m_url.scheme() != "nbd") {
+		WRITE_TRACE(DBG_FATAL, "Invalid url %s", qPrintable(fileName));
 		return PRL_ERR_INVALID_ARG;
+	}
 
 	QRegExp rx("\\{(.*)\\}");
 	rx.indexIn(m_url.path());
 	m_uuid = rx.cap(1);
 
 	m_clnt = m_nbd->nbd_client_init();
-	if (m_clnt == NULL)
+	if (m_clnt == NULL) {
+		WRITE_TRACE(DBG_FATAL, "nbd_client_init failed");
 		return PRL_ERR_FAILURE;
+	}
 
 	if ((rc = m_nbd->nbd_client_connect(m_clnt,
 		qPrintable(m_url.authority()), qPrintable(m_url.path().mid(1)))) != 0)
