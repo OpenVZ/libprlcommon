@@ -83,7 +83,7 @@ void LibNbd::load()
 	if (m_Handle != NULL)
 		return;
 
-	m_Handle = dlopen("libpcs_nbd.so", RTLD_LAZY);
+	m_Handle = dlopen("libpcs_nbd.so.1", RTLD_LAZY);
 	if (m_Handle == NULL) {
 		WRITE_TRACE(DBG_FATAL, "Failed to load libpcs_nbd.so: %s", strerror(errno));
 		return;
