@@ -84,7 +84,7 @@ private:
 		}
 		bool operator()(int flags) const
 		{
-			return flags == NBD_STATE_HOLE;
+			return flags & (NBD_STATE_HOLE|NBD_STATE_ZERO);
 		}
 	private:
 		Uuid m_uuid;
