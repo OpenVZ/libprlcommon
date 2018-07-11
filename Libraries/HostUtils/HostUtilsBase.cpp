@@ -34,6 +34,8 @@
 
 #include "Libraries/PrlUuid/Uuid.h"
 #include <QRegExp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/random_device.hpp>
 
 /**
  * @function Sleep for a while
@@ -62,14 +64,8 @@ QString HostUtils::parseMacAddress(const QString& mac)
 QString HostUtils::generateMacAddress (HostUtils::MacPrefixType prefix)
 {
 	QString macAddress;
-
-	quint32 hash = qHash(Uuid::createUuid());
-	UCHAR *addrBytes = (UCHAR *) &hash;
-
-	// NOTE: addresses 00:1c:42:00:00:00 - 00:1c:42:00:00:0F are reserved for
-	// the Parallels Host Network adapters
-	if( 0 == addrBytes[0] && 0 == addrBytes[1] )
-		addrBytes[2] |= 0x10;
+	boost::random::random_device g;
+	boost::uniform_int<quint32> d(16, (1<<24) - 1);
 
 	QString macPrefix;
 	switch ( prefix ) {
@@ -80,8 +76,7 @@ QString HostUtils::generateMacAddress (HostUtils::MacPrefixType prefix)
 		macPrefix = "001C42";
 		break;
 	};
-
-	macAddress.sprintf( "%02X%02X%02X", addrBytes[0], addrBytes[1], addrBytes[2] );
+	macAddress.sprintf("%06X", d(g));
 	return macPrefix + macAddress;
 }
 
