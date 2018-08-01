@@ -758,13 +758,13 @@ void SocketServerPrivate::run ()
 
         bool listened = false;
         QList<ErrDesc> errList;
-        addrinfo* listenAddrInfo = 0;
+        const addrinfo* listenAddrInfo = 0;
         const quint32 MaxBindingTries = 50;
         quint32 bindingTry = 0;
 
-        // Order addrinfo with IPv6 priority
-        QList<addrinfo*> addrInfoList =
-            orderAddrInfo( addrInfo, OP_PreferIPv6 );
+        // Order addrinfo with IPv4 priority
+        QList<const addrinfo*> addrInfoList =
+            orderAddrInfo( addrInfo, OP_PreferIPv4 );
 
     iterate_from_the_beginning:
 
@@ -789,7 +789,7 @@ void SocketServerPrivate::run ()
         // Get suitable addr info in loop
         for ( int i = 0; i < addrInfoList.size() && i < (int)MaxSocks; ++i ) {
 
-            addrinfo* ai = addrInfoList[i];
+            const addrinfo* ai = addrInfoList[i];
 
 #ifndef _WIN_
             if ( !m_useUnixSockets )

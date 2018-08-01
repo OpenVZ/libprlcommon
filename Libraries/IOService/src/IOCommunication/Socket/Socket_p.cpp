@@ -469,25 +469,40 @@ bool IOService::getCredInfo( int sock,
 	return true;
 }
 
-QList<addrinfo*> IOService::orderAddrInfo ( addrinfo* addrInfo,
+QList<const addrinfo*> IOService::orderAddrInfo ( addrinfo* addrInfo,
                                             OrderPreference orderPref )
 {
-    QList<addrinfo*> resPrefered;
-    QList<addrinfo*> resOther;
+    QList<const addrinfo*> res6;
+    QList<const addrinfo*> res4;
+    QList<const addrinfo*> resOther;
     if ( addrInfo == 0 ) {
         Q_ASSERT(0);
         return resOther;
     }
+
     // Sort
     for ( addrinfo* ai = addrInfo; ai != 0; ai = ai->ai_next ) {
-        if ( orderPref == OP_PreferIPv6 && ai->ai_family == AF_INET6 )
-            resPrefered.append(ai);
-        else if ( orderPref == OP_PreferIPv4 && ai->ai_family == AF_INET )
-            resPrefered.append(ai);
+        if ( ai->ai_family == AF_INET6 )
+            res6.append(ai);
+        else if ( ai->ai_family == AF_INET )
+            res4.append(ai);
         else
             resOther.append(ai);
     }
-    return resPrefered + resOther;
+
+    if ( res4.isEmpty() && orderPref == OP_PreferIPv4 ) {
+	    static addrinfo s_ai_ip4 = addrinfo();
+
+	    s_ai_ip4.ai_family = AF_INET;
+	    s_ai_ip4.ai_socktype = SOCK_STREAM;
+
+	    res4.append(&s_ai_ip4);
+    }
+
+    if ( orderPref == OP_PreferIPv4 )
+	    return res4 + res6 + resOther;
+    else
+	    return res6 + res4 + resOther;
 }
 
 /*****************************************************************************/
