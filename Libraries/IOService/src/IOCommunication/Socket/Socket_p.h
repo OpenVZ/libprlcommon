@@ -194,7 +194,7 @@ enum OrderPreference {
     OP_PreferIPv6
 };
 /** Order addrinfo with specified preference */
-QList<addrinfo*> orderAddrInfo ( addrinfo* addrInfo,
+QList<const addrinfo*> orderAddrInfo ( addrinfo* addrInfo,
                                  OrderPreference orderPref );
 
 /** Detached client state */

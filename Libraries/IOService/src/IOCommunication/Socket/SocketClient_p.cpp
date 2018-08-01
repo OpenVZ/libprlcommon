@@ -1463,8 +1463,8 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
 #ifndef _WIN_
     struct sockaddr_un *pAddr = 0;
 #endif
-    addrinfo* connAddrInfo = 0;
-    QList<addrinfo*> addrInfoList;
+    const addrinfo* connAddrInfo = 0;
+    QList<const addrinfo*> addrInfoList;
     QList<ErrDesc> errList;
     QString host = m_remoteHost;
     QString port = QString("%1").arg(m_remotePort);
@@ -1552,7 +1552,7 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
 
     // Get suitable addr info in loop while not connected
     for ( qint32 i = 0; i < addrInfoList.size(); ++i ) {
-        addrinfo* ai = addrInfoList[i];
+        const addrinfo* ai = addrInfoList[i];
 
 #ifndef _WIN_
         if (!m_useUnixSockets)
