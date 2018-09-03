@@ -761,6 +761,7 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
 
     int lastfd = -1;
     std::swap(lastfd, m_lastfd);
+    m_rawBuffer.reserve(BUFFER_LIMIT);
     do {
         quint32 s = m_rawBuffer.size();
         if ( size <= s ) {
@@ -838,7 +839,6 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
         ::memset( &msg, 0, sizeof(msg) );
         ::memset( &cmsg, 0, sizeof(cmsg) );
 
-        m_rawBuffer.reserve(BUFFER_LIMIT);
         iov->iov_base = m_rawBuffer.data() + s;
         iov->iov_len = m_rawBuffer.capacity() - s;
         msg.msg_iov = iov;
@@ -870,7 +870,7 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
 
             return false;
         }
-	m_rawBuffer.resize(m_rawBuffer.size() + readBytes);
+	m_rawBuffer.data_ptr()->size = m_rawBuffer.size() + readBytes;
         if ( msg.msg_controllen == sizeof(cmsg) ) {
             lastfd = *(int *)CMSG_DATA(&cmsg.head);
         }
