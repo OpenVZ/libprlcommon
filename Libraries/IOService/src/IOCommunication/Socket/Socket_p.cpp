@@ -293,23 +293,9 @@ bool IOService::setSocketOptions ( int sock )
     if ( ! IOService::setCloseOnExec(sock) )
         return false;
 
+#ifndef _LIN_
     int newBufSz;
     socklen_t optLen = sizeof(newBufSz);
-#ifdef _LIN_
-    // Increase send buffer size
-    newBufSz = std::numeric_limits<int>::max();
-    if ( ::setsockopt(sock, SOL_SOCKET, SO_SNDBUF,
-                      reinterpret_cast<char*>(&newBufSz),
-                      optLen) < 0 )
-        return false;
-
-    // Increase receive buffer size
-    newBufSz = std::numeric_limits<int>::max();
-    if ( ::setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
-                      reinterpret_cast<char*>(&newBufSz),
-                      optLen) < 0 )
-        return false;
-#else // _LIN_
     // Increase send buffer size
     newBufSz = SSLMaxDataLength * 2;
     if ( ::setsockopt(sock, SOL_SOCKET, SO_SNDBUF,
@@ -786,6 +772,156 @@ void SocketWriteThread::setUuidsToPkgHeaderAndRegisterJob (
     sendJob->registerPackageUuid( pkgHeader.uuid );
 }
 
+#ifndef _WIN_ // non-Windows
+IOSendJob::Result SocketWriteThread::write ( int sock,
+		      int rdEventPipe,
+		      QVector<struct iovec> data_,
+		      quint32 msecsTimeout, int* unixfd)
+{
+	const size_t ErrBuffSize = 256;
+	char errBuff[ ErrBuffSize ];
+
+	quint32 size = 0;
+
+	Q_ASSERT(rdEventPipe != -1);
+
+	IOService::TimeMark startMark = 0;
+
+	// Get time mark if timeout is used
+	if ( msecsTimeout != 0 )
+	IOService::timeMark(startMark);
+
+	int i = 0;
+	while (i < data_.size()) {
+		pollfd p[2];
+		p[0].fd = sock;
+		p[0].events = POLLOUT;
+		p[1].fd = rdEventPipe;
+		p[1].events = POLLIN;
+
+		timespec timeout = {0, 0};
+		timespec* timeo = 0;
+
+		// Create timeout
+		if ( msecsTimeout != 0 ) {
+			IOService::TimeMark endMark = 0;
+			IOService::timeMark(endMark);
+			quint32 elapsed = IOService::msecsDiffTimeMark(startMark, endMark);
+			qint32 msecsToWait = msecsTimeout - elapsed;
+
+			if ( msecsToWait <= 0 ) {
+				WRITE_TRACE(DBG_FATAL, IO_LOG("Wait for write failed: timeout expired!"));
+				return IOSendJob::Fail;
+			}
+
+			// Set timeout
+			timeout.tv_sec = msecsToWait / 1000;
+			timeout.tv_nsec = (msecsToWait % 1000) * 1000000;
+			timeo = &timeout;
+		}
+
+		// Do select
+		int res = ::ppoll(p, sizeof(p)/sizeof(p[0]), timeo, NULL);
+		if ( res == 0 ) {
+			WRITE_TRACE(DBG_FATAL, IO_LOG("Wait for write failed: timeout expired!"));
+			return IOSendJob::Timeout;
+		}
+		else if ( res < 0 && errno == EINTR ) {
+			LOG_MESSAGE(DBG_INFO, IO_LOG("Select has been interrupted"));
+			continue;
+		}
+		else if ( res < 0 ) {
+			WRITE_TRACE(DBG_FATAL, IO_LOG("Select failed (native error: %s)"),
+			native_strerror(errBuff, ErrBuffSize));
+			return IOSendJob::Fail;
+		}
+
+		// Check stop in progress
+		if (p[1].revents & POLLIN) {
+			WRITE_TRACE(DBG_INFO, IO_LOG("Stop in progress for write thread"));
+			return IOSendJob::ConnClosedByUser;
+		}
+
+		// Send msg
+		struct msghdr msg;
+		struct {
+			struct cmsghdr head;
+			int fd;
+		} cmsg;
+
+		::memset( &msg, 0, sizeof(msg) );
+		::memset( &cmsg, 0, sizeof(cmsg) );
+
+		msg.msg_iov = &data_[i];
+		msg.msg_iovlen = data_.size() - i;
+
+		if ( unixfd != 0 && *unixfd >= 0 ) {
+			cmsg.head.cmsg_level = SOL_SOCKET;
+			cmsg.head.cmsg_type = SCM_RIGHTS;
+			cmsg.head.cmsg_len = CMSG_LEN(sizeof(int));
+			*(int *)CMSG_DATA(&cmsg.head) = *unixfd;
+			msg.msg_control = (caddr_t)&cmsg;
+			msg.msg_controllen = sizeof(cmsg);
+			*unixfd = -1;
+		}
+		ssize_t written = ::sendmsg( sock, &msg, 0 );
+
+		if ( written == 0 ) {
+			WRITE_TRACE(DBG_FATAL, IO_LOG("Connection was closed unexpectedly"));
+			return IOSendJob::Fail;
+		}
+		else if ( written < 0 && errno == EINTR ) {
+			LOG_MESSAGE(DBG_INFO, IO_LOG("Write has been interrupted"));
+			continue;
+		}
+		else if ( written < 0 && errno == EAGAIN ) {
+			LOG_MESSAGE(DBG_INFO, IO_LOG("Write would block"));
+			continue;
+		}
+		else if ( written < 0 ) {
+			int err = errno;
+			bool knownErr = (err == EPIPE ||    // other side has been closed
+				err == ECONNRESET);// connection reset
+
+			if ( knownErr ) {
+				WRITE_TRACE(DBG_INFO,
+					IO_LOG("Write to socket failed because of known "
+					"err (native error: %s)"),
+					native_strerror(errBuff, ErrBuffSize));
+			} else {
+				WRITE_TRACE(DBG_FATAL, IO_LOG("Write to socket failed (native error: %s)"),
+				native_strerror(errBuff, ErrBuffSize));
+			}
+
+			if ( err == EFAULT )
+				return IOSendJob::InvalidPackage;
+			// Try to detect that socket has been
+			// correctly shut down on the other side
+			else if ( err == EPIPE || err == ECONNRESET )
+				return IOSendJob::ConnClosedByPeer;
+
+			return IOSendJob::Fail;
+		}
+		size += written;
+		while (0 < written)
+		{
+			size_t d = qMin<size_t>(written, data_[i].iov_len);
+			written -= d;
+			if (0 == (data_[i].iov_len -= d))
+				++i;
+			else
+				data_[i].iov_base = ((char* )data_[i].iov_base) + d;
+		}
+	};
+
+	// Append written bytes to statistics
+	AtomicAdd64(&m_stat.sentBytes, size);
+
+	return IOSendJob::Success;
+}
+
+#endif // non-Windows
+
 IOSendJob::Result SocketWriteThread::write (
     int sock,
 #ifdef _WIN_ // Windows
@@ -970,134 +1106,16 @@ IOSendJob::Result SocketWriteThread::write (
 
 #else
     // Unix
+	Q_UNUSED(size);
+	Q_UNUSED(errBuff);
+	Q_UNUSED(ErrBuffSize);
 
-    Q_ASSERT(rdEventPipe != -1);
-
-    IOService::TimeMark startMark = 0;
-
-    // Get time mark if timeout is used
-    if ( msecsTimeout != 0 )
-        IOService::timeMark(startMark);
-
-    do {
-        pollfd p[2];
-        p[0].fd = sock;
-        p[0].events = POLLOUT;
-        p[1].fd = rdEventPipe;
-        p[1].events = POLLIN;
-
-        timespec timeout = {0, 0};
-        timespec* timeo = 0;
-
-        // Create timeout
-        if ( msecsTimeout != 0 ) {
-            IOService::TimeMark endMark = 0;
-            IOService::timeMark(endMark);
-            quint32 elapsed = IOService::msecsDiffTimeMark(startMark, endMark);
-            qint32 msecsToWait = msecsTimeout - elapsed;
-
-            if ( msecsToWait <= 0 ) {
-                WRITE_TRACE(DBG_FATAL, IO_LOG("Wait for write failed: timeout expired!"));
-                return IOSendJob::Fail;
-            }
-
-            // Set timeout
-            timeout.tv_sec = msecsToWait / 1000;
-            timeout.tv_nsec = (msecsToWait % 1000) * 1000000;
-            timeo = &timeout;
-        }
-
-        // Do select
-        int res = ::ppoll(p, sizeof(p)/sizeof(p[0]), timeo, NULL);
-        if ( res == 0 ) {
-            WRITE_TRACE(DBG_FATAL, IO_LOG("Wait for write failed: timeout expired!"));
-            return IOSendJob::Timeout;
-        }
-        else if ( res < 0 && errno == EINTR ) {
-            LOG_MESSAGE(DBG_INFO, IO_LOG("Select has been interrupted"));
-            continue;
-        }
-        else if ( res < 0 ) {
-            WRITE_TRACE(DBG_FATAL, IO_LOG("Select failed (native error: %s)"),
-                        native_strerror(errBuff, ErrBuffSize));
-            return IOSendJob::Fail;
-        }
-
-        // Check stop in progress
-        if (p[1].revents & POLLIN) {
-            WRITE_TRACE(DBG_INFO, IO_LOG("Stop in progress for write thread"));
-            return IOSendJob::ConnClosedByUser;
-        }
-
-        // Send msg
-        struct iovec iov;
-        struct msghdr msg;
-        struct {
-            struct cmsghdr head;
-            int fd;
-        } cmsg;
-
-        ::memset( &msg, 0, sizeof(msg) );
-        ::memset( &cmsg, 0, sizeof(cmsg) );
-        ::memset( &iov, 0, sizeof(iov) );
-
-        iov.iov_base = const_cast<char*>(buff);
-        iov.iov_len = size;
-        msg.msg_iov = &iov;
-        msg.msg_iovlen = 1;
-
-        if ( unixfd != 0 && *unixfd >= 0 ) {
-            cmsg.head.cmsg_level = SOL_SOCKET;
-            cmsg.head.cmsg_type = SCM_RIGHTS;
-            cmsg.head.cmsg_len = CMSG_LEN(sizeof(int));
-            *(int *)CMSG_DATA(&cmsg.head) = *unixfd;
-            msg.msg_control = (caddr_t)&cmsg;
-            msg.msg_controllen = sizeof(cmsg);
-            *unixfd = -1;
-        }
-        ssize_t written = ::sendmsg( sock, &msg, 0 );
-
-        if ( written == 0 ) {
-            WRITE_TRACE(DBG_FATAL, IO_LOG("Connection was closed unexpectedly"));
-            return IOSendJob::Fail;
-        }
-        else if ( written < 0 && errno == EINTR ) {
-            LOG_MESSAGE(DBG_INFO, IO_LOG("Write has been interrupted"));
-            continue;
-        }
-	else if ( written < 0 && errno == EAGAIN ) {
-            LOG_MESSAGE(DBG_INFO, IO_LOG("Write would block"));
-            continue;
-        }
-        else if ( written < 0 ) {
-            int err = errno;
-            bool knownErr = (err == EPIPE ||    // other side has been closed
-                             err == ECONNRESET);// connection reset
-
-            if ( knownErr )
-                WRITE_TRACE(DBG_INFO,
-                            IO_LOG("Write to socket failed because of known "
-                                   "err (native error: %s)"),
-                            native_strerror(errBuff, ErrBuffSize));
-            else
-                WRITE_TRACE(DBG_FATAL, IO_LOG("Write to socket failed (native error: %s)"),
-                            native_strerror(errBuff, ErrBuffSize));
-
-            if ( err == EFAULT )
-                return IOSendJob::InvalidPackage;
-
-            // Try to detect that socket has been
-            // correctly shut down on the other side
-            else if ( err == EPIPE || err == ECONNRESET )
-                return IOSendJob::ConnClosedByPeer;
-
-            return IOSendJob::Fail;
-        }
-
-        size -= written;
-        buff += written;
-
-    } while ( size > 0 );
+	QVector<struct iovec> d(1);
+	d[0].iov_base = const_cast<char*>(buff);
+	d[0].iov_len = sizeToWrite;
+	IOSendJob::Result e = this->write(sock, rdEventPipe, d, msecsTimeout, unixfd);
+	if (IOSendJob::Success != e)
+		return e;
 #endif
 
     // Append written bytes to statistics
@@ -1134,92 +1152,49 @@ IOSendJob::Result SocketWriteThread::plainWrite (
     Q_ASSERT(outBuff);
     Q_ASSERT(size != 0);
 
-    // Create SSL header of plain data
-    SSLv3Header header;
-    header.type = 0xff;
-    header.sslVersion = 3;
+	// Create SSL header of plain data
+	SSLv3Header x;
+	x.type = 0xff;
+	x.sslVersion = 3;
+	x.sslDataLength = htons(SSLMaxDataLength);
 
-    quint32 iters = size / SSLMaxDataLength;
-    quint32 mod = size % SSLMaxDataLength;
-    IOService::TimeMark startMark = 0;
+	quint32 iters = (size + SSLMaxDataLength - 1) / SSLMaxDataLength;
+	SSLv3Header y = x;
+	y.sslDataLength = htons(size % SSLMaxDataLength);
 
-    // Default size for iters
-    header.sslDataLength = htons(SSLMaxDataLength);
+	IOService::TimeMark startMark = 0;
 
-    MARK_TIMEOUT
+	MARK_TIMEOUT
 
-    for ( quint32 i = 0; i < iters; ++i ) {
+	QVector<struct iovec> d;
+	d.reserve(128);
+	for (quint32 i = 0, a = (iters + d.capacity() - 1) / d.capacity();
+		i < a; ++i)
+	{
+		d.resize(0);
+		for (quint32 j = 0, b = qMin<quint32>(d.capacity(), iters); j < b; ++j, --iters)
+		{
+			quint32 z = qMin<quint32>(SSLMaxDataLength, size);
+			d.push_back(iovec());
+			d.last().iov_len = sizeof(SSLv3Header);
+			d.last().iov_base = SSLMaxDataLength == z ? &x : &y;
 
-        // Write header
-        IOSendJob::Result res = write( sock,
-#ifdef _WIN_ // Windows
-                                       m_threadState,
-                                       &m_sockOverlappedWrite,
-                                       m_writeEventHandle,
-#else // Unix
-                                       m_eventPipes[0],
-#endif
-                                       &header, sizeof(header),
-                                       msecsTimeout, unixfd );
-        if ( res != IOSendJob::Success )
-            return res;
+			d.push_back(iovec());
+			d.last().iov_len = z;
+			d.last().iov_base = const_cast<char* >(outBuff);
+			
+			size -= z;
+			outBuff += z;
+		}
+		IOSendJob::Result e = write(sock, m_eventPipes[0], d,
+						msecsTimeout, unixfd);
+		if (IOSendJob::Success != e)
+			return e;
 
-        CALCULATE_TIMEOUT
+		CALCULATE_TIMEOUT
+	}
 
-        // Write body
-        res = write( sock,
-#ifdef _WIN_ // Windows
-                     m_threadState,
-                     &m_sockOverlappedWrite,
-                     m_writeEventHandle,
-#else // Unix
-                     m_eventPipes[0],
-#endif
-                     outBuff, SSLMaxDataLength,
-                     msecsTimeout, unixfd );
-        if ( res != IOSendJob::Success )
-            return res;
-
-        CALCULATE_TIMEOUT
-
-        outBuff += SSLMaxDataLength;
-    }
-
-    // Write remains if we have
-    if ( mod ) {
-        // Write header
-        header.sslDataLength = htons(mod);
-        IOSendJob::Result res = write( sock,
-#ifdef _WIN_ // Windows
-                                       m_threadState,
-                                       &m_sockOverlappedWrite,
-                                       m_writeEventHandle,
-#else // Unix
-                                       m_eventPipes[0],
-#endif
-                                       &header, sizeof(header),
-                                       msecsTimeout, unixfd );
-        if ( res != IOSendJob::Success )
-            return res;
-
-        CALCULATE_TIMEOUT
-
-        // Write body
-        res = write( sock,
-#ifdef _WIN_ // Windows
-                     m_threadState,
-                     &m_sockOverlappedWrite,
-                     m_writeEventHandle,
-#else // Unix
-                     m_eventPipes[0],
-#endif
-                     outBuff, mod,
-                     msecsTimeout, unixfd );
-        if ( res != IOSendJob::Success )
-            return res;
-    }
-
-    return IOSendJob::Success;
+	return IOSendJob::Success;
 }
 
 IOSendJob::Result SocketWriteThread::sslWrite (

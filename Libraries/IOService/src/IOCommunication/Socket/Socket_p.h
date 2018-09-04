@@ -275,6 +275,13 @@ public:
 
     SmartPtr<IOJobManager::JobPool> getJobPool () const;
 
+#ifndef _WIN_ // Windows
+    IOSendJob::Result write ( int sock,
+                              int rdEventPipe,
+                              QVector<struct iovec> data_,
+                              quint32 timeoutMsecs, int* unixfd = 0 );
+#endif // Windows
+
     IOSendJob::Result write ( int sock,
 #ifdef _WIN_ // Windows
                               volatile ThreadState& threadState,
