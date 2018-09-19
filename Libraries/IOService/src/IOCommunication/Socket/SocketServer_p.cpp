@@ -914,11 +914,17 @@ void SocketServerPrivate::run ()
 #endif
             int res = 0;
 #ifndef _WIN_
-            if (!m_useUnixSockets)
+            if (!m_useUnixSockets) {
 #endif
+		    WRITE_TRACE(DBG_FATAL,
+			    IO_LOG("bind() i=%d sk=%d "
+				    "ai_family=%d ai_socktype=%d ai_protocol=%d"),
+			    i, servHandles[i],
+			    ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+
                 res = ::bind(servHandles[i], ai->ai_addr, (int)ai->ai_addrlen);
 #ifndef _WIN_
-            else
+            } else
             {
                 ::unlink( host.toUtf8().constData() );
                 res = ::bind(servHandles[i], (struct sockaddr *)pAddr, SUN_LEN(pAddr));
@@ -956,7 +962,7 @@ void SocketServerPrivate::run ()
 #endif
                     // Close all opened sockets
                     for ( int j = 0; j <= i; j++ ) {
-                        if ( servHandles[j] > 0 ) {
+                        if ( servHandles[j] >= 0 ) {
 #ifdef _WIN_
                             ::closesocket(servHandles[j]);
 #else
