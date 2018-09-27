@@ -477,10 +477,14 @@ QList<const addrinfo*> IOService::orderAddrInfo ( addrinfo* addrInfo,
     }
 
     if ( res4.isEmpty() && orderPref == OP_PreferIPv4 ) {
-	    static addrinfo s_ai_ip4 = addrinfo();
+	    static struct addrinfo s_ai_ip4;
+	    static struct sockaddr_in s_a;
 
 	    s_ai_ip4.ai_family = AF_INET;
 	    s_ai_ip4.ai_socktype = SOCK_STREAM;
+	    s_ai_ip4.ai_protocol = IPPROTO_TCP;
+	    s_ai_ip4.ai_addr = (struct sockaddr *) &s_a;
+	    s_ai_ip4.ai_addrlen = sizeof(struct sockaddr_in);
 
 	    res4.append(&s_ai_ip4);
     }

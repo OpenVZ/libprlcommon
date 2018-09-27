@@ -916,12 +916,6 @@ void SocketServerPrivate::run ()
 #ifndef _WIN_
             if (!m_useUnixSockets) {
 #endif
-		    WRITE_TRACE(DBG_FATAL,
-			    IO_LOG("bind() i=%d sk=%d "
-				    "ai_family=%d ai_socktype=%d ai_protocol=%d"),
-			    i, servHandles[i],
-			    ai->ai_family, ai->ai_socktype, ai->ai_protocol);
-
                 res = ::bind(servHandles[i], ai->ai_addr, (int)ai->ai_addrlen);
 #ifndef _WIN_
             } else
