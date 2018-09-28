@@ -456,7 +456,7 @@ bool IOService::getCredInfo( int sock,
 }
 
 QList<const addrinfo*> IOService::orderAddrInfo ( addrinfo* addrInfo,
-                                            OrderPreference orderPref )
+		OrderPreference orderPref, quint32 port)
 {
     QList<const addrinfo*> res6;
     QList<const addrinfo*> res4;
@@ -480,6 +480,7 @@ QList<const addrinfo*> IOService::orderAddrInfo ( addrinfo* addrInfo,
 	    static struct addrinfo s_ai_ip4;
 	    static struct sockaddr_in s_a;
 
+	    s_a.sin_port = htons(port);
 	    s_ai_ip4.ai_family = AF_INET;
 	    s_ai_ip4.ai_socktype = SOCK_STREAM;
 	    s_ai_ip4.ai_protocol = IPPROTO_TCP;

@@ -195,7 +195,7 @@ enum OrderPreference {
 };
 /** Order addrinfo with specified preference */
 QList<const addrinfo*> orderAddrInfo ( addrinfo* addrInfo,
-                                 OrderPreference orderPref );
+                                 OrderPreference orderPref, quint32 port = 0);
 
 /** Detached client state */
 struct DetachedClientState

@@ -764,7 +764,7 @@ void SocketServerPrivate::run ()
 
         // Order addrinfo with IPv4 priority
         QList<const addrinfo*> addrInfoList =
-            orderAddrInfo( addrInfo, OP_PreferIPv4 );
+            orderAddrInfo( addrInfo, OP_PreferIPv4, m_impl->remotePortNumber());
 
     iterate_from_the_beginning:
 
