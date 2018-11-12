@@ -105,8 +105,10 @@
 #define MIGRATE_DISP_PROTO_V5   5
 /* Vz 7.0.0 version */
 #define MIGRATE_DISP_PROTO_V7   7
+/* w2k8 UEFI enabled migration */
+#define MIGRATE_DISP_PROTO_V8   8
 /* current migrate protocol version */
-#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V7
+#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V8
 
 /* backup client-dispatcher and dispatcher-dispatcher protocol versions */
 /* RC version */
