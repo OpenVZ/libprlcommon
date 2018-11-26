@@ -1171,13 +1171,16 @@ IOSendJob::Result SocketWriteThread::plainWrite (
 
 	MARK_TIMEOUT
 
+	enum
+	{
+		N = 64
+	};
 	QVector<struct iovec> d;
-	d.reserve(128);
-	for (quint32 i = 0, a = (iters + d.capacity() - 1) / d.capacity();
-		i < a; ++i)
+	d.reserve(N << 1);
+	for (quint32 i = 0, a = (iters + N - 1) / N; i < a; ++i)
 	{
 		d.resize(0);
-		for (quint32 j = 0, b = qMin<quint32>(d.capacity(), iters); j < b; ++j, --iters)
+		for (quint32 j = 0, b = qMin<quint32>(N, iters); j < b; ++j, --iters)
 		{
 			quint32 z = qMin<quint32>(SSLMaxDataLength, size);
 			d.push_back(iovec());
