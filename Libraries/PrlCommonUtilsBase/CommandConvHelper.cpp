@@ -222,6 +222,9 @@ void InitializeDispatcherCommandsMaps()
 PRL_JOB_OPERATION_CODE DispatcherCmdsToJobTypeConverter::Convert(PVE::IDispatcherCommands nCmdId)
 {
 	QMutexLocker _lock(DispatcherCommandsAndJobTypesMapsMutex());
+	if (NULL == _lock.mutex())
+		return PJOC_UNKNOWN;
+
 	if (!DispatcherCommandsToJobTypesMap()->size())
 		InitializeDispatcherCommandsMaps();
 	DispatcherCmdsToJobTypesMapType::const_iterator _it =
@@ -234,6 +237,9 @@ PRL_JOB_OPERATION_CODE DispatcherCmdsToJobTypeConverter::Convert(PVE::IDispatche
 PVE::IDispatcherCommands DispatcherCmdsToJobTypeConverter::Convert(PRL_JOB_OPERATION_CODE nJobOpCode)
 {
 	QMutexLocker _lock(DispatcherCommandsAndJobTypesMapsMutex());
+	if (NULL == _lock.mutex())
+		return (PVE::DspIllegalCommand);
+
 	if (!JobTypesToDispatcherCommandsMap()->size())
 		InitializeDispatcherCommandsMaps();
 	JobTypesToDispatcherCmdsMapType::const_iterator _it =
