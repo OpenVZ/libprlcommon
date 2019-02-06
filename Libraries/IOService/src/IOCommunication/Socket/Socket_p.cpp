@@ -1894,9 +1894,6 @@ void SocketWriteThread::doJob ()
             SmartPtr<IOSendJob> job = h->sendJob;
             // Wake send waitings
             if ( ! job->sendWaitingsWereWaken() ) {
-                SmartPtr<IOPackage> p = h->pkg;
-                Q_ASSERT(p.isValid());
-
                 //
                 // All active jobs must be waken by common result
                 // (smb has gone wrong, or connection was closed),
@@ -1906,7 +1903,11 @@ void SocketWriteThread::doJob ()
                 //
                 // Here we call only package callbacks, we do not call
                 // onBeforeWrite or onAfterWrite.
+                if (h->isActive)
                 {
+                    SmartPtr<IOPackage> p = h->pkg;
+                    Q_ASSERT(p.isValid());
+
                     CALLBACK_MARK;
                     if ( p->callback.beforeSendCall ) {
                         p->callback.beforeSendCall( false, p->callback.sendContext,
