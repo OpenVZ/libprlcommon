@@ -119,7 +119,7 @@ QString CBaseNode::toString(bool IncludeXmlNode, bool no_save_option) const
 
 	QString str;
 	QTextStream out( &str );
-	document.save( out, 3 );
+	document.save( out, 1 );
 	out.flush();
 
 	if (str.contains(QChar('\0')))
