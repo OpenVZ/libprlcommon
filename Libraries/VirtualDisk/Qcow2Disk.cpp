@@ -494,8 +494,8 @@ template<> void Create::operator() (const Policy::Qcow2::size_type &value)
 
 template<> void Create::operator() (const Policy::Qcow2::base_type &value)
 {
-	m_cmdLine << "-o" << QString("backing_fmt=qcow2,backing_file=%1")
-		.arg(enquote(value));
+	m_cmdLine << "-o" << QString("backing_fmt=%2,backing_file=%1")
+		.arg(enquote(value.getUrl())).arg(enquote(value.getFormat()));
 }
 
 template<> void Create::operator() (const Policy::Qcow2::clusterSize_type &value)

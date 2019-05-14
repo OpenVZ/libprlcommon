@@ -34,7 +34,7 @@
 #include <QSharedPointer>
 #include <QProcess>
 #include <boost/serialization/strong_typedef.hpp>
-
+#include <boost/tuple/tuple.hpp>
 #include "VirtualDisk.h"
 #include "Util.h"
 
@@ -116,8 +116,31 @@ namespace Policy
 {
 namespace Qcow2
 {
+///////////////////////////////////////////////////////////////////////////////
+// struct Backing
 
-typedef QString base_type;
+struct Backing: private boost::tuple<QString, QString>
+{
+	typedef boost::tuple<QString, QString> base_type;
+
+	explicit Backing(const QString& image_): base_type(image_, "qcow2")
+	{
+	}
+	Backing(const QString& image_, const QString& format_): base_type(image_, format_)
+	{
+	}
+
+	const QString& getUrl() const
+	{
+		return get<0>();
+	}
+	const QString& getFormat() const
+	{
+		return get<1>();
+	}
+};
+
+typedef Backing base_type;
 typedef PRL_UINT64 size_type;
 BOOST_STRONG_TYPEDEF(QString, unix_type)
 BOOST_STRONG_TYPEDEF(PRL_UINT16, port_type)
