@@ -59,33 +59,42 @@ CVmEvent::CVmEvent(CVmEvent *other)
 {
 	if (other)
 	{
-		fromString(other->toString());
+		QList<CVmEventParameters* > b;
+		b.swap(other->m_lstBaseEventParameters);
+		CVmEventParameters* f = m_lstBaseEventParameters.takeFirst();
+		Copy(*other);
 
-		m_uiRcInit = other->m_uiRcInit;
-		m_szErrMsg = other->m_szErrMsg;
-		m_iErrLine = other->m_iErrLine;
-		m_iErrCol = other->m_iErrCol;
-
-		for(int i = 0; i < m_lstEventParameters.size() && i < other->m_lstEventParameters.size(); i++)
+		*f = *b[0];
+		m_lstBaseEventParameters << f;
+		for (int i = 0; i < m_lstEventParameters.size(); ++i)
 		{
-			CVmEventParameter* pParam = other->m_lstEventParameters[i];
-			if (pParam)
-			{
-				if (pParam->getEventParameterClassType() == CVmEventParameter::List)
-				{
-					m_lstEventParameters[i]->setEventParameterClassType(CVmEventParameter::List);
-				}
-				else if (pParam->getEventParameterClassType() == CVmEventParameter::Binary)
-				{
-					int nItemId = m_lstEventParameters[i]->getItemId();
-					delete m_lstEventParameters[i];
+			CVmEventParameter* p = other->m_lstEventParameters[i];
+			if (NULL == p)
+				continue;
 
-					CVmBinaryEventParameter *pBinaryParam = static_cast<CVmBinaryEventParameter *>(pParam);
-					m_lstEventParameters[i] = new CVmBinaryEventParameter(*pBinaryParam);
-					m_lstEventParameters[i]->setItemId(nItemId);
-				}
+			switch (p->getEventParameterClassType())
+			{
+			case CVmEventParameter::Binary:
+			{
+				int I = m_lstEventParameters[i]->getItemId();
+				delete m_lstEventParameters[i];
+
+				CVmBinaryEventParameter* b = static_cast<CVmBinaryEventParameter *>(p);
+				m_lstEventParameters[i] = new CVmBinaryEventParameter(*b);
+				m_lstEventParameters[i]->setItemId(I);
+				break;
+			}
+			case CVmEventParameter::List:
+				m_lstEventParameters[i]->setEventParameterClassType(CVmEventParameter::List);
+			default:
+				break;
 			}
 		}
+		for (int i = 1; i < b.size(); ++i)
+		{
+			m_lstBaseEventParameters << new CVmEventParameters(b[i]);
+		}
+		b.swap(other->m_lstBaseEventParameters);
 	}
 }
 
