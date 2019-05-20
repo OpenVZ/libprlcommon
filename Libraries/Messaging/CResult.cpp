@@ -141,7 +141,7 @@ CResult::CResult(const CResult &_obj) : QEvent(_obj),
    m_uiPackageId(_obj.m_uiPackageId)
 {
     if (_obj.m_pError)
-        m_pError = new CVmEvent(_obj.m_pError->toString());
+        m_pError = new CVmEvent(_obj.m_pError);
     m_hashResultSet = _obj.m_hashResultSet;
 	if (_obj.m_pBinaryContent)
 		m_pBinaryContent = new CVmEvent(_obj.m_pBinaryContent);
@@ -166,7 +166,7 @@ CResult &CResult::operator=(const CResult &_obj) {
             m_pError = NULL;
         }
         if (_obj.m_pError)
-            m_pError = new CVmEvent(_obj.m_pError->toString());
+            m_pError = new CVmEvent(_obj.m_pError);
         m_hashResultSet = _obj.m_hashResultSet;
 
         if( m_pBinaryContent ) {
