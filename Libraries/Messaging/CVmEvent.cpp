@@ -59,13 +59,12 @@ CVmEvent::CVmEvent(CVmEvent *other)
 {
 	if (other)
 	{
-		QList<CVmEventParameters* > b;
-		b.swap(other->m_lstBaseEventParameters);
 		CVmEventParameters* f = m_lstBaseEventParameters.takeFirst();
 		Copy(*other);
 
-		*f = *b[0];
-		m_lstBaseEventParameters << f;
+		*f = *m_lstBaseEventParameters[0];
+		delete m_lstBaseEventParameters.front();
+		m_lstBaseEventParameters.front() = f;
 		for (int i = 0; i < m_lstEventParameters.size(); ++i)
 		{
 			CVmEventParameter* p = other->m_lstEventParameters[i];
@@ -90,11 +89,6 @@ CVmEvent::CVmEvent(CVmEvent *other)
 				break;
 			}
 		}
-		for (int i = 1; i < b.size(); ++i)
-		{
-			m_lstBaseEventParameters << new CVmEventParameters(b[i]);
-		}
-		b.swap(other->m_lstBaseEventParameters);
 	}
 }
 
