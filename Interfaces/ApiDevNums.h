@@ -10,6 +10,7 @@
 /// for the API request exchange between Application and Monitor
 ///
 /// Copyright (c) 2010-2017, Parallels International GmbH. All rights reserved.
+/// Copyright (c) 2017-2019 Virtuozzo International GmbH, All rights reserved.
 ///
 /// This file is licensed for use in the Linux Kernel under the
 /// terms of the GNU General Public License version 2.
@@ -19,7 +20,7 @@
 /// <http://www.gnu.org/licenses/> or write to Free Software Foundation,
 /// 51 Franklin Street, Fifth Floor Boston, MA 02110, USA.
 ///
-/// Our contact details: Parallels International GmbH, Vordergasse 59, 8200
+/// Our contact details: Virtuozzo International GmbH, Vordergasse 59, 8200
 /// Schaffhausen, Switzerland.
 ///
 ///
