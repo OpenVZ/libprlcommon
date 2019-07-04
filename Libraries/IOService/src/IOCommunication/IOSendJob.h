@@ -153,7 +153,7 @@ private:
     Cancellation::Sink m_sendSink;
     Cancellation::Sink m_responseSink;
     Cancellation::Token m_token;
-    mutable BlockingQueue<Response, 31> m_throttle;
+    mutable BlockingQueue<Response, 7> m_throttle;
 };
 
 class IOJobManager
