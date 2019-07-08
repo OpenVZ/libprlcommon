@@ -33,7 +33,6 @@
 #include <QtCore>
 #include <QtXml>
 
-#include "Build/Current.ver"
 #include "../Interfaces/ParallelsDomModel.h"
 #include "../Interfaces/ParallelsQt.h"
 #include "../Interfaces/ParallelsNamespace.h"
