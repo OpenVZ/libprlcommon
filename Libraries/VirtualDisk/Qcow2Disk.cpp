@@ -490,12 +490,12 @@ Create::Create(const QString &fileName) :
 
 template<> void Create::operator() (const Policy::Qcow2::size_type &value)
 {
-	m_cmdLine << "-o" << QString("size=%1").arg(value);
+	m_cmdLine << "-o" << QString("size=%1").arg(value) << "-u";
 }
 
 template<> void Create::operator() (const Policy::Qcow2::base_type &value)
 {
-	m_cmdLine << "-u" << "-o" << QString("backing_fmt=%2,backing_file=%1")
+	m_cmdLine << "-o" << QString("backing_fmt=%2,backing_file=%1")
 		.arg(enquote(value.getUrl())).arg(enquote(value.getFormat()));
 }
 
