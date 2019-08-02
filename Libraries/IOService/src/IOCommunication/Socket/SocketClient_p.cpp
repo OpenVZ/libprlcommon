@@ -2481,9 +2481,6 @@ void SocketClientPrivate::doJob ()
 
             if ( ! SSL_session_reused(m_ssl) ) {
                 WRITE_TRACE(DBG_FATAL, IO_LOG("SSL session was not reused!"));
-                // Do not continue writing
-                // Anyway writing will be stopped
-                goto cleanup_and_disconnect;
             }
 
             // Continue writing
@@ -3610,7 +3607,7 @@ bool SocketClientPrivate::srv_addSSLSessionFromStateAndRehandshake (
         WRITE_TRACE(DBG_FATAL, IO_LOG("SSL session was not reused!"));
         // New session was created!
         // It is not correct!
-        return false;
+//        return false;
     }
 
     // Save additional package
