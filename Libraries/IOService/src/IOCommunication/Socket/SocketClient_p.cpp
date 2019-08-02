@@ -3205,8 +3205,8 @@ bool SocketClientPrivate::sslHandshake ( int sock, quint32 msecsTimeout, bool re
 bool SocketClientPrivate::sslHeaderCheck ( const SSLv3Header& header ) const
 {
     // Check version
-    if ( header.sslVersion != 3 ) {
-        WRITE_TRACE(DBG_FATAL, IO_LOG("SSL version is wrong!"));
+    if (header.sslVersion != 3 && header.sslVersion != TLS1_2_VERSION) {
+        WRITE_TRACE(DBG_FATAL, IO_LOG("SSL version %d is wrong!"), header.sslVersion);
         return false;
     }
 
