@@ -9,6 +9,5 @@
 
 QMAKE_CFLAGS += -Werror
 macx:QMAKE_CFLAGS += -Wno-deprecated-declarations
-QMAKE_CXXFLAGS += -Werror
 macx:QMAKE_CXXFLAGS += -Wno-deprecated-declarations
 
