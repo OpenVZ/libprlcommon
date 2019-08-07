@@ -69,7 +69,7 @@ x86only {
 win32:DEFINES     += "_WIN_=1"
 win32:DEFINES     += "SUPPORT_ASM_MS"
 linux-*:DEFINES   += "_LIN_=1"
-linux-*:QMAKE_CXXFLAGS += -fno-strict-aliasing
+linux-*:QMAKE_CXXFLAGS += -fno-strict-aliasing -fno-gnu-unique -fno-weak
 
 # Release/Debug detection defines
 CONFIG(debug, debug|release) {
