@@ -192,7 +192,7 @@ namespace IOService {
     public:
 	enum
 	{
-		SIZE_LIMIT = (1 << 26)
+		SIZE_LIMIT = (1 << 27)
 	};
 
         /** Common package type */

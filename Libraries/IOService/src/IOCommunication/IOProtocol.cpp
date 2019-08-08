@@ -1120,7 +1120,8 @@ PRL_RESULT IOPackage::setBuffer(quint32 buffer_, const SmartPtr<char>& data_, co
 {
 	PODData* d = IODATAMEMBER(this);
 	PODData& b = d[buffer_];
-	register qint64 c = SIZE_LIMIT - fullPackageSize() + b.bufferSize - pod_.bufferSize;
+	qint64 c = qint64(SIZE_LIMIT) - qint64(fullPackageSize()) + qint64(b.bufferSize) -
+		qint64(pod_.bufferSize);
 	if (0 > c)
 		return PRL_ERR_BUFFER_OVERRUN;
 
@@ -1136,7 +1137,7 @@ qint32 IOPackage::stowBuffer(quint32 buffer_, const void* data_, const PODData& 
 		return -1;
 
 	PODData& b = IODATAMEMBER(this)[buffer_];
-	register qint64 c = SIZE_LIMIT - fullPackageSize() + b.bufferSize;
+	qint64 c = qint64(SIZE_LIMIT) - qint64(fullPackageSize()) + qint64(b.bufferSize);
 	if (0 >= c)
 		return -1;
 

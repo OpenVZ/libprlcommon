@@ -218,13 +218,14 @@ inline SmartPtr<IOService::IOPackage> createInstance (
 				IOService::IOPackage::createInstance( cmdNumber, 1,parent);
 		}
 	}
-
-	// Create data buffer
-	if ( size > 0 ) {
+	if (ioPkg.isValid() && size > 0)
+	{
+		// Create data buffer
 		SmartPtr<char> dataBuff( new char[ size ],
 					 SmartPtrPolicy::ArrayStorage );
 		out.readRawData( dataBuff.getImpl(), size );
-		ioPkg->setBuffer( 0, IOService::IOPackage::RawEncoding, dataBuff, size );
+		if (!ioPkg->setBuffer( 0, IOService::IOPackage::RawEncoding, dataBuff, size))
+			return SmartPtr<IOService::IOPackage>();
 	}
 
 	return ioPkg;
