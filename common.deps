@@ -38,3 +38,5 @@ include($$LIBS_LEVEL/Messaging/Messaging.pri)
 include($$LIBS_LEVEL/PrlObjects/PrlObjects.pri)
 include($$LIBS_LEVEL/Std/Std.pri)
 include($$LIBS_LEVEL/VirtualDisk/VirtualDisk.pri)
+
+LIBS += -ljson-c

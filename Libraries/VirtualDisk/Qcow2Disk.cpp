@@ -36,19 +36,17 @@
 #include <linux/fs.h>
 #include <fcntl.h>
 #include <cstdlib>
-
+#include <json/json.h>
 #include <QStringList>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QtGlobal>
-#include <boost/property_tree/json_parser.hpp>
 
 #include <prlsdk/PrlErrorsValues.h>
 #include "../Logging/Logging.h"
 #include "../HostUtils/HostUtils.h"
 #include "Util.h"
-
-namespace pt = boost::property_tree;
+#include <boost/algorithm/string.hpp>
 
 namespace VirtualDisk
 {
@@ -666,28 +664,30 @@ bool Qcow2::isValid(const QString &fileName)
 		WRITE_TRACE(DBG_FATAL, "Cannot get image info");
 		return false;
 	}
-
-	pt::ptree pt;
 	QByteArray bytes(out.toUtf8());
-	std::istringstream stream(bytes.constData());
-	try
-	{
-		read_json(stream, pt);
-	}
-	catch(const pt::json_parser_error &e)
+	struct json_object* j = json_tokener_parse(bytes.constData());
+	if (NULL == j)
 	{
 		WRITE_TRACE(DBG_FATAL, "Cannot parse qemu-img info output");
 		return false;
 	}
-
-	boost::optional<std::string> format = pt.get_optional<std::string>("format");
-	if (!format)
+	json_object_object_foreach(j, k, v)
 	{
-		WRITE_TRACE(DBG_FATAL, "Cannot get image format");
-		return false;
-	}
+		if (boost::equals(k, "format"))
+		{
+			const char* V = json_object_get_string(v);
+			if (NULL == V)
+				break;
 
-	return *format == "qcow2";
+			bool output = boost::equals(V, "qcow2");
+			json_object_put(j);
+			return output;
+		}
+	}
+	json_object_put(j);
+
+	WRITE_TRACE(DBG_FATAL, "Cannot get image format");
+	return false;
 }
 
 CSparseBitmap *Qcow2::getUsedBlocksBitmap(UINT32 granularity,
