@@ -39,9 +39,11 @@
 #include <json/json.h>
 #include <QStringList>
 #include <QDir>
+#include <errno.h>
 #include <QElapsedTimer>
 #include <QtGlobal>
-
+#include <sys/file.h>
+#include <boost/atomic.hpp>
 #include <prlsdk/PrlErrorsValues.h>
 #include "../Logging/Logging.h"
 #include "../HostUtils/HostUtils.h"
@@ -162,21 +164,33 @@ void Process::setupChildProcess()
 
 PRL_RESULT Qemu::setDevice(const QString &device)
 {
-	IO::File file;
-	PRL_RESULT res = file.open(device, O_RDONLY);
-	if (PRL_FAILED(res))
-		return res;
-
-	size_t size;
-	res = file.ioctl(BLKGETSIZE64, &size);
-	if (PRL_FAILED(res))
-		return res;
-
-	if (size != 0)
+	QScopedPointer<QFile> f(new QFile(device));
+	if (!f->open(QIODevice::ReadOnly))
+	{
+		WRITE_TRACE(DBG_FATAL, "Cannot open file '%s': %m",
+		            qPrintable(device));
+		return PRL_ERR_DISK_FILE_OPEN_ERROR;
+	}
+	if (-1 == TEMP_FAILURE_RETRY(::flock(f->handle(), LOCK_EX | LOCK_NB)))
+	{
+		WRITE_TRACE(DBG_FATAL, "Device '%s' has already been locked",
+		            qPrintable(device));
 		return PRL_ERR_INVALID_ARG;
+	}
+	if (QFileInfo(QString("/sys/block/%1/pid").arg(QFileInfo(device).fileName())).exists())
+	{
+		WRITE_TRACE(DBG_FATAL, "Device '%s' is being used by someone else",
+		            qPrintable(device));
+		return PRL_ERR_INVALID_ARG;
+	}
 
-	m_device = device;
+	m_device.reset(f.take());
 	return PRL_ERR_SUCCESS;
+}
+
+const QString Qemu::getDevice() const
+{
+	return m_device.isNull() ? QString() : m_device->fileName();
 }
 
 qemu_type Qemu::create()
@@ -203,8 +217,8 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
 		<< enquote(image);
 	if (readOnly)
 		cmdLine << "-r";
-	if (!getDevice().isEmpty())
-		cmdLine << "-c" << enquote(getDevice());
+	if (!m_device.isNull())
+		cmdLine << "-c" << enquote(m_device->fileName());
 	else
 	{
 		// forbid server to stop after first connection
@@ -220,7 +234,7 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
 		return PRL_ERR_DISK_FILE_OPEN_ERROR;
 	}
 
-	if (getDevice().isEmpty())
+	if (m_device.isNull())
 	{
 		if (m_process.waitForFinished(CMD_FAIL_TIMEOUT))
 		{
@@ -236,11 +250,11 @@ PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
 
 PRL_RESULT Qemu::disconnect()
 {
-	if (getDevice().isEmpty())
+	if (m_device.isNull())
 		m_process.terminate();
 	else
 	{
-		QStringList cmdLine = QStringList() << QEMU_NBD << "-d" << enquote(getDevice());
+		QStringList cmdLine = QStringList() << QEMU_NBD << "-d" << enquote(m_device->fileName());
 		QString out;
 		if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
 		{
@@ -250,24 +264,25 @@ PRL_RESULT Qemu::disconnect()
 	}
 	// Wait infinitely to catch disconnect errors.
 	m_process.waitForFinished(-1);
+	m_device.reset();
 	return PRL_ERR_SUCCESS;
 }
 
 PRL_RESULT Qemu::waitDevice()
 {
-	IO::File f;
-	PRL_RESULT e = f.open(getDevice(), O_RDONLY);
-	if (PRL_FAILED(e))
-		return e;
+	if (m_device.isNull())
+		return PRL_ERR_UNINITIALIZED;
 
 	QElapsedTimer t;
 	size_t s = 0;
 	for (t.start(); t.elapsed() < CMD_WAIT_TIMEOUT;)
 	{
 		// check whether block device is ready
-		e = f.ioctl(BLKGETSIZE64, &s);
-		if (PRL_FAILED(e))
-			return e;
+		if (-1 == ::ioctl(m_device->handle(), BLKGETSIZE64, &s))
+		{
+			WRITE_TRACE(DBG_FATAL, "ioctl() failed: %m");
+			return PRL_ERR_DISK_GENERIC_ERROR;
+		}
 		if (s)
 			break;
 		// maybe qemu-nbd already exited?
