@@ -94,11 +94,7 @@ struct Qemu
 
 	PRL_RESULT disconnect();
 
-	const QString& getDevice() const
-	{
-		return m_device;
-	}
-
+	const QString getDevice() const;
 	void addFd(quint32 fd_)
 	{
 		m_process.addChannel(fd_);
@@ -107,8 +103,8 @@ struct Qemu
 private:
 	PRL_RESULT waitDevice();
 
-	QString m_device;
 	Process m_process;
+	QScopedPointer<QFile> m_device;
 };
 
 } // namespace Nbd
