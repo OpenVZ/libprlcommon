@@ -861,6 +861,23 @@ void Logger::ResetLogFile( Logger::LOG_RESET_REASON reason /* = LRR_RESTART */ )
 #undef FPRINTF
 }
 
+static void __attribute__((destructor)) parkLogger()
+{
+	struct LoggerData* d = g_d();
+	int h = INVALID_FILE_HANDLE;
+	h = AtomicSwap(&d->fd, h);
+	if (INVALID_FILE_HANDLE != h)
+	{
+		/* There is a strict race in between logging being performed from
+		 * other thread with this close. Though:
+		 *   - this is rare case
+		 *   - no problem to lost one record, write will just return EINVAL
+		 *     for the case
+		 */
+		close(h);
+	}
+}
+
 // #define SELF_CHECK_ENABLE
 
 #ifdef SELF_CHECK_ENABLE
