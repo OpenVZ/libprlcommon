@@ -1599,14 +1599,13 @@ bool SocketClientPrivate::connectToHost ( int& outSockHandle, quint32 connTimeou
 
         // Connect with msecs timeout
         int res = 0;
-#ifndef _WIN_
-        if (!m_useUnixSockets)
-#endif
-            res = ::connect(sockHandle, ai->ai_addr, ai->ai_addrlen);
-#ifndef _WIN_
-        else
-            res = ::connect(sockHandle, (struct sockaddr *)pAddr, SUN_LEN(pAddr));
-#endif
+	socklen_t z = m_useUnixSockets ? SUN_LEN(pAddr) : ai->ai_addrlen;
+	struct sockaddr* a = m_useUnixSockets ? ((struct sockaddr *)pAddr) : ai->ai_addr;
+	do
+	{
+		res = TEMP_FAILURE_RETRY(::connect(sockHandle, a, z));
+	} while(-1 == res && errno == EAGAIN);
+
         if ( res < 0 ) {
             if ( errno != EINPROGRESS ) {
                 // Create error
