@@ -989,7 +989,7 @@ RunCmdResult HostUtils::RunCmdLineUtilityEx(const QString &cmdline, QProcess &pr
 
 RunCmdResult HostUtils::waitProcessResult(QProcess &process, int timeout, void (*afterStartCallback)(QProcess*))
 {
-	if (!process.waitForStarted())
+	if (!process.waitForStarted(300000))
 		return RunCmdResult(QProcess::FailedToStart);
 
 	if (afterStartCallback)
