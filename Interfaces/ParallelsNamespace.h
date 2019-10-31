@@ -108,8 +108,10 @@
 #define MIGRATE_DISP_PROTO_V7   7
 /* w2k8 UEFI enabled migration */
 #define MIGRATE_DISP_PROTO_V8   8
+/* snapshotless shared migration */
+#define MIGRATE_DISP_PROTO_V9   9
 /* current migrate protocol version */
-#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V8
+#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V9
 
 /* backup client-dispatcher and dispatcher-dispatcher protocol versions */
 /* RC version */
