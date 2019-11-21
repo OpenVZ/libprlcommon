@@ -88,21 +88,52 @@ bool isAligned(const void *value)
 
 namespace Nbd
 {
+namespace
+{
+///////////////////////////////////////////////////////////////////////////////
+// struct Crutch
+
+struct Crutch: QThread
+{
+	void run()
+	{
+		if (0 == startTimer(150000))
+			abort();
+		if (0 != exec())
+			abort();
+	}
+
+protected:
+	void timerEvent(QTimerEvent* event_)
+	{
+		Q_UNUSED(event_);
+		exit(1);
+	}
+};
+
+} // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
 // Driver
 
 PRL_RESULT Driver::insertModule()
 {
+	Crutch q;
 	QStringList cmdLine = QStringList() << MODPROBE << "nbd" << "max_part=16";
 	QString out;
+	q.moveToThread(&q);
+	q.start();
+	PRL_RESULT output = PRL_ERR_SUCCESS;
 	if (!HostUtils::RunCmdLineUtility(
 			cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
-	{
+		output = PRL_ERR_DISK_GENERIC_ERROR;
+
+	q.quit();
+	q.wait();
+	if (PRL_FAILED(output))
 		WRITE_TRACE(DBG_FATAL, "Cannot insert nbd kernel module");
-		return PRL_ERR_DISK_GENERIC_ERROR;
-	}
-	return PRL_ERR_SUCCESS;
+
+	return output;
 }
 
 QStringList Driver::getDeviceList()
