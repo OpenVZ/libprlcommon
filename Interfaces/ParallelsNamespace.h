@@ -111,7 +111,7 @@
 /* snapshotless shared migration */
 #define MIGRATE_DISP_PROTO_V9   9
 /* current migrate protocol version */
-#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V9
+#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V8
 
 /* backup client-dispatcher and dispatcher-dispatcher protocol versions */
 /* RC version */
