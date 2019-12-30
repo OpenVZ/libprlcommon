@@ -32,7 +32,8 @@ HEADERS = PloopDisk.h \
           VirtualDisk.h \
           Util.h \
           Qcow2Disk.h \
-	  SparseBitmap.h \
+          Qcow2Disk_p.h \
+          SparseBitmap.h \
           NbdDisk.h
 
 SOURCES = PloopDisk.cpp \

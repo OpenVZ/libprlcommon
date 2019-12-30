@@ -7,7 +7,7 @@
 /// @author mperevedentsev
 ///
 /// Copyright (c) 2016-2017, Parallels International GmbH
-/// Copyright (c) 2017-2019 Virtuozzo International GmbH, All rights reserved.
+/// Copyright (c) 2017-2020 Virtuozzo International GmbH, All rights reserved.
 ///
 /// This file is part of Virtuozzo SDK. Virtuozzo SDK is free
 /// software; you can redistribute it and/or modify it under the terms
@@ -30,6 +30,7 @@
 ///
 ///////////////////////////////////////////////////////////////////////////////
 #include "Qcow2Disk.h"
+#include "Qcow2Disk_p.h"
 #include "Util.h"
 
 #include <sys/ioctl.h>
@@ -40,11 +41,10 @@
 #include <QStringList>
 #include <QDir>
 #include <errno.h>
-#include <QElapsedTimer>
 #include <QtGlobal>
 #include <sys/file.h>
+#include <boost/bind.hpp>
 #include <boost/atomic.hpp>
-#include <prlsdk/PrlErrorsValues.h>
 #include "../Logging/Logging.h"
 #include "../HostUtils/HostUtils.h"
 #include "Util.h"
@@ -99,6 +99,7 @@ struct Crutch: QThread
 	{
 		if (0 == startTimer(150000))
 			abort();
+		WRITE_TRACE(DBG_FATAL, "running the crutch");
 		if (0 != exec())
 			abort();
 	}
@@ -190,147 +191,511 @@ void Process::setupChildProcess()
 	qputenv("LISTEN_PID", QString::number(getpid()).toUtf8());
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Qemu
-
-PRL_RESULT Qemu::setDevice(const QString &device)
+namespace State
 {
-	QScopedPointer<QFile> f(new QFile(device));
+///////////////////////////////////////////////////////////////////////////////
+// struct Stopping
+
+Retired Stopping::retire()
+{
+	token_type t = getToken();
+	if (!t.isNull())
+	{
+		t->reportResult(PRL_ERR_SUCCESS);
+		t->reportFinished();
+	}
+	m_machine.clear();
+
+	return Retirable::retire();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Wakeup
+
+void Wakeup::bind(QObject& target_)
+{
+	QTimer* t = new QTimer();
+	t->setSingleShot(true);
+	target_.connect(t, SIGNAL(timeout()), SLOT(reactTimeout()));
+	t->connect(t, SIGNAL(timeout()), SLOT(deleteLater()));
+	t->start(CMD_FAIL_TIMEOUT);
+
+	m_timer = t;
+}
+
+void Wakeup::cancel()
+{
+	if (NULL != m_timer)
+	{
+		m_timer->stop();
+		m_timer->deleteLater();
+		m_timer = NULL;
+	}
+}
+
+} // namespace State
+
+namespace Machine
+{
+///////////////////////////////////////////////////////////////////////////////
+// struct Carcass
+
+Carcass::~Carcass()
+{
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Generic<T>
+
+template<class T>
+template<class U>
+Generic<T>::Generic(const Script& script_, T& state_, U flavor_):
+	m_state(state_), m_flavor(flavor_)
+{
+	QTimer* t = new QTimer();
+	Process* p = new Process();
+	m_engine.reset(p);
+	t->setSingleShot(true);
+	connect(t, SIGNAL(timeout()), SLOT(reactTimeout()));
+	t->connect(t, SIGNAL(timeout()), SLOT(deleteLater()));
+	t->connect(p, SIGNAL(started()), SLOT(stop()));
+	t->connect(p, SIGNAL(started()), SLOT(deleteLater()));
+
+	connect(p, SIGNAL(started()), SLOT(reactStarted()));
+	connect(p, SIGNAL(finished(int , QProcess::ExitStatus )),
+			SLOT(reactFinish(int , QProcess::ExitStatus )));
+
+	script_(*p);
+	t->start(30000);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Flavor<Persistent::state_type>
+
+void Flavor<Persistent::state_type>::terminate(std::auto_ptr<QProcess>& nbd_)
+{
+	if (NULL == nbd_.get())
+		return;
+
+	switch (nbd_->state())
+	{
+	case QProcess::NotRunning:
+		nbd_.reset();
+		break;
+	default:
+		nbd_->terminate();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Flavor<Export::state_type>
+
+void Flavor<Export::state_type>::terminate(std::auto_ptr<QProcess>& nbd_)
+{
+	Flavor<Persistent::state_type>().terminate(nbd_);
+	if (NULL == nbd_.get())
+		m_guard.clear();
+}
+
+} // namespace Machine
+
+namespace Export
+{
+namespace State
+{
+///////////////////////////////////////////////////////////////////////////////
+// struct Disconnecting
+
+Nbd::State::Stopping Disconnecting::stop() const
+{
+	Nbd::State::Stopping output(m_machine);
+	output.adopt(getToken());
+
+	return output;
+}
+
+Nbd::State::Terminating Disconnecting::terminate(PRL_RESULT reason_) const
+{
+	token_type t = getToken();
+	if (!t.isNull())
+		t->reportFinished(&reason_);
+
+	return Nbd::State::Terminating(m_machine);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Running
+
+Disconnecting Running::disconnect() const
+{
+	QFutureWatcher<PRL_RESULT>* w = new QFutureWatcher<PRL_RESULT>();
+	m_machine->connect(w, SIGNAL(finished()), SLOT(reactCompleted()));
+	w->connect(w, SIGNAL(finished()), SLOT(deleteLater()));
+	PRL_RESULT (* f)(const QString&) = &Running::disconnect;
+	w->setFuture(QtConcurrent::run(boost::bind(f, m_machine->getDevice())));
+
+	return Disconnecting(m_machine);
+}
+
+PRL_RESULT Running::disconnect(const QString& device_)
+{
+	WRITE_TRACE(DBG_FATAL, "DISCONNECT %s", qPrintable(device_));
+	QStringList cmdLine = QStringList() << QEMU_NBD << "-d" << enquote(device_);
+	QString out;
+	if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
+	{
+		WRITE_TRACE(DBG_FATAL, "Cannot disconnect device using qemu-nbd");
+		return PRL_ERR_DISK_GENERIC_ERROR;
+	}
+
+	return PRL_ERR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Steady
+
+Steady::Steady(const machineCarrier_type& machine_, const token_type& token_):
+	m_token(token_), m_machine(machine_)
+{
+	m_timer.start();
+}
+
+Running Steady::run() const
+{
+	m_token->reportResult(PRL_ERR_SUCCESS);
+	m_token->reportFinished();
+	return Running(m_machine);
+}
+
+Nbd::State::Retired Steady::retire()
+{
+	m_retry.cancel();
+	m_token->reportResult(PRL_ERR_FAILURE);
+	m_token->reportFinished();
+	return Nbd::State::Retired();
+}
+
+Nbd::State::Terminating Steady::terminate() const
+{
+	return Nbd::State::Terminating(m_machine);
+}
+
+Prl::Expected<size_t, PRL_RESULT> Steady::probe()
+{
+	m_retry = Nbd::State::Wakeup();
+	Prl::Expected<size_t, PRL_RESULT> output;
+	if (CMD_WAIT_TIMEOUT > m_timer.elapsed())
+		output = m_machine->probe();
+	else
+	{
+		WRITE_TRACE(DBG_FATAL, "Timeout elapsed while waiting for "
+			"nbd device to become ready");
+		output = PRL_ERR_DISK_FILE_OPEN_ERROR;
+	}
+	if (output.isFailed())
+		m_token->reportFinished(&output.error());
+
+	return output;
+}
+
+Steady Steady::retry() const
+{
+	Steady output = *this;
+	output.m_retry.bind(*m_machine);
+
+	return output;
+}
+
+} // namespace State
+
+namespace Visitor
+{
+///////////////////////////////////////////////////////////////////////////////
+// struct Started
+
+Started::result_type Started::operator()(const State::Starting& value_) const
+{
+	State::Steady x = value_.steady();
+	return visit(x);
+}
+
+Started::result_type Started::visit(State::Steady& value_) const
+{
+	Prl::Expected<size_t, PRL_RESULT> p(value_.probe());
+	if (p.isFailed())
+		return result_type(value_.terminate());
+	else if (0 < p.value())
+		return result_type(value_.run());
+
+	return result_type(value_.retry());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Completed
+
+Completed::result_type Completed::operator()(State::Disconnecting& value_) const
+{
+	if (PRL_FAILED(m_status))
+		return result_type(value_.terminate(m_status));
+
+	return result_type(value_.stop());
+}
+
+} // namespace Visitor
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Machine
+
+Machine::Machine(Script script_, state_type& state_, QSharedPointer<QFile> guard_):
+	Nbd::Machine::Generic<state_type>
+		(script_.addArgument("-c").addArgument(enquote(guard_->fileName())), state_, guard_),
+	m_guard(guard_.toWeakRef())
+{
+}
+
+QString Machine::getDevice() const
+{
+	return m_guard.isNull() ? QString() : m_guard.data()->fileName();
+}
+
+Prl::Expected<size_t, PRL_RESULT> Machine::probe() const
+{
+	QFile* f = m_guard.data();
+	if (NULL == f)
+		return PRL_ERR_UNINITIALIZED;
+
+	size_t output = 0;
+	if (-1 == ::ioctl(f->handle(), BLKGETSIZE64, &output))
+	{
+		WRITE_TRACE(DBG_FATAL, "ioctl() failed: %m");
+		return PRL_ERR_DISK_GENERIC_ERROR;
+	}
+
+	return output;
+}
+
+void Machine::reactCompleted()
+{
+	PRL_RESULT s = static_cast<QFutureWatcher<PRL_RESULT>* >(sender())->result();
+	m_state = boost::apply_visitor(Visitor::Completed(s), m_state);
+}
+
+} // namespace Export
+
+namespace Persistent
+{
+namespace State
+{
+///////////////////////////////////////////////////////////////////////////////
+// struct Linger
+
+Linger::Linger(const machineCarrier_type& machine_, const token_type& token_):
+	m_token(token_), m_machine(machine_)
+{
+	m_delay.bind(*machine_);
+}
+
+Running Linger::expire()
+{
+	m_delay = Nbd::State::Wakeup();
+	m_token->reportResult(PRL_ERR_SUCCESS);
+	m_token->reportFinished();
+
+	return Running(m_machine);
+}
+
+Nbd::State::Retired Linger::retire()
+{
+	m_delay.cancel();
+	m_token->reportResult(PRL_ERR_FAILURE);
+	m_token->reportFinished();
+	WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd:"
+		"waitForFinished() failed");
+
+	return Nbd::State::Retired();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Starting
+
+Nbd::State::Retired Starting::retire() const
+{
+	Nbd::State::Terminating x(m_machine);
+	m_token->reportResult(PRL_ERR_FAILURE);
+	m_token->reportFinished();
+
+	return x.retire();
+}
+
+} // namespace State
+} // namespace Persistent
+
+namespace Backend
+{
+///////////////////////////////////////////////////////////////////////////////
+// struct Flavor<Persistent::state_type>
+
+Flavor<Persistent::state_type>::startVisitor_type
+Flavor<Persistent::state_type>::start(Script script_, const token_type& token_, state_type& state_)
+{
+	return startVisitor_type(
+		Persistent::State::Starting(
+			Persistent::machineCarrier_type(
+				new Nbd::Machine::Generic<state_type>(
+					script_.addArgument("--persistent"), state_, Nbd::Machine::Flavor<state_type>())),
+			token_));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Flavor<Export::state_type>
+
+Flavor<Export::state_type>::startVisitor_type
+Flavor<Export::state_type>::start(const Script& script_, const token_type& token_, Export::state_type& state_)
+{
+	return startVisitor_type(
+		Export::State::Starting(
+			Export::machineCarrier_type(
+				new Export::Machine(script_, state_, QSharedPointer<QFile>(m_guard.release()))),
+			token_));
+}
+
+} // namespace Backend
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Script
+
+Script::Script(const QString& image_, const portList_type& portList_):
+	m_image(image_), m_logUuid(Uuid::createUuid().toStringWithoutBrackets()),
+	m_portList(portList_)
+{
+}
+
+Script& Script::addArgument(const QString& one_)
+{
+	m_commandLine << one_;
+	return *this;
+}
+
+Script& Script::addArguments(const QStringList& bunch_)
+{
+	m_commandLine << bunch_;
+	return *this;
+}
+
+void Script::operator()(Process& target_) const
+{
+	foreach(quint32 p, m_portList)
+	{
+		target_.addChannel(p);
+	}
+	QStringList a;
+	a << QEMU_NBD << "-v"
+//		<< "-T" << QString("enable=*,file=/vz/tmp/rempy/%1").arg(m_logUuid)
+		<< "-f" << "qcow2" << "--detect-zeroes=on"
+		<< m_commandLine << m_image;
+	target_.start(a.join(" "));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// struct Frontend
+
+Frontend::Frontend(): m_nbd()
+{
+	qRegisterMetaType<Script>("Script");
+	qRegisterMetaType<QFuture<PRL_RESULT> >("future_type");
+}
+
+PRL_RESULT Frontend::stop()
+{
+	if (NULL == m_nbd)
+		return PRL_ERR_UNINITIALIZED;
+
+	future_type f;
+	bool x = QMetaObject::invokeMethod(m_nbd, "stop",
+				Qt::BlockingQueuedConnection,
+				Q_RETURN_ARG(future_type, f));
+	if (!x) 
+		return PRL_ERR_FAILURE;
+
+	PRL_RESULT output = f.result();
+	m_device.clear();
+	m_nbd->deleteLater();
+	m_nbd = NULL;
+
+	return output;
+}
+
+PRL_RESULT Frontend::bind(const QString& device_)
+{
+	if (NULL != m_nbd)
+		return PRL_ERR_OPERATION_PENDING;
+
+	QScopedPointer<QFile> f(new QFile(device_));
 	if (!f->open(QIODevice::ReadOnly))
 	{
 		WRITE_TRACE(DBG_FATAL, "Cannot open file '%s': %m",
-		            qPrintable(device));
+			qPrintable(device_));
 		return PRL_ERR_DISK_FILE_OPEN_ERROR;
 	}
 	if (-1 == TEMP_FAILURE_RETRY(::flock(f->handle(), LOCK_EX | LOCK_NB)))
 	{
 		WRITE_TRACE(DBG_FATAL, "Device '%s' has already been locked",
-		            qPrintable(device));
+			qPrintable(device_));
 		return PRL_ERR_INVALID_ARG;
 	}
-	if (QFileInfo(QString("/sys/block/%1/pid").arg(QFileInfo(device).fileName())).exists())
+	if (QFileInfo(QString("/sys/block/%1/pid").arg(QFileInfo(device_).fileName())).exists())
 	{
 		WRITE_TRACE(DBG_FATAL, "Device '%s' is being used by someone else",
-		            qPrintable(device));
+			qPrintable(device_));
 		return PRL_ERR_INVALID_ARG;
 	}
 
-	m_device.reset(f.take());
+	m_guard.reset(f.take());
 	return PRL_ERR_SUCCESS;
 }
 
-const QString Qemu::getDevice() const
+PRL_RESULT Frontend::start(const Script& script_)
 {
-	return m_device.isNull() ? QString() : m_device->fileName();
-}
+	if (NULL != m_nbd)
+		return PRL_ERR_OPERATION_PENDING;
 
-qemu_type Qemu::create()
-{
-	QSharedPointer<Qemu> qemu(new Qemu());
-
-	QStringList devices = Driver::getDeviceList();
-	Q_FOREACH(const QString &device, devices)
+	if (NULL == QCoreApplication::instance())
 	{
-		if (PRL_SUCCEEDED(qemu->setDevice(device)))
-			return qemu;
-	}
-
-	WRITE_TRACE(DBG_FATAL, "Cannot find free NBD device");
-	return Error::Simple(PRL_ERR_DISK_GENERIC_ERROR);
-}
-
-PRL_RESULT Qemu::setImage(const QString &image, bool readOnly,
-                          const QStringList &args)
-{
-	QStringList cmdLine = QStringList()
-		<< QEMU_NBD << "-v"
-		<< "-f" << "qcow2" << "--detect-zeroes=on"
-		<< enquote(image);
-	if (readOnly)
-		cmdLine << "-r";
-	if (!m_device.isNull())
-		cmdLine << "-c" << enquote(m_device->fileName());
-	else
-	{
-		// forbid server to stop after first connection
-		cmdLine << "--persistent";
-	}
-	cmdLine << args;
-
-	m_process.start(cmdLine.join(" "));
-	if (!m_process.waitForStarted())
-	{
-		WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd:"
-			"waitForStarted() failed");
-		return PRL_ERR_DISK_FILE_OPEN_ERROR;
-	}
-
-	if (m_device.isNull())
-	{
-		if (m_process.waitForFinished(CMD_FAIL_TIMEOUT))
-		{
-			WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd:"
-				"waitForFinished() failed");
-			return PRL_ERR_DISK_FILE_OPEN_ERROR;
-		}
-		return PRL_ERR_SUCCESS;
-	}
-
-	return waitDevice();
-}
-
-PRL_RESULT Qemu::disconnect()
-{
-	if (m_device.isNull())
-		m_process.terminate();
-	else
-	{
-		QStringList cmdLine = QStringList() << QEMU_NBD << "-d" << enquote(m_device->fileName());
-		QString out;
-		if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
-		{
-			WRITE_TRACE(DBG_FATAL, "Cannot disconnect device using qemu-nbd");
-			return PRL_ERR_DISK_GENERIC_ERROR;
-		}
-	}
-	// Wait infinitely to catch disconnect errors.
-	m_process.waitForFinished(-1);
-	m_device.reset();
-	return PRL_ERR_SUCCESS;
-}
-
-PRL_RESULT Qemu::waitDevice()
-{
-	if (m_device.isNull())
+		WRITE_TRACE(DBG_FATAL, "Qt application is not running");
 		return PRL_ERR_UNINITIALIZED;
-
-	QElapsedTimer t;
-	size_t s = 0;
-	for (t.start(); t.elapsed() < CMD_WAIT_TIMEOUT;)
+	}
+	QString d;
+	Backend::Base* b = NULL;
+	if (NULL == m_guard.get())
 	{
-		// check whether block device is ready
-		if (-1 == ::ioctl(m_device->handle(), BLKGETSIZE64, &s))
-		{
-			WRITE_TRACE(DBG_FATAL, "ioctl() failed: %m");
-			return PRL_ERR_DISK_GENERIC_ERROR;
-		}
-		if (s)
-			break;
-		// maybe qemu-nbd already exited?
-		if (m_process.waitForFinished(CMD_FAIL_TIMEOUT))
-		{
-			WRITE_TRACE(DBG_FATAL, "Cannot connect device using qemu-nbd");
-			return PRL_ERR_DISK_FILE_OPEN_ERROR;
-		}
+		b = new Backend::Generic<Persistent::state_type>
+			(Backend::Flavor<Persistent::state_type>());
+	}
+	else
+	{
+		d = m_guard->fileName();
+		b = new Backend::Generic<Export::state_type>(m_guard.release());
 	}
 
-	if (s == 0)
-	{
-		WRITE_TRACE(DBG_FATAL, "Timeout elapsed while waiting for "
-			"nbd device to become ready");
-		return PRL_ERR_DISK_FILE_OPEN_ERROR;
-	}
+	b->moveToThread(QCoreApplication::instance()->thread());
+	b->connect(this, SIGNAL(destroyed()), SLOT(deleteLater()));
 
+	future_type f;
+	bool x = QMetaObject::invokeMethod(b, "start",
+		Qt::BlockingQueuedConnection, Q_RETURN_ARG(future_type, f),
+		Q_ARG(Script, script_));
+	if (!x)
+	{
+		b->deleteLater();
+		return PRL_ERR_FAILURE;
+	}
+	if (PRL_FAILED(f.result()))
+	{
+		b->deleteLater();
+		return f.result();
+	}
+	m_nbd = b;
+	m_device = d;
 	return PRL_ERR_SUCCESS;
 }
 
@@ -344,20 +709,27 @@ namespace Command
 
 struct SetImage
 {
+	typedef QSharedPointer<Nbd::Frontend> qemuCarrier_type;
+
 	SetImage():
 		m_offset(0), m_compressed(false), m_cache("none"), m_aio("native"),
-		m_device(QSharedPointer<Nbd::Qemu>(new Nbd::Qemu))
+		m_device(qemuCarrier_type(new Nbd::Frontend()))
 	{
 	}
 
 	PRL_RESULT operator() (const QString &image, bool readOnly)
 	{
 		if (m_device.isFailed())
-			return m_device.error().code();
-		return m_device.value()->setImage(image, readOnly, buildArgs());
+			return m_device.error();
+
+		Nbd::Script x(image, m_portList);
+		if (readOnly)
+			x.addArgument("-r");
+
+		return m_device.value()->start(x.addArguments(buildArgs()));
 	}
 
-	const QSharedPointer<Nbd::Qemu>& getDevice() const
+	const qemuCarrier_type& getDevice() const
 	{
 		return m_device.value();
 	}
@@ -382,13 +754,24 @@ struct SetImage
 	void setFd(PRL_INT32 fd)
 	{
 		if (fd >= 0) {
-			m_device.value()->addFd(fd);
+			m_portList << fd;
 		}
 	}
 
 	void setAutoDevice(bool autoDevice)
 	{
-		m_device = autoDevice ? Nbd::Qemu::create() : QSharedPointer<Nbd::Qemu>(new Nbd::Qemu);
+		qemuCarrier_type qemu(new Nbd::Frontend());
+		if (!autoDevice)
+			return (void)(m_device = qemu);
+
+		foreach(const QString &device, Nbd::Driver::getDeviceList())
+		{
+			if (PRL_SUCCEEDED(qemu->bind(device)))
+				return (void)(m_device = qemu);
+		}
+
+		WRITE_TRACE(DBG_FATAL, "Cannot find free NBD device");
+		m_device = PRL_ERR_DISK_GENERIC_ERROR;
 	}
 
 	void setCompressed(bool compressed)
@@ -432,9 +815,10 @@ private:
 	QString m_cache;
 	QString m_aio;
 	QString m_exportName;
+	Nbd::Script::portList_type m_portList;
 
 	QStringList m_args;
-	Nbd::qemu_type m_device;
+	Prl::Expected<qemuCarrier_type, PRL_RESULT> m_device;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -639,6 +1023,7 @@ PRL_RESULT Qcow2::close()
 void Qcow2::closeForce()
 {
 	m_file.close();
+	m_device->stop();
 	m_device.clear();
 	m_fileName.clear();
 }

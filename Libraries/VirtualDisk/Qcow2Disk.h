@@ -38,11 +38,13 @@
 #include <boost/tuple/tuple.hpp>
 #include "VirtualDisk.h"
 #include "Util.h"
+#include "../Logging/Logging.h"
 
 namespace VirtualDisk
 {
 namespace Nbd
 {
+struct Frontend;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Driver
@@ -67,44 +69,6 @@ protected:
 
 private:
 	QList<int> m_channels;
-};
-
-struct Qemu;
-typedef Prl::Expected<QSharedPointer<Qemu>, Error::Simple> qemu_type;
-
-///////////////////////////////////////////////////////////////////////////////
-// Qemu
-
-struct Qemu
-{
-	static qemu_type create();
-
-	Qemu()
-	{
-	}
-
-	~Qemu()
-	{
-		disconnect();
-	}
-
-	PRL_RESULT setDevice(const QString &device);
-	PRL_RESULT setImage(const QString &image, bool readOnly,
-	                    const QStringList &args = QStringList());
-
-	PRL_RESULT disconnect();
-
-	const QString getDevice() const;
-	void addFd(quint32 fd_)
-	{
-		m_process.addChannel(fd_);
-	}
-
-private:
-	PRL_RESULT waitDevice();
-
-	Process m_process;
-	QScopedPointer<QFile> m_device;
 };
 
 } // namespace Nbd
@@ -203,7 +167,7 @@ private:
 
 	QString m_fileName;
 	bool m_readOnly;
-	QSharedPointer<Nbd::Qemu> m_device;
+	QSharedPointer<Nbd::Frontend> m_device;
 	IO::File m_file;
 };
 
