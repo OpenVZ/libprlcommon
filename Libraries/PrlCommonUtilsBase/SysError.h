@@ -31,9 +31,6 @@
 #include <QString>
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
-#include <boost/type_traits.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <utility>
 #include <prlsdk/PrlTypes.h>
 
 namespace Prl
