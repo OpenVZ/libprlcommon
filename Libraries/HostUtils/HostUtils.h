@@ -432,10 +432,6 @@ public:
 
 
 	static bool isFastRebootNodeAllowed();
-
-	static bool MountPram(bool init, const QString& point, bool bCustomMount = false);
-	static bool UMountPram(const QString& point);
-
 	static bool ReadXCr0(UINT64* pXCr0);
 
 	static quint32 convertWeightToIoprio(quint32 weight_);
