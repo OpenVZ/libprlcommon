@@ -31,6 +31,7 @@
 #endif
 #include <openssl/err.h>
 #include <openssl/rand.h>
+#include <openssl/crypto.h>
 
 #ifndef _WIN_
 #include <pthread.h>
@@ -81,7 +82,9 @@ namespace OpenSSL
 		CONF_modules_free();
 		EVP_cleanup();
 		ENGINE_cleanup();
+#ifndef OPENSSL_NO_CRYPTO_MDEBUG
 		CRYPTO_mem_leaks_fp(stderr);
+#endif
 		CRYPTO_cleanup_all_ex_data();
 		ERR_remove_state(0);
 		ERR_free_strings();
