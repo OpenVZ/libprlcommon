@@ -81,6 +81,7 @@ CONFIG(release, debug|release) {
 
 # Build Unix release with debug symbols
 linux-* {
+	QMAKE_CFLAGS_ISYSTEM = -I
 	QMAKE_CFLAGS_RELEASE += -g
 	QMAKE_CXXFLAGS_RELEASE += -g
 }
