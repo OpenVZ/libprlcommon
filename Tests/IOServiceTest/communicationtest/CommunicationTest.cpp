@@ -1410,7 +1410,7 @@ void CommunicationTest::sendShortMessageFromServerToExactClients ()
         Uuid::dump( h, p->header.receiverUuid );
         Uuid::dump( h, p->header.senderUuid );
 
-        p->fillBuffer(0, randEncoding(), timeStr.toAscii().data(),
+        p->fillBuffer(0, randEncoding(), timeStr.toLatin1().data(),
                       timeStr.length() + 1);
 
 

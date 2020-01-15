@@ -92,8 +92,8 @@ int createProcess ( const QString& program,
         si.hStdInput = pipeInRd;
     }
 
-    BOOL res = ::CreateProcessA( program.toAscii().data(),
-                                 arguments.join(" ").toAscii().data(),
+    BOOL res = ::CreateProcessA( program.toLatin1().data(),
+                                 arguments.join(" ").toLatin1().data(),
                                  0, 0, TRUE, 0, 0, 0, &si, &pi);
 
     if ( res && sock.isValid() ) {
@@ -134,14 +134,14 @@ int createProcess ( const QString& program,
 
         // add the program name
         argv[0] = reinterpret_cast<char*>(::malloc(program.size()+1));
-        ::memcpy( argv[0], program.toAscii().constData(), program.size() );
+        ::memcpy( argv[0], program.toLatin1().constData(), program.size() );
         argv[0][program.size()] = 0;
 
         // add every argument to the list
         for ( int i = 0; i < args.count(); ++i ) {
             QString arg = args.at(i);
             argv[i + 1] = reinterpret_cast<char*>(::malloc(arg.size()+1));
-            ::memcpy( argv[i + 1], arg.toAscii().constData(), arg.size() );
+            ::memcpy( argv[i + 1], arg.toLatin1().constData(), arg.size() );
             argv[i + 1][arg.size()] = 0;
         }
 
@@ -176,7 +176,7 @@ int createProcess ( const QString& program,
             for ( int j = 0; j < environment.count(); ++j ) {
                 QString item = environment.at(j);
                 envp[j] = reinterpret_cast<char*>(::malloc(item.size()+1));
-                ::memcpy( envp[j], item.toAscii().constData(), item.size() );
+                ::memcpy( envp[j], item.toLatin1().constData(), item.size() );
                 envp[j][item.size()] = 0;
             }
 

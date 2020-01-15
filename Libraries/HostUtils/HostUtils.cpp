@@ -25,10 +25,10 @@
  */
 
 
-#include <QFSFileEngine>
 #include <QMutexLocker>
 #include <QTemporaryFile>
 #include <QUrl>
+#include <QDir>
 #include <QStringList>
 
 #include "Interfaces/ParallelsTypes.h"
@@ -1051,7 +1051,7 @@ bool HostUtils::RunCmdLineUtility(const QStringList& argv,
  */
 bool HostUtils::isPathAbsolute(const QString& path)
 {
-	return !QFSFileEngine(path).isRelativePath();
+	return QFileInfo(path).isAbsolute();
 }
 
 #ifdef _WIN_
