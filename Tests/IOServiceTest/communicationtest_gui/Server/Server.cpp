@@ -193,7 +193,7 @@ void Server::onSendPressed ()
         SmartPtr<IOPackage> p =
             IOPackage::createInstance( 0, 1 );
         p->fillBuffer( 0, IOPackage::RawEncoding,
-                       data.toAscii().data(), data.size() );
+                       data.toLatin1().data(), data.size() );
 
         sendTillResult( p, num, sendLatency );
     }
@@ -218,7 +218,7 @@ void Server::onSendPressed ()
 
         int filled = 0;
         int tmpDataSz = tmpData.size();
-        QByteArray tmpBa = tmpData.toAscii();
+        QByteArray tmpBa = tmpData.toLatin1();
         if ( num > 1024 ) {
             LOG_MESSAGE(DBG_FATAL, "Package size is big, buffer is set with "
                         " zeroes!");
@@ -261,7 +261,7 @@ void Server::onSendPressed ()
 
         int filled = 0;
         int tmpDataSz = tmpData.size();
-        QByteArray tmpBa = tmpData.toAscii();
+        QByteArray tmpBa = tmpData.toLatin1();
         if ( num1 > 1024 ) {
             LOG_MESSAGE(DBG_FATAL, "Package size is big, buffer is set with "
                         " zeroes!");
@@ -315,7 +315,7 @@ void Server::onSendPressed ()
 
         int filled = 0;
         int tmpDataSz = tmpData.size();
-        QByteArray tmpBa = tmpData.toAscii();
+        QByteArray tmpBa = tmpData.toLatin1();
         if ( num2 > 1024 ) {
             LOG_MESSAGE(DBG_FATAL, "Package size is big, buffer is set with "
                         " zeroes!");
@@ -340,7 +340,7 @@ void Server::onSendPressed ()
         SmartPtr<IOPackage> p =
             IOPackage::createInstance( 0, 1 );
         p->fillBuffer( 0, IOPackage::RawEncoding,
-                       str.toAscii().data(), str.size() );
+                       str.toLatin1().data(), str.size() );
 
         sendTillResult( p, 1, sendLatency );
     }

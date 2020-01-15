@@ -58,7 +58,7 @@ void IOProtocolTest::createInstances ()
         for ( uint buffNum = 0; buffNum < i; ++buffNum ) {
             QString uuid = Uuid::createUuid().toString();
             pkg1->fillBuffer( buffNum, IOPackage::RawEncoding,
-                              uuid.toAscii().data(), uuid.length() + 1 );
+                              uuid.toLatin1().data(), uuid.length() + 1 );
         }
 
         SmartPtr<IOPackage> pkg2 = IOPackage::duplicateInstance(pkg1);
@@ -153,7 +153,7 @@ void IOProtocolTest::readWriteToStream ()
         for ( uint buffNum = 0; buffNum < i; ++buffNum ) {
             QString uuid = Uuid::createUuid().toString();
             pkg1->fillBuffer( buffNum, IOPackage::RawEncoding,
-                              uuid.toAscii().data(), uuid.length() + 1 );
+                              uuid.toLatin1().data(), uuid.length() + 1 );
             size += (uuid.length() + 1);
         }
         QVERIFY( pkg1->header.buffersNumber == i );
@@ -247,7 +247,7 @@ void IOProtocolTest::readWriteToBuffer ()
         for ( uint buffNum = 0; buffNum < i; ++buffNum ) {
             QString uuid = Uuid::createUuid().toString();
             pkg1->fillBuffer( buffNum, IOPackage::RawEncoding,
-                              uuid.toAscii().data(), uuid.length() + 1 );
+                              uuid.toLatin1().data(), uuid.length() + 1 );
             size += (uuid.length() + 1);
         }
         QVERIFY( pkg1->header.buffersNumber == i );

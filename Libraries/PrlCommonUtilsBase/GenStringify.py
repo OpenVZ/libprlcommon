@@ -216,7 +216,7 @@ def parse_error_file(file_data, writer):
         def row(type, text):
             return (text, type)
         header = True
-        for line in map(string.rstrip, data.splitlines()):
+        for line in map(lambda s: s.rstrip(), data.splitlines()):
             if header and not line.startswith('#ifndef'):
                 continue
             header = False
@@ -228,7 +228,7 @@ def parse_error_file(file_data, writer):
                 if arr[1].startswith('PRL_') and arr[2].startswith('PRL_RESULT'):
                     yield row(arr[0], arr[1])
             except:
-                print "!!!! invalid row: ", line
+                print("!!!! invalid row: ", line)
                 raise
 
     for txt, row_type in parser(file_data):
@@ -240,7 +240,7 @@ def parse_error_file(file_data, writer):
 
 def parse_event_file(file_data, writer):
 
-    for line in map(string.rstrip, file_data.splitlines()):
+    for line in map(lambda s: s.rstrip(), file_data.splitlines()):
         if not line.startswith(' PET_'):
             continue
         writer.write_value(line.split()[0])
@@ -335,7 +335,7 @@ def read_file(file_name, path=''):
 def write_if_differ(new_data, dest_filename):
     if os.path.exists(dest_filename) and \
             new_data == read_file(dest_filename):
-        print 'Skip writing %s, it not changed.' % dest_filename
+        print('Skip writing %s, it not changed.' % dest_filename)
         return False
     open(dest_filename, "w").write(new_data)
     return True
@@ -387,8 +387,8 @@ def gen_string_consts():
 def main():
     try:
         gen_string_consts()
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         return 1
     return 0
 

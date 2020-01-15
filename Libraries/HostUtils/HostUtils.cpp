@@ -25,10 +25,10 @@
  */
 
 
-#include <QFSFileEngine>
 #include <QMutexLocker>
 #include <QTemporaryFile>
 #include <QUrl>
+#include <QDir>
 #include <QStringList>
 
 #include "Interfaces/ParallelsTypes.h"
@@ -1051,7 +1051,7 @@ bool HostUtils::RunCmdLineUtility(const QStringList& argv,
  */
 bool HostUtils::isPathAbsolute(const QString& path)
 {
-	return !QFSFileEngine(path).isRelativePath();
+	return QFileInfo(path).isAbsolute();
 }
 
 #ifdef _WIN_
@@ -1414,53 +1414,6 @@ bool HostUtils::isFastRebootNodeAllowed()
 #endif
 
 	return ret;
-}
-
-bool HostUtils::MountPram(bool init, const QString& point, bool bCustomMount)
-{
-	QString opts, cmd, out;
-
-	WRITE_TRACE(DBG_FATAL, "Mount PRAM: '%s'", QSTR2UTF8(point));
-	if (!QDir(point).exists())
-	{
-		if (!QDir().mkpath(point))
-			return false;
-	}
-
-	if (!bCustomMount)
-	{
-		if (init)
-			opts = "-o noload,pram_name=vm";
-		else
-			opts = "-o pram_name=vm";
-	}
-
-	cmd = "mount ";
-	cmd += opts;
-	cmd += " -t pram none ";
-	cmd += point;
-
-	bool ok = RunCmdLineUtility(cmd, out);
-	WRITE_TRACE(DBG_DEBUG, "Pram: run %s, rc=%d", QSTR2UTF8(cmd), ok);
-
-	return ok;
-}
-
-bool HostUtils::UMountPram(const QString& point)
-{
-	if (point.isEmpty())
-		return true;
-
-	WRITE_TRACE(DBG_FATAL, "Umount PRAM: '%s'", QSTR2UTF8(point));
-
-	QString cmd, out;
-	cmd = "umount ";
-	cmd += point;
-
-	bool ok = RunCmdLineUtility(cmd, out);
-	WRITE_TRACE(DBG_DEBUG, "Pram: run %s, rc=%d", QSTR2UTF8(cmd), ok);
-
-	return ok;
 }
 
 bool HostUtils::IsEfi64BootDevice(const QString& mountPoint)

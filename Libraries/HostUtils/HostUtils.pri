@@ -33,5 +33,5 @@ win32: LIBS += -lAdvapi32 -lNetapi32 -lSecur32 -lKernel32
 linux-* {
 	PCS_API = $$PWD/../../../External/PCS/api
 	INCLUDEPATH *= $$PCS_API
-	LIBS += -ldl -lboost_random-mt
+	LIBS += -ldl -lboost_random
 }

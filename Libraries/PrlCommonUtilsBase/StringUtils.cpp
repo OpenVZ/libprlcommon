@@ -271,7 +271,7 @@ uint fromBase26(const QString& value_)
 	uint y = 0, z = 1, i = value_.size();
 	while (i--)
 	{
-		y += (value_[i].toAscii() - 'a') * z;
+		y += (value_[i].toLatin1() - 'a') * z;
 		z *= 26;
 	}
 	return y;

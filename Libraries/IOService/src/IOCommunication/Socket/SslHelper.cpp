@@ -51,17 +51,29 @@ const char* SSLHelper::s_serverSessionIdContext = "ParallelsServer";
 
 static DH * get_dhXXX(unsigned char * dhXXX_p, int pLen, unsigned char * dhXXX_g, int gLen)
 {
+	BIGNUM *p, *g;
 	DH* dh = DH_new();
-	if (dh)
-	{
-		dh->p = BN_bin2bn(dhXXX_p, pLen, NULL);
-		dh->g = BN_bin2bn(dhXXX_g, gLen, NULL);
-		if ((dh->p == NULL) || (dh->g == NULL))
-		{
-			DH_free(dh);
-			return NULL;
-		}
+
+	if (dh == NULL)
+		return NULL;
+
+	p = BN_bin2bn(dhXXX_p, pLen, NULL);
+	g = BN_bin2bn(dhXXX_g, gLen, NULL);
+
+	if (p == NULL || g == NULL) {
+		DH_free(dh);
+		BN_free(p);
+		BN_free(g);
+		return NULL;
 	}
+
+#if  OPENSSL_VERSION_NUMBER >= 0x10100000L
+	DH_set0_pqg(dh, p, NULL, g);
+#else
+	dh->p = p;
+	dh->g = g;
+#endif
+
 	return dh;
 }
 

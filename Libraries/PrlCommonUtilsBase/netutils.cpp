@@ -55,14 +55,14 @@ bool PrlNet::stringToEthAddress(const QString &s, unsigned char ethAddress[ETH_A
 	int curr_pos = 0;
 	while(curr_pos < s.length())
 	{
-		int d1 = hex2num(s[curr_pos++].toAscii());
+		int d1 = hex2num(s[curr_pos++].toLatin1());
 		if (d1<0)
 			return false;
 
 		if (curr_pos >= s.length())
 			return false;
 
-		int d2 = hex2num(s[curr_pos++].toAscii());
+		int d2 = hex2num(s[curr_pos++].toLatin1());
 		if (d2<0)
 			return false;
 
@@ -71,7 +71,7 @@ bool PrlNet::stringToEthAddress(const QString &s, unsigned char ethAddress[ETH_A
 			return true;
 
 		// eth_separator is not necessary.
-		if (curr_pos < s.length() && is_eth_separator(s[curr_pos].toAscii()))
+		if (curr_pos < s.length() && is_eth_separator(s[curr_pos].toLatin1()))
 			curr_pos++;
 	}
 	return false;
