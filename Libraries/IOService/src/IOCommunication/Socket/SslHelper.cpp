@@ -188,8 +188,10 @@ DH* SSLHelper::DHCallback ( SSL*, int, int keyLength )
 		break;
 	}
 	if ( dh == 0 )
-		dh = DH_generate_parameters(keyLength, DH_GENERATOR_2, NULL, NULL);
-
+	{
+		dh = DH_new();
+		DH_generate_parameters_ex(dh, keyLength, DH_GENERATOR_2, NULL);
+	}
 	if ( dh != 0 )
 		dhMap->insert(keyLength, SmartPtr<DH>(dh, DH_free));
 
@@ -216,9 +218,9 @@ bool SSLHelper::InitSSLContext(const IOCredentials& credentials)
 
 		// Setup anonymous DH cipher
 		if (credentials.isValid()) {
-			SSL_CTX_set_cipher_list(s_clientSSLCtx, "RSA:ADH:!eNULL:@STRENGTH");
+			SSL_CTX_set_cipher_list(s_clientSSLCtx, "RSA:ADH:!eNULL:@STRENGTH:@SECLEVEL=0");
 		}else {
-			SSL_CTX_set_cipher_list(s_clientSSLCtx, "ADH:!eNULL:@STRENGTH");
+			SSL_CTX_set_cipher_list(s_clientSSLCtx, "ADH:!eNULL:@STRENGTH:@SECLEVEL=0");
 		}
 	}
 
@@ -237,9 +239,9 @@ bool SSLHelper::InitSSLContext(const IOCredentials& credentials)
 
 		// Setup anonymous DH cipher
 		if (credentials.isValid())
-			SSL_CTX_set_cipher_list(s_serverSSLCtx, "RSA:ADH:!eNULL:@STRENGTH");
+			SSL_CTX_set_cipher_list(s_serverSSLCtx, "RSA:ADH:!eNULL:@STRENGTH:@SECLEVEL=0");
 		else
-			SSL_CTX_set_cipher_list(s_serverSSLCtx, "ADH:!eNULL:@STRENGTH");
+			SSL_CTX_set_cipher_list(s_serverSSLCtx, "ADH:!eNULL:@STRENGTH:@SECLEVEL=0");
 
 		SSL_CTX_set_tmp_dh_callback(s_serverSSLCtx, DHCallback);
 		SSL_CTX_set_session_id_context(
