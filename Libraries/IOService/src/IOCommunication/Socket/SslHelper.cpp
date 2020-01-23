@@ -217,11 +217,19 @@ bool SSLHelper::InitSSLContext(const IOCredentials& credentials)
 		SSL_CTX_set_quiet_shutdown(s_clientSSLCtx, 1);
 
 		// Setup anonymous DH cipher
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+		if (credentials.isValid()) {
+			SSL_CTX_set_cipher_list(s_clientSSLCtx, "RSA:ADH:!eNULL:@STRENGTH");
+		}else {
+			SSL_CTX_set_cipher_list(s_clientSSLCtx, "ADH:!eNULL:@STRENGTH");
+		}
+#else
 		if (credentials.isValid()) {
 			SSL_CTX_set_cipher_list(s_clientSSLCtx, "RSA:ADH:!eNULL:@STRENGTH:@SECLEVEL=0");
 		}else {
 			SSL_CTX_set_cipher_list(s_clientSSLCtx, "ADH:!eNULL:@STRENGTH:@SECLEVEL=0");
 		}
+#endif
 	}
 
 	// Create server context
@@ -238,10 +246,17 @@ bool SSLHelper::InitSSLContext(const IOCredentials& credentials)
 		SSL_CTX_set_quiet_shutdown(s_serverSSLCtx, 1);
 
 		// Setup anonymous DH cipher
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+		if (credentials.isValid())
+			SSL_CTX_set_cipher_list(s_serverSSLCtx, "RSA:ADH:!eNULL:@STRENGTH");
+		else
+			SSL_CTX_set_cipher_list(s_serverSSLCtx, "ADH:!eNULL:@STRENGTH");
+#else
 		if (credentials.isValid())
 			SSL_CTX_set_cipher_list(s_serverSSLCtx, "RSA:ADH:!eNULL:@STRENGTH:@SECLEVEL=0");
 		else
 			SSL_CTX_set_cipher_list(s_serverSSLCtx, "ADH:!eNULL:@STRENGTH:@SECLEVEL=0");
+#endif
 
 		SSL_CTX_set_tmp_dh_callback(s_serverSSLCtx, DHCallback);
 		SSL_CTX_set_session_id_context(
