@@ -119,6 +119,9 @@ protected:
 
 PRL_RESULT Driver::insertModule()
 {
+	if (access("/sys/block/nbd0", F_OK) == 0)
+		return PRL_ERR_SUCCESS;
+
 	Crutch q;
 	QStringList cmdLine = QStringList() << MODPROBE << "nbd" << "max_part=16";
 	QString out;
