@@ -309,7 +309,7 @@ protected:
 		m_iErrCol(0), m_iParseRc(0),
 		m_nItemId(-1),
 		m_bFakeSection(false),
-		m_flgCrashSafeSaving(false)
+		m_flgCrashSafeSaving(true)
 		{}
 	// Virtual destructor
 	virtual ~CBaseNode() {}
