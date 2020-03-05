@@ -26,6 +26,7 @@
 
 
 #include "CBaseNode.h"
+#include <QTemporaryFile>
 
 #ifdef _WIN_
 #	include <windows.h>
@@ -389,16 +390,15 @@ int CBaseNode::saveToFile(QFile* pOrigFile, bool , bool )
 	}
 
 	QFile* pFile = pOrigFile;
-	QFile tmpFile;
+	QTemporaryFile tmpFile;
 	if( m_flgCrashSafeSaving )
 	{
 		pFile = &tmpFile;
-
 		QString tmpFileName = QString( "%1.tmp.%2" )
 			.arg( pOrigFile->fileName() )
 			.arg( Uuid::createUuid().toString() );
 
-		tmpFile.setFileName( tmpFileName );
+		tmpFile.setFileTemplate(tmpFileName);
 	}
 
 	if ( !pFile->open(QIODevice::ReadWrite) )
@@ -431,7 +431,6 @@ int CBaseNode::saveToFile(QFile* pOrigFile, bool , bool )
 
 	if ( PRL_FAILED( iResult ) )
 	{
-		pFile->close();
 		return iResult;
 	}
 
@@ -470,16 +469,7 @@ int CBaseNode::saveToFile(QFile* pOrigFile, bool , bool )
 	if( m_flgCrashSafeSaving )
 	{
 		if( !CSimpleFileHelper::AtomicMoveFile( pFile->fileName(), pOrigFile->fileName() ) )
-		{
-			// rm.old
-			PRL_ASSERT( pFile!= pOrigFile );
-			if( ! pFile->remove() )
-			{
-				WRITE_TRACE(DBG_FATAL, "Can't remove tmp file '%s'", QSTR2UTF8( pFile->fileName() ) );
-			}
-
 			return PRL_ERR_XML_WRITE_FILE;
-		}
 	}
 
 	m_qsFileName = pOrigFile->fileName();
