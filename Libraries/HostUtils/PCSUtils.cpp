@@ -40,7 +40,8 @@
 #include "Libraries/HostUtils/PCSUtils.h"
 #include "Libraries/Logging/Logging.h"
 
-#define LIBPCS_CLIENT	"libpcs_client.so.1"
+#define LIBPCS_CLIENT	"libpcs_client.so.3"
+#define LIBPCS_CLIENT_1	"libpcs_client.so.1"
 
 const PRL_UINT64 LOAD_TIMEOUT = PRL_UINT64(6)*60*1000000;
 
@@ -203,13 +204,13 @@ static int init()
 	}
 
 	dlhandle = dlopen(LIBPCS_CLIENT, RTLD_LAZY);
+	if (dlhandle == NULL)
+		dlhandle = dlopen(LIBPCS_CLIENT_1, RTLD_LAZY);
 	if (dlhandle == NULL) {
 		last_load_error = PrlGetTimeMonotonic();
 		WRITE_TRACE(DBG_FATAL, "Failed to load %s: %s", LIBPCS_CLIENT, dlerror());
 		return -EAGAIN;
 	}
-
-	dlerror();
 
 	for (i=0; funcs[i].name; ++i) {
 		*(funcs[i].pptr) = dlsym(dlhandle, funcs[i].name);
