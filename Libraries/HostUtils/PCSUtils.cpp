@@ -28,6 +28,7 @@
 
 #include <QMutex>
 #include <QMutexLocker>
+#include <QString>
 
 #include <dlfcn.h>
 #include <errno.h>
@@ -40,8 +41,7 @@
 #include "Libraries/HostUtils/PCSUtils.h"
 #include "Libraries/Logging/Logging.h"
 
-#define LIBPCS_CLIENT	"libpcs_client.so.3"
-#define LIBPCS_CLIENT_1	"libpcs_client.so.1"
+#define LIBPCS_CLIENT	"libpcs_client.so"
 
 const PRL_UINT64 LOAD_TIMEOUT = PRL_UINT64(6)*60*1000000;
 
@@ -203,13 +203,16 @@ static int init()
 		last_load_error = load_time;
 	}
 
-	dlhandle = dlopen(LIBPCS_CLIENT, RTLD_LAZY);
-	if (dlhandle == NULL)
-		dlhandle = dlopen(LIBPCS_CLIENT_1, RTLD_LAZY);
-	if (dlhandle == NULL) {
-		last_load_error = PrlGetTimeMonotonic();
-		WRITE_TRACE(DBG_FATAL, "Failed to load %s: %s", LIBPCS_CLIENT, dlerror());
-		return -EAGAIN;
+	for (int v = 5; v > 0; v--) {
+		QString f(QString(LIBPCS_CLIENT".%1").arg(v));
+		dlhandle = dlopen(qPrintable(f), RTLD_LAZY);
+		if (dlhandle != NULL) {
+			break;
+		} else if (errno != ENOENT || v == 1) {
+			last_load_error = PrlGetTimeMonotonic();
+			WRITE_TRACE(DBG_FATAL, "Failed to load %s: %s",	qPrintable(f), dlerror());
+			return -EAGAIN;
+		}
 	}
 
 	for (i=0; funcs[i].name; ++i) {
