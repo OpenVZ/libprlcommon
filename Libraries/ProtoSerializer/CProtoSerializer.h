@@ -32,7 +32,7 @@
 #include "CProtoCommands.h"
 #include "../IOService/IOCommunication/IOProtocol.h"
 
-namespace Parallels
+namespace Virtuozzo
 {
 
 namespace DispatcherPackage {
@@ -1006,7 +1006,7 @@ public:
     );
 };
 
-}//namespace Parallels
+}//namespace Virtuozzo
 
 #endif
 

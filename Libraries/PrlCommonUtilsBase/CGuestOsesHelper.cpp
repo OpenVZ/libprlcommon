@@ -28,7 +28,7 @@
 
 #include "Build/Current.ver"
 #include "CGuestOsesHelper.h"
-#include "ParallelsDirs.h"
+#include "VirtuozzoDirs.h"
 
 COpaqueTypeListImpl *COpaqueTypeListImpl::CreateInstance(PRL_SIZE nTypeSize)
 {
@@ -175,7 +175,7 @@ TOpaqueTypeList<PRL_UINT16> CGuestOsesHelper::GetSupportedOsesVersions(PRL_HOST_
 
 PRL_UINT16 CGuestOsesHelper::GetDefaultOsVersion(PRL_UINT8 nOsType)
 {
-	PRL_APPLICATION_MODE nAppMode = ParallelsDirs::getAppExecuteMode();
+	PRL_APPLICATION_MODE nAppMode = VirtuozzoDirs::getAppExecuteMode();
 	bool bIsDesktopOrWorkstation = ( nAppMode != PAM_SERVER );
 	PRL_UINT16 nDefaultOsVersion = 0;
 	switch ( nOsType )

@@ -18,6 +18,6 @@ addSubdirsDir(AtomicOpsTest, $$PWD/AtomicOpsTest)
 addSubdirsDir(MonitorAtomicOpsTest, $$PWD/MonitorAtomicOpsTest)
 addSubdirsDir(IOServiceTest, $$PWD/IOServiceTest)
 
-include($$PWD/ParallelsDirTest/ParallelsDirTest.deps)
+include($$PWD/VirtuozzoDirTest/VirtuozzoDirTest.deps)
 include($$PWD/StdTest/StdTest.pro)
 include($$PWD/QtLibraryTest/QtLibraryTest.deps)

@@ -4,7 +4,7 @@ QT = core
 TARGET = test_atomic_ops
 
 LEVEL = ../..
-include($$LEVEL/Sources/Parallels.pri)
+include($$LEVEL/Sources/Virtuozzo.pri)
 
 HEADERS += AtomicOpsTest.h
 SOURCES += AtomicOpsTest.cpp

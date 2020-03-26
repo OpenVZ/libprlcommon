@@ -40,7 +40,7 @@
 
 namespace IOService {
 
-const char* SSLHelper::s_serverSessionIdContext = "ParallelsServer";
+const char* SSLHelper::s_serverSessionIdContext = "VirtuozzoServer";
 
 /* These DH parameters have been generated as follows:
  *    $ openssl dhparam -C -noout 512

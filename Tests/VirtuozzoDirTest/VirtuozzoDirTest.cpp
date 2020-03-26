@@ -23,23 +23,23 @@
 /// Schaffhausen, Switzerland.
 ///
 /// @file
-///		ParallelsDirTest.cpp
+///		VirtuozzoDirTest.cpp
 ///
 /// @author
 ///		sergeyt@
 ///
 /// @brief
-///		Tests fixture class for testing ParallelsDirs class functionality.
+///		Tests fixture class for testing VirtuozzoDirs class functionality.
 ///
 /// @brief
 ///
 /// last version of specification is available on http://wiki/index.php/Paths_to_Configuration_Files
 ///
 /////////////////////////////////////////////////////////////////////////////
-#include "ParallelsDirTest.h"
-#include "Libraries/PrlCommonUtilsBase/ParallelsDirs.h"
+#include "VirtuozzoDirTest.h"
+#include "Libraries/PrlCommonUtilsBase/VirtuozzoDirs.h"
 
-#include "Interfaces/ParallelsQt.h"
+#include "Interfaces/VirtuozzoQt.h"
 #include "Libraries/Logging/Logging.h"
 #include <prlsdk/PrlOses.h>
 #include "Build/Current.ver"
@@ -49,12 +49,12 @@
 #include <pwd.h>
 #include <errno.h>
 
-void ParallelsDirTest::testGetDispatcherConfigDir()
+void VirtuozzoDirTest::testGetDispatcherConfigDir()
 {
 //	QVERIFY (currentProcessHasRootPermission());
 
 	QString expectedPath;
-	QString path=ParallelsDirs::getDispatcherConfigDir();
+	QString path=VirtuozzoDirs::getDispatcherConfigDir();
 
 	switch(getOsType())
 	{
@@ -66,12 +66,12 @@ void ParallelsDirTest::testGetDispatcherConfigDir()
 
 	QCOMPARE(path, expectedPath);
 }
-void ParallelsDirTest::testGetCallerUserPreferencesDir()
+void VirtuozzoDirTest::testGetCallerUserPreferencesDir()
 {
 	QString path;
 	QString expectedPath = QDir::homePath();
 
-	path=ParallelsDirs::getCallerUserPreferencesDir();
+	path=VirtuozzoDirs::getCallerUserPreferencesDir();
 
 	switch(getOsType())
 	{
@@ -83,14 +83,14 @@ void ParallelsDirTest::testGetCallerUserPreferencesDir()
 	QCOMPARE(path, expectedPath);
 }
 
-void ParallelsDirTest::testGetDefaultVmCatalogue_serverMode()
+void VirtuozzoDirTest::testGetDefaultVmCatalogue_serverMode()
 {
 //	QVERIFY (currentProcessHasRootPermission());
 
 	QString path;
 	QString expectedPath;
 
-	path=ParallelsDirs::getCommonDefaultVmCatalogue();
+	path=VirtuozzoDirs::getCommonDefaultVmCatalogue();
 
 	switch(getOsType())
 	{
@@ -103,7 +103,7 @@ void ParallelsDirTest::testGetDefaultVmCatalogue_serverMode()
 }
 
 
-void ParallelsDirTest::testGetToolsBaseImagePath()
+void VirtuozzoDirTest::testGetToolsBaseImagePath()
 {
 	// NOTE: windows path depends from product installation path
 	PRL_APPLICATION_MODE mode;
@@ -112,13 +112,13 @@ void ParallelsDirTest::testGetToolsBaseImagePath()
 
 	// Server
 	mode = PAM_SERVER;
-	path = ParallelsDirs::getToolsBaseImagePath(mode);
+	path = VirtuozzoDirs::getToolsBaseImagePath(mode);
 	expectedPath = "/usr/share/vz-guest-tools/";
 	QCOMPARE(path, expectedPath);
 }
 
 
-void ParallelsDirTest::testGetToolsImage()
+void VirtuozzoDirTest::testGetToolsImage()
 {
 	PRL_APPLICATION_MODE mode = PAM_SERVER;
 	unsigned int nOsVersion;
@@ -126,28 +126,28 @@ void ParallelsDirTest::testGetToolsImage()
 	QString expectedPath;
 
 	nOsVersion = PVS_GUEST_VER_LIN_OTHER;
-	path = ParallelsDirs::getToolsImage(mode, nOsVersion);
+	path = VirtuozzoDirs::getToolsImage(mode, nOsVersion);
 	expectedPath = "/usr/share/vz-guest-tools/vz-guest-tools-lin.iso";
 	QCOMPARE(path, expectedPath);
 
 	nOsVersion = PVS_GUEST_VER_WIN_OTHER;
-	path = ParallelsDirs::getToolsImage(mode, nOsVersion);
+	path = VirtuozzoDirs::getToolsImage(mode, nOsVersion);
 	expectedPath = "/usr/share/vz-guest-tools/vz-guest-tools-win.iso";
 	QCOMPARE(path, expectedPath);
 }
 
 
-bool ParallelsDirTest::currentProcessHasRootPermission()
+bool VirtuozzoDirTest::currentProcessHasRootPermission()
 {
 	return 0==getuid();
 }
 
-ParallelsDirTest::OsType ParallelsDirTest::getOsType()
+VirtuozzoDirTest::OsType VirtuozzoDirTest::getOsType()
 {
 	return osLinux;
 }
 
-void ParallelsDirTest::unixImpersonateTo(const QString& userName)
+void VirtuozzoDirTest::unixImpersonateTo(const QString& userName)
 {
 	m_last_euid=geteuid();
 	struct passwd* pwd=getpwnam(QSTR2UTF8(userName));
@@ -160,13 +160,13 @@ void ParallelsDirTest::unixImpersonateTo(const QString& userName)
 	(void)ret;
 }
 
-void ParallelsDirTest::unixRevertToSelf()
+void VirtuozzoDirTest::unixRevertToSelf()
 {
 	int ret = seteuid(m_last_euid);
 	(void)ret;
 }
 
-QString ParallelsDirTest::linuxGetUserHomePath(const QString& userName)
+QString VirtuozzoDirTest::linuxGetUserHomePath(const QString& userName)
 {
 	m_last_euid=geteuid();
 	struct passwd* pwd=getpwnam(QSTR2UTF8(userName));

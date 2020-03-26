@@ -81,7 +81,7 @@ public:
 	//       (#SocketClientPrivate::sslHeaderCheck). This function
 	//       checks that SSL header must be <= SSLMaxDataLength,
 	//       but SSL _can_ send 16kb + padding bytes, so old
-	//       released versions of Parallels product can't accept
+	//       released versions of Virtuozzo product can't accept
 	//       such packages and will disconnect the peer. If we reduce
 	//       the number of default SSL buffer SSL engine will never
 	//       exceed this threshold.

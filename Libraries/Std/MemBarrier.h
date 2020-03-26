@@ -28,7 +28,7 @@
 #ifndef __MEM_BARRIER_H__
 #define __MEM_BARRIER_H__
 
-#include "../Interfaces/ParallelsTypes.h"
+#include "../Interfaces/VirtuozzoTypes.h"
 
 /**
  * Default full memory barriers

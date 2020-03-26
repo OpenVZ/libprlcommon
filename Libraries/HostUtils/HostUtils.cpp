@@ -31,8 +31,8 @@
 #include <QDir>
 #include <QStringList>
 
-#include "Interfaces/ParallelsTypes.h"
-#include <Interfaces/ParallelsQt.h>
+#include "Interfaces/VirtuozzoTypes.h"
+#include <Interfaces/VirtuozzoQt.h>
 #include "Libraries/HostUtils/HostUtils.h"
 #include <Libraries/HostUtils/PCSUtils.h>
 #include "Libraries/Logging/Logging.h"

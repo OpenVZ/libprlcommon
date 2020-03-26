@@ -207,7 +207,7 @@ bool generateCredentials(const QString& userId,
 		}
 
 		X509_NAME_add_entry_by_NID(name, NID_organizationName, MBSTRING_ASC,
-								   (unsigned char*)"Parallels", -1, -1, 0);
+								   (unsigned char*)"Virtuozzo", -1, -1, 0);
 
 		X509_NAME_add_entry_by_NID(name, NID_organizationalUnitName, MBSTRING_ASC,
 								   (unsigned char*)"Mobile", -1, -1, 0);

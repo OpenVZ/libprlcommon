@@ -28,7 +28,7 @@
 #ifndef PRLUUIDCOMMON_H__
 #define PRLUUIDCOMMON_H__
 
-#include "../Interfaces/ParallelsTypes.h"
+#include "../Interfaces/VirtuozzoTypes.h"
 
 #define UUID_BUF_LENGTH 16
 typedef UINT8 Uuid_t[UUID_BUF_LENGTH];

@@ -34,7 +34,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "PrlTime.h"
-#include "Interfaces/ParallelsTypes.h"
+#include "Interfaces/VirtuozzoTypes.h"
 
 #include <time.h>
 #include <errno.h>

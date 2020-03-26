@@ -29,8 +29,8 @@
 #include <QString>
 #include <QRegExp>
 #include <QList>
-#include "Interfaces/ParallelsTypes.h"
-#include "Interfaces/ParallelsQt.h"
+#include "Interfaces/VirtuozzoTypes.h"
+#include "Interfaces/VirtuozzoQt.h"
 
 #ifdef _WIN_
 #   include <windows.h>
