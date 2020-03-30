@@ -1,5 +1,5 @@
 /*
- * ParallelsSdk.h
+ * VirtuozzoSdk.h
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
  * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
@@ -25,8 +25,8 @@
  */
 
 
-#ifndef __PARALLELS_SDK_PRIVATE__
-#define __PARALLELS_SDK_PRIVATE__
+#ifndef __VIRTUOZZO_SDK_PRIVATE__
+#define __VIRTUOZZO_SDK_PRIVATE__
 
 #include <prlsdk/PrlOses.h>
 
@@ -68,5 +68,5 @@ static inline int PVS_GUEST_SCSI_LSI_SAS_SUPPORTED(unsigned int nVersion)
 	return nVersion >= PVS_GUEST_VER_WIN_VISTA && nVersion <= PVS_GUEST_VER_WIN_LAST;
 }
 
-#endif // __PARALLELS_SDK_PRIVATE__
+#endif // __VIRTUOZZO_SDK_PRIVATE__
 

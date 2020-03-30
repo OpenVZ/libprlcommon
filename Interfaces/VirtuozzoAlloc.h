@@ -1,5 +1,5 @@
 /*
- * ParallelsAlloc.h: Aligned memory allocation code for cross
+ * VirtuozzoAlloc.h: Aligned memory allocation code for cross
  * platform compilation.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
@@ -26,8 +26,8 @@
  */
 
 
-#ifndef __PARALLELS_ALLOC_HEADER_H__
-#define __PARALLELS_ALLOC_HEADER_H__
+#ifndef __VIRTUOZZO_ALLOC_HEADER_H__
+#define __VIRTUOZZO_ALLOC_HEADER_H__
 
 /**
  * This is cross-platform code for the virtual memory alloc/free calls.
@@ -48,7 +48,7 @@
 #if defined(_WIN_)
 # define prl_valloc(size) _aligned_malloc(size, PAGE_SIZE)
 #elif defined(_LIN_)
-#include "ParallelsTypes.h"
+#include "VirtuozzoTypes.h"
 
 static inline void *prl_valloc(size_t size)
 {

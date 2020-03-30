@@ -4,7 +4,7 @@ QT += core
 TARGET = test_monitor_std
 
 LEVEL = ./../../../
-include($$LEVEL/Sources/Parallels.pri)
+include($$LEVEL/Sources/Virtuozzo.pri)
 
 INCLUDEPATH += ./Monitor/Source/Core/ ./../../
 

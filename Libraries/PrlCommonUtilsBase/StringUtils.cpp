@@ -28,14 +28,14 @@
 #include <QtCore/QLocale>
 
 #include "StringUtils.h"
-#include "Interfaces/ParallelsQt.h"
+#include "Interfaces/VirtuozzoQt.h"
 #include "Libraries/PrlUuid/Uuid.h"
 
 #include <QMap>
 
 #include <string.h>
 
-namespace Parallels {
+namespace Virtuozzo {
 
 QString GenerateFilename(
 			const QStringList &_dir_entries,

@@ -28,7 +28,7 @@
 
 
 #include "CVmEventParameterList.h"
-#include "../Interfaces/ParallelsDomModel.h"
+#include "../Interfaces/VirtuozzoDomModel.h"
 #include "../PrlDataSerializer/CPrlStringDataSerializer.h"
 
 

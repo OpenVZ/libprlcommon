@@ -1,5 +1,5 @@
 /*
- * PrlStringifyConsts.h: This file is the part of parallels public
+ * PrlStringifyConsts.h: This file is the part of virtuozzo public
  * SDK library.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH

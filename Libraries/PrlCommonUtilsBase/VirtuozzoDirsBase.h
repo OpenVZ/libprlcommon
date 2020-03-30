@@ -1,8 +1,5 @@
 /*
- * ParallelsDefines.h: Parallels Namespace primary constant
- * definition. This file contains definitions, which are used in
- * various project parts. NOTE. Do not include other headers into
- * this file.
+ * VirtuozzoDirsBase.h: Base functionality of VirtuozzoDirs class.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
  * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
@@ -28,23 +25,26 @@
  */
 
 
-#ifndef __PARALLELS_DEFINES__
-#define __PARALLELS_DEFINES__
-
-// Do not include any other headers except current.ver
+#ifndef VirtuozzoDirsBase_H
+#define VirtuozzoDirsBase_H
 
 
-/**
- * Parallels directories & files
- */
-#define PARALLELS_LICENSES_XML_FILE "licenses.xml"
+	struct UserInfo;
 
-#define DISPATCHER_CONFIGURATION_SERVER_XML_FILE	"dispatcher.xml"
+	enum InitOption /* sub modes */ {
+		// Note: members should be bitmask!
+		smNormalMode	= 0,
+		smAppStoreMode	= 1 << 0,
+	};
+	Q_DECLARE_FLAGS( InitOptions, InitOption );
 
-#define DISPATCHER_SERVICE_COMMON_NAME				"prl_disp_service"
+	static bool Init( PRL_APPLICATION_MODE mode, InitOptions subMode = smNormalMode, bool bForce = false );
+	static PRL_APPLICATION_MODE getAppExecuteMode();
 
-#define VMDIR_DEFAULT_CATALOGUE_SERVER_FILE			"vmdirectorylist.xml"
+	static const char* getAppExecuteModeAsCString();
+	static const char* getAppExecuteModeAsCString( PRL_APPLICATION_MODE mode );
 
-#define NETWORK_CONFIGURATION_SERVER_XML_FILE		"network.xml"
+	static void setLogPath(const char* path);
 
-#endif // __PARALLELS_DEFINES__
+
+#endif

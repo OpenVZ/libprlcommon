@@ -36,7 +36,7 @@
 
 
 #include "SysError.h"
-#include "Interfaces/ParallelsQt.h"
+#include "Interfaces/VirtuozzoQt.h"
 
 QString Prl::GetLastErrorAsString()
 {

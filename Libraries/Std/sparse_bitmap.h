@@ -22,7 +22,7 @@
 #ifndef _SPARCE_BITMAP_H_
 #define _SPARCE_BITMAP_H_
 
-#include "Interfaces/ParallelsTypes.h"
+#include "Interfaces/VirtuozzoTypes.h"
 
 #ifdef __cplusplus
 extern "C" {

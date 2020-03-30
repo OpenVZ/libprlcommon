@@ -31,12 +31,12 @@ DEFINES += PRINTABLE_TARGET=cmn_utils_base
 
 include(PrlCommonUtilsBase.pri)
 
-HEADERS = ParallelsDirs.h \
+HEADERS = VirtuozzoDirs.h \
 		Common.h \
 		SysError.h \
 		PrlStringifyConsts.h \
-            ParallelsDirsDefs.h \
-            ParallelsDirsBase.h \
+            VirtuozzoDirsDefs.h \
+            VirtuozzoDirsBase.h \
             CommandLine.h \
             OsInfo.h \
             CSimpleFileHelper.h \
@@ -54,11 +54,11 @@ HEADERS = ParallelsDirs.h \
             Archive.h
 
 
-SOURCES = ParallelsDirs.cpp \
-		ParallelsNamespace.cpp \
+SOURCES = VirtuozzoDirs.cpp \
+		VirtuozzoNamespace.cpp \
 		Common.cpp \
 		SysError.cpp \
-            ParallelsDirsBase.cpp \
+            VirtuozzoDirsBase.cpp \
             CommandLine.cpp \
             OsInfo.c \
             CSimpleFileHelper.cpp \

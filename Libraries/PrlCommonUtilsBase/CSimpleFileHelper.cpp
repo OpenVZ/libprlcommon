@@ -42,7 +42,7 @@
 #include "Libraries/Logging/Logging.h"
 #include <prlsdk/PrlErrorsValues.h>
 #include <prlsdk/PrlErrors.h>
-#include "Interfaces/ParallelsQt.h"
+#include "Interfaces/VirtuozzoQt.h"
 #include <boost/utility/value_init.hpp>
 #include "Libraries/PrlCommonUtilsBase/SysError.h"
 #include "Libraries/Std/PrlAssert.h"

@@ -33,9 +33,9 @@
 #include <QtCore>
 #include <QtXml>
 
-#include "../Interfaces/ParallelsDomModel.h"
-#include "../Interfaces/ParallelsQt.h"
-#include "../Interfaces/ParallelsNamespace.h"
+#include "../Interfaces/VirtuozzoDomModel.h"
+#include "../Interfaces/VirtuozzoQt.h"
+#include "../Interfaces/VirtuozzoNamespace.h"
 #include <prlsdk/PrlEnums.h>
 #include <prlsdk/PrlErrors.h>
 #include "../PrlUuid/Uuid.h"
@@ -516,6 +516,8 @@ protected:
 	}
 
 	void checkAndInsertExtDocElement(QDomElement root_element, int& nElemIdx) const;
+
+	bool eqName(QString& tag_name, const QString xml_name, const bool replace_name = false);
 
 	QString	m_qsFileName;
 

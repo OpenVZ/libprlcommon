@@ -3,15 +3,15 @@ QT = core
 
 INCLUDEPATH += /usr/share /usr/include/prlsdk
 
-include(ParallelsDirTest.deps)
+include(VirtuozzoDirTest.deps)
 
 HEADERS += \
-	ParallelsDirTest.h\
+	VirtuozzoDirTest.h\
 	CUrlParserTest.h \
 	$$SRC_LEVEL/Tests/CommonTestsUtils.h
 
 SOURCES += \
-	ParallelsDirTest.cpp\
+	VirtuozzoDirTest.cpp\
 	Main.cpp   \
 	CUrlParserTest.cpp \
 	$$SRC_LEVEL/Tests/CommonTestsUtils.cpp

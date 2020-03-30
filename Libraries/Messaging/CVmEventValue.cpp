@@ -224,7 +224,7 @@ int CVmEventValue::readXml(QDomElement* RootElement, QString ext_tag_name, bool 
 	tag_name = RootElement->tagName();
 	m_qsTagName = tag_name;
 	m_qsExtRootTagName = ext_tag_name;
-	if (tag_name != (ext_tag_name.isEmpty() ? QString("Value") : ext_tag_name))
+	if (!eqName(tag_name, (ext_tag_name.isEmpty() ? QString("Value") : ext_tag_name), true))
 	{
 		m_qsErrorMessage = "Error in class 'CVmEventValue': wrong root element with tag name '" + tag_name + "'";
 		return PRL_ERR_PARSE_VM_CONFIG;
@@ -258,7 +258,7 @@ int CVmEventValue::readXml(QDomElement* RootElement, QString ext_tag_name, bool 
 		bool is_set = false;
 		Q_UNUSED(is_set);
 
-		if (tag_name == "ListItem")
+		if (eqName(tag_name, "ListItem"))
 		{
 			unused_tag = false;
 			text_element = element.firstChild().toText();

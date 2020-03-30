@@ -22,8 +22,8 @@
  * Schaffhausen, Switzerland.
  */
 
-#ifndef __PARALLELS_NAMESPACE_TESTS__
-#define __PARALLELS_NAMESPACE_TESTS__
+#ifndef __VIRTUOZZO_NAMESPACE_TESTS__
+#define __VIRTUOZZO_NAMESPACE_TESTS__
 
 //Defines for test guest OS functionality framework
 #define PRL_TEST_FAKE_GUEST_SESSION	"e5d1d397-b03e-4e98-a117-b19c4bd583b4"

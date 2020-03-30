@@ -49,7 +49,7 @@ namespace {
 void InitializeDispatcherCommandsMaps()
 {
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserCancelOperation] = PJOC_JOB_CANCEL;
-	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdLookupParallelsServers] = PJOC_SRV_LOOKUP_PARALLELS_SERVERS;
+	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdLookupVirtuozzoServers] = PJOC_SRV_LOOKUP_VIRTUOZZO_SERVERS;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserLogin] = PJOC_SRV_LOGIN;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserLoginLocal] = PJOC_SRV_LOGIN_LOCAL;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdUserLoginLocalStage2] = PJOC_SRV_LOGIN_LOCAL;

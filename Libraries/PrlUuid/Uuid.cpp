@@ -35,7 +35,7 @@
 
 #include "Uuid.h"
 #include <Libraries/Logging/Logging.h>
-#include <Interfaces/ParallelsTypes.h>
+#include <Interfaces/VirtuozzoTypes.h>
 
 Uuid::Uuid ()
 {

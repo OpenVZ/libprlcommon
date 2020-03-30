@@ -1,5 +1,5 @@
 #
-# Parallels.pri
+# Virtuozzo.pri
 #
 # Copyright (c) 1999-2017, Parallels International GmbH
 # Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
@@ -266,8 +266,8 @@ contains(SANITIZE, TRUE) {
 
 # Switch gcc into deterministic mode
 unix {
-	QMAKE_CFLAGS += -frandom-seed=parallels
-	QMAKE_CXXFLAGS += -frandom-seed=parallels
+	QMAKE_CFLAGS += -frandom-seed=virtuozzo
+	QMAKE_CXXFLAGS += -frandom-seed=virtuozzo
 }
 
 SDK_HEADERS = $$(SDK_HEADERS)

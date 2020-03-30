@@ -1,5 +1,5 @@
 /*
- * ParallelsDirs.h: Helper class for getting default parallels
+ * VirtuozzoDirs.h: Helper class for getting default virtuozzo
  * configs locations.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
@@ -26,25 +26,25 @@
  */
 
 
-#ifndef __PARALLELS_DIRS_H__
-#define __PARALLELS_DIRS_H__
+#ifndef __VIRTUOZZO_DIRS_H__
+#define __VIRTUOZZO_DIRS_H__
 
 #include <QString>
 #include <QFile>
 #include <QPair>
 #include <QFlags>
 #include <QMutex>
-#include "../Interfaces/ParallelsNamespace.h"
+#include "../Interfaces/VirtuozzoNamespace.h"
 #include <prlsdk/PrlEnums.h>
-#include "ParallelsDirsDefs.h"
+#include "VirtuozzoDirsDefs.h"
 
 class QDir;
 
-class ParallelsDirs
+class VirtuozzoDirs
 {
 public:
 
-#include "ParallelsDirsBase.h"
+#include "VirtuozzoDirsBase.h"
 
 	static QString getAppGuiName( PRL_APPLICATION_MODE nAppMode );
 	static QString getAppSwitcherAppName();
@@ -65,17 +65,17 @@ public:
 	static QString getCallerUserPreferencesDir();
 
 	static QString getCommonDefaultVmCatalogue();
-	static QString getUserDefaultVmCatalogue(const ParallelsDirs::UserInfo* pUserInfo);
+	static QString getUserDefaultVmCatalogue(const VirtuozzoDirs::UserInfo* pUserInfo);
 
-	static QString getUserHomePath(const ParallelsDirs::UserInfo* pUserInfo);
+	static QString getUserHomePath(const VirtuozzoDirs::UserInfo* pUserInfo);
 
 	// #132602
 	static QString getPathToDispatcherTesterConfig();
 
-	static QString getParallelsDriversDir();
-	/// returns path to the directory where Parallels applications is located
-	static QString getParallelsApplicationDir();
-	static QString getParallelsScriptsDir();
+	static QString getVirtuozzoDriversDir();
+	/// returns path to the directory where Virtuozzo applications is located
+	static QString getVirtuozzoApplicationDir();
+	static QString getVirtuozzoScriptsDir();
 
 	/// returns true if build is runt under developers build environment.
 	static bool isDevelopersBuild();
@@ -108,31 +108,31 @@ public:
 	// get full path to VmInfo file for VM with [strVmHomeDir] home path
 	static QString getVmInfoPath(const QString & strVmHomeDir);
 
-	// get Parallels application directory
-	static QString getParallelsDirName();
+	// get Virtuozzo application directory
+	static QString getVirtuozzoDirName();
 
-	// get base path to Parallels Tools .iso image
+	// get base path to Virtuozzo Tools .iso image
 	static QString getToolsBaseImagePath(PRL_APPLICATION_MODE mode);
-	// get full path to .iso with Parallels Tools for the given guest OS
+	// get full path to .iso with Virtuozzo Tools for the given guest OS
 	// Note: if function returns an empty string then OS is not supported
 	static QString getToolsImage(PRL_APPLICATION_MODE mode, unsigned int nOsVersion);
 
-	// get full path to .tar.gz with Parallels Tools for the given guest OS
+	// get full path to .tar.gz with Virtuozzo Tools for the given guest OS
 	// Note: if function returns an empty string then OS is not supported
 	static QString getToolsTarGz(PRL_APPLICATION_MODE mode, unsigned int nOsVersion);
 
-	// get Parallels Tools installer name for the given guest OS
+	// get Virtuozzo Tools installer name for the given guest OS
 	// Note: if function returns an empty string then OS is not supported
 	static QString getToolsInstallerName(unsigned int nOsVersion);
 
-	// get full path to .fdd with Parallels Tools
+	// get full path to .fdd with Virtuozzo Tools
 	// return "" if fdd image doesn't required for this guest
 	static QString getFddToolsImage( PRL_APPLICATION_MODE mode, unsigned int uGuestOsType );
 
-	// get full path to .fdd with Parallels Tools
+	// get full path to .fdd with Virtuozzo Tools
 	static QString getFddToolsImageBaseName( unsigned int uGuestOsType );
 
-	// get full path to .iso with Parallels Tools
+	// get full path to .iso with Virtuozzo Tools
 	static QString getToolsFileName(unsigned int uGuestOsType);
 
 	// get full path to .iso with unattended floppy drivers
@@ -190,7 +190,7 @@ public:
 	static QString getServiceAppName();
 
 private:
-	static QString getDefaultVmCatalogue(const ParallelsDirs::UserInfo* pUserInfo);
+	static QString getDefaultVmCatalogue(const VirtuozzoDirs::UserInfo* pUserInfo);
 	static QString getIPCPath(const QString& fileName, const QString& humanName);
 
 public:
@@ -206,7 +206,7 @@ public:
 		QString getHomePath() const {return m_homePath; }
 
 	private:
-		friend class ParallelsDirs;
+		friend class VirtuozzoDirs;
 
 		bool isValid()  const;
 
@@ -220,7 +220,7 @@ private:
 	static InitOptions ms_nInitOptions;
 
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS( ParallelsDirs::InitOptions );
+Q_DECLARE_OPERATORS_FOR_FLAGS( VirtuozzoDirs::InitOptions );
 
-#endif // __PARALLELS_DIRS_H__
+#endif // __VIRTUOZZO_DIRS_H__
 

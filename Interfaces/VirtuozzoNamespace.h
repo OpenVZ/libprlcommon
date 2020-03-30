@@ -1,5 +1,5 @@
 /*
- * ParallelsNamespace.h: Parallels Namespace definition. This file
+ * VirtuozzoNamespace.h: Virtuozzo Namespace definition. This file
  * contains various definitions and macro, which are used throughout
  * the project modules.
  *
@@ -27,14 +27,14 @@
  */
 
 
-#ifndef __PARALLELS_NAMESPACE__
-#define __PARALLELS_NAMESPACE__
+#ifndef __VIRTUOZZO_NAMESPACE__
+#define __VIRTUOZZO_NAMESPACE__
 
 #include <prlsdk/PrlErrors.h>
 #include <prlsdk/PrlEnums.h>
 #include <prlsdk/PrlPorts.h>
-#include "ParallelsDefines.h"
-#include "ParallelsTypes.h"
+#include "VirtuozzoDefines.h"
+#include "VirtuozzoTypes.h"
 
 //Mouse and keyboard profiles extension
 #define PROFILE_EXTENSION				"kbd"
@@ -162,14 +162,14 @@
  */
 
 
-#define PVS_VMCATALOGUE_DIR_ENV	"PARALLELS_VMDIR"
-#define PVS_DISPATCHER_CONFIG_DIR_ENV	"PARALLELS_CONFIG_DIR"
+#define PVS_VMCATALOGUE_DIR_ENV	"VIRTUOZZO_VMDIR"
+#define PVS_DISPATCHER_CONFIG_DIR_ENV	"VIRTUOZZO_CONFIG_DIR"
 
-#define PVS_VM_EXECUTABLE_ENV	"PARALLELS_VM"
-#define PVS_VM_SCRIPTS_ENV	"PARALLELS_SCRIPTS"
-#define PVS_VM_ENVIRONMENT_ENV	"PARALLELS_VM_ENV"
+#define PVS_VM_EXECUTABLE_ENV	"VIRTUOZZO_VM"
+#define PVS_VM_SCRIPTS_ENV	"VIRTUOZZO_SCRIPTS"
+#define PVS_VM_ENVIRONMENT_ENV	"VIRTUOZZO_VM_ENV"
 #define PVS_VM_ENVIRONMENT_ENV_SEPARATOR	";"
-#define PVS_APPLE_HARDWARE_MODEL_ENV "PARALLELS_HW_MDL_ENV"
+#define PVS_APPLE_HARDWARE_MODEL_ENV "VIRTUOZZO_HW_MDL_ENV"
 
 #ifdef _WIN_
 	#define VM_AUTH_EXECUTABLE	"/prlauth.exe"
@@ -1338,7 +1338,7 @@ public:
 			DspCmdGetVmToolsInfo			= DspClientToDispatcherCommandRangeStart + 100,
 
 			DspCmdFsGenerateEntryName					= DspClientToDispatcherCommandRangeStart + 101,
-			DspCmdLookupParallelsServers					= DspClientToDispatcherCommandRangeStart + 102,
+			DspCmdLookupVirtuozzoServers					= DspClientToDispatcherCommandRangeStart + 102,
 			DspCmdVmUpdateSecurity							= DspClientToDispatcherCommandRangeStart + 103,
 			DspCmdVmSectionValidateConfig							= DspClientToDispatcherCommandRangeStart + 104,
 			DspCmdUserInfoList			= DspClientToDispatcherCommandRangeStart + 105,
@@ -1561,7 +1561,7 @@ public:
 		MultipleArgStart = 10000
 	};
 
-	// Defined in Libraries/PrlCommonUtilsBase/ParallelsNamespace.cpp
+	// Defined in Libraries/PrlCommonUtilsBase/VirtuozzoNamespace.cpp
 	// Please modify this function when DispatcherCommands are changed.
 	static const char* DispatcherCommandToString( unsigned int cmd );
 
@@ -1636,7 +1636,7 @@ public:
 #undef VM_GUEST_OS_TYPE_END
 #undef VM_GUEST_OS_VERSION_END
 
-#define PARALLELS_SERVER_BROADCAST_PORT 64000
+#define VIRTUOZZO_SERVER_BROADCAST_PORT 64000
 #define PRL_GET_SERVER_INFO_BROADCAST_SERVER_MSG "GET_SERVER_INFO"
 
 #define USB_LIST_DIVIDER "---sdjhfgsjhdfgs"
@@ -1650,4 +1650,4 @@ public:
 
 #define COMMON_NOT_INITIALIZED_INT_VALUE (-12345678)
 
-#endif // __PARALLELS_NAMESPACE__
+#endif // __VIRTUOZZO_NAMESPACE__

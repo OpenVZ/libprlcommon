@@ -35,7 +35,7 @@
 #include <QString>
 #include <QStringList>
 
-namespace Parallels {
+namespace Virtuozzo {
 /**
  * Generates unique filename for specified directory entries list. New filename generates as {prefix}{index}{suffix} combination
  * @param directory entries list

@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 #include "Libraries/Std/BitOps.h"
-#include <Interfaces/ParallelsAlloc.h>
+#include <Interfaces/VirtuozzoAlloc.h>
 #include "Libraries/Std/sparse_bitmap.h"
 
 #ifndef	PAGE_SHIFT

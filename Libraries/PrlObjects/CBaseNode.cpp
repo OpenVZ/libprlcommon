@@ -551,6 +551,39 @@ void CBaseNode::checkAndInsertExtDocElement(QDomElement root_element, int& nElem
 	++nElemIdx;
 }
 
+bool CBaseNode::eqName(QString& tag_name, const QString xml_name, const bool replace_name)
+{
+	// At first we always use direct comparing names
+	if (tag_name == xml_name)
+		return true;
+	// At second try to find our keyword in true xml name
+	const QString vz("Virtuozzo");
+	const int delta[] = {-6, -8, 0, -19, -9, -3, -21, -14, 4};
+	int n = xml_name.indexOf(vz, 0, Qt::CaseInsensitive);
+	if (n != -1)
+	{
+		// Make second version of xml name for check
+		QString plz(xml_name);
+		for(int i = 0; i < vz.size(); i++)
+			plz[n + i] = QChar((char)((int)xml_name[n + i].toLatin1() + delta[i]));
+		if (tag_name == plz)
+		{
+			// Change tag name in parameter to true xml name
+			// Because it may be to use in future
+			tag_name = xml_name;
+			// Akso change saved tag names for object
+			if (replace_name)
+			{
+				m_qsTagName = xml_name;
+				if (!m_qsExtRootTagName.isEmpty())
+					m_qsExtRootTagName = xml_name;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
 //////////////////////
 // For compatibility
 //////////////////////

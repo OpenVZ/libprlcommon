@@ -32,7 +32,7 @@
 #ifndef _STD_BITOPS_H_
 #define _STD_BITOPS_H_
 
-#include "../Interfaces/ParallelsTypes.h"
+#include "../Interfaces/VirtuozzoTypes.h"
 #include "AtomicOps.h"
 
 

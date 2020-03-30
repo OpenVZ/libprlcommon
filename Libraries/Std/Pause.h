@@ -4,7 +4,7 @@
 ///
 /// @brief CpuPause operation
 ///
-/// @author Denis V. Lunev <den@parallels.com>
+/// @author Denis V. Lunev <den@virtuozzo.com>
 ///
 /// Copyright (c) 2006-2017, Parallels International GmbH
 /// Copyright (c) 2017-2019 Virtuozzo International GmbH, All rights reserved.

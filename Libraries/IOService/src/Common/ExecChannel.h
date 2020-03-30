@@ -33,7 +33,7 @@
 #include <QObject>
 #include <QThread>
 
-#include "../../Interfaces/ParallelsTypes.h"
+#include "../../Interfaces/VirtuozzoTypes.h"
 #include "Channel.h"
 #include "../../PrlDataSerializer/CPrlStringDataSerializer.h"
 #include "../../PrlUuid/Uuid.h"
