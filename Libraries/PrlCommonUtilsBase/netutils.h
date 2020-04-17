@@ -26,7 +26,7 @@
 
 #include <QString>
 
-#include "../Interfaces/VirtuozzoTypes.h"
+#include "../Interfaces/ParallelsTypes.h"
 
 #ifndef ETH_ADDRESS_LEN
 # define ETH_ADDRESS_LEN 6

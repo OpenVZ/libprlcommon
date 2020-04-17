@@ -1,5 +1,5 @@
 /*
- * VirtuozzoTypes.h: Base Virtuozzo types declarations. Ideally, all
+ * ParallelsTypes.h: Base Parallels types declarations. Ideally, all
  * user - and - kernel space components are supposed to use types,
  * declared in this module. Does not need any additional headers.
  *
@@ -27,8 +27,8 @@
  */
 
 
-#ifndef __VIRTUOZZO_TYPES_H__
-#define __VIRTUOZZO_TYPES_H__
+#ifndef __PARALLELS_TYPES_H__
+#define __PARALLELS_TYPES_H__
 
 #if defined(__linux__) && defined(__KERNEL__)
 /* all from stddef.h + ARRAY_SIZE, container_of */
@@ -411,4 +411,4 @@ typedef UINT64 QWORD;
  */
 typedef UINT64 PRL_ALIGN(8) API_UINT64;
 
-#endif // __VIRTUOZZO_TYPES_H__
+#endif // __PARALLELS_TYPES_H__

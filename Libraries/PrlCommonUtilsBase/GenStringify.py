@@ -112,7 +112,7 @@ STRINGIFY_CONSTS_TMPL = """/////////////////////////////////////////////////////
 
 #include "PrlStringifyConsts.h"
 #include "Libraries/Logging/Logging.h"
-#include "Interfaces/VirtuozzoTypes.h"
+#include "Interfaces/ParallelsTypes.h"
 
 #define CASE_VALUE_TO_STRING( r ) \
     case ((unsigned int) r) : return #r ;

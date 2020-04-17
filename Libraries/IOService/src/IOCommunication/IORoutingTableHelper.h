@@ -31,7 +31,7 @@
 #include <QMutex>
 
 #include "IORoutingTable.h"
-#include "../../Interfaces/VirtuozzoNamespace.h"
+#include "../../Interfaces/ParallelsNamespace.h"
 
 namespace IOService {
 

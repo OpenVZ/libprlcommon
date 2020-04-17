@@ -1,5 +1,5 @@
 /*
- * VirtuozzoDispToDispProto.h: Implementation of Dispatcher-Dispatcher
+ * ParallelsDispToDispProto.h: Implementation of Dispatcher-Dispatcher
  * common protocol commands serializer helpers.
  *
  * Copyright (C) 1999-2016 Parallels IP Holdings GmbH
@@ -25,12 +25,12 @@
  * Schaffhausen, Switzerland.
  */
 
-#ifndef VirtuozzoDispToDispProto_H
-#define VirtuozzoDispToDispProto_H
+#ifndef ParallelsDispToDispProto_H
+#define ParallelsDispToDispProto_H
 
-#include <prlcommon/Interfaces/VirtuozzoNamespace.h>
+#include <prlcommon/Interfaces/ParallelsNamespace.h>
 
-namespace Virtuozzo
+namespace Parallels
 {
 
 /**
@@ -144,6 +144,6 @@ enum IDispToDispCommands
 #define	IS_FILE_COPY_PACKAGE(type) (((type) > FileCopyRangeStart) && ((type) < FileCopyRangeEnd))
 #define	IS_ABACKUP_PROXY_PACKAGE(type) (((type) > ABackupProxyRangeStart) && ((type) < ABackupProxyRangeEnd))
 
-}//namespace Virtuozzo
+}//namespace Parallels
 
 #endif

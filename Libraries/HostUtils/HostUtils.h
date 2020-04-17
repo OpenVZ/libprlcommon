@@ -55,12 +55,12 @@
 #include <sys/time.h>
 #endif
 
-#include "../Interfaces/VirtuozzoTypes.h"
+#include "../Interfaces/ParallelsTypes.h"
 #include <prlsdk/PrlEnums.h>
 #include <prlsdk/PrlTypes.h>
 #include <prlsdk/PrlErrors.h>
 #include "../Logging/Logging.h"
-#include "../Interfaces/VirtuozzoQt.h"
+#include "../Interfaces/ParallelsQt.h"
 
 #include <QFileInfo>
 #include <QFile>

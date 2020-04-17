@@ -1,5 +1,5 @@
 /*
- * VirtuozzoDomModel.h: Virtuozzo XML data model. This file contains
+ * ParallelsDomModel.h: Parallels XML data model. This file contains
  * various definitions and macroses, which are used for maintaining
  * of the VM XML data model.
  *
@@ -27,8 +27,8 @@
  */
 
 
-#ifndef VIRTUOZZODOMMODEL_H
-#define VIRTUOZZODOMMODEL_H
+#ifndef PARALLELSDOMMODEL_H
+#define PARALLELSDOMMODEL_H
 
 /**
  * XML parsing return codes
@@ -771,7 +771,7 @@ public:
 //
 // XML tree basic elements
 //
-#define XML_VM_CONFIG_EL_ROOT						"VirtuozzoVirtualMachine"
+#define XML_VM_CONFIG_EL_ROOT						"ParallelsVirtualMachine"
 #define XML_VM_CONFIG_EL_HARDWARE					"Hardware"
 #define XML_VM_CONFIG_EL_SETTINGS					"Settings"
 #define XML_VM_CONFIG_EL_SECURITY					"Security"
@@ -1010,14 +1010,14 @@ public:
 //
 // XML tree basic elements
 //
-#define XML_VM_DISP_EL_ROOT							"VirtuozzoPreferences"
+#define XML_VM_DISP_EL_ROOT							"ParallelsPreferences"
 #define XML_VM_DISP_EL_SETTINGS						"ServerSettings"
 #define XML_VM_DISP_EL_SERVER_PREFERS				"CommonPreferences"
 #define XML_VM_DISP_EL_USERS_PREFERS				"UsersPreferences"
 #define XML_VM_DISP_EL_WORKSPACE_PREFERS			"WorkspacePreferences"
 #define XML_VM_DISP_EL_MEMORY_PREFERS				"MemoryPreferences"
 #define XML_VM_DISP_EL_NETWORK_PREFERS				"NetworkPreferences"
-#define XML_VM_DISP_EL_USER_ITEM					"VirtuozzoUser"
+#define XML_VM_DISP_EL_USER_ITEM					"ParallelsUser"
 #define XML_VM_DISP_EL_USER_CONNECTION				"ConnectionProperties"
 #define XML_VM_DISP_EL_USER_WORKSPACE				"UserWorkspace"
 #define XML_VM_DISP_EL_USER_HOTKEYS					"Hotkeys"
@@ -1087,7 +1087,7 @@ public:
 //
 // XML tree basic elements
 //
-#define XML_VM_EVENT_EL_ROOT						"VirtuozzoEvent"
+#define XML_VM_EVENT_EL_ROOT						"ParallelsEvent"
 #define XML_VM_EVENT_EL_PARAMETERS					"EventParameters"
 #define XML_VM_EVENT_EL_PARAM						"EventParameter"
 
@@ -1110,7 +1110,7 @@ public:
 //
 // XML tree basic elements
 //
-#define XML_HOST_INFO_EL_ROOT						"VirtuozzoHostInfo"
+#define XML_HOST_INFO_EL_ROOT						"ParallelsHostInfo"
 #define XML_HOST_INFO_EL_PRINTER_GROUP				"Printers"
 #define XML_HOST_INFO_EL_PRINTER					"Printer"
 #define XML_HOST_INFO_EL_USBDEVICE_GROUP			"UsbDevices"
@@ -1176,7 +1176,7 @@ public:
 //
 // XML tree basic elements
 //
-#define XML_STATISTICS_EL_ROOT						"VirtuozzoSystemStatistics"
+#define XML_STATISTICS_EL_ROOT						"ParallelsSystemStatistics"
 #define XML_STATISTICS_EL_CPUS_GROUP			"Cpus"
 #define XML_STATISTICS_EL_CPU							"Cpu"
 #define XML_STATISTICS_EL_DISKS_GROUP			"Disks"
@@ -1237,7 +1237,7 @@ public:
 //
 // XML tree basic elements
 //
-#define XML_BUGREP_EL_ROOT							"VirtuozzoProblemReport"
+#define XML_BUGREP_EL_ROOT							"ParallelsProblemReport"
 #define XML_BUGREP_EL_PREAMBLE						"Preamble"
 #define XML_BUGREP_EL_TYPE							"Type"
 #define XML_BUGREP_EL_SERVER_VER					"ServerVersion"
@@ -1341,7 +1341,7 @@ public:
  * Client Preferences XML model
  */
 
-#define XML_PREFS_EL_ROOT		"VirtuozzoClientPreferences"
+#define XML_PREFS_EL_ROOT		"ParallelsClientPreferences"
 #define XML_VM_DISP_EL_HOTKEY_GENERIC				"HotkeyCombination"
 #define XML_VM_DISP_EL_ANIMATION						"Animation"
 #define XML_VM_DISP_EL_PRESENTATION					"Presentation"
@@ -1376,15 +1376,15 @@ public:
 #define XML_VM_DISP_ND_NUMENTER_TO_ALTGR			"TranslateNumEnterToAltGr"
 
 /**
- * Virtuozzo Updater XML model
+ * Parallels Updater XML model
  */
 
 //
 // XML tree basic elements
 //
-#define XML_UPD_UPDATER_CONFIG_EL_ROOT		"VirtuozzoUpdaterConfig"
+#define XML_UPD_UPDATER_CONFIG_EL_ROOT		"ParallelsUpdaterConfig"
 #define XML_UPD_UPDATER_CONFIG_EL_AUTO		"AutomaticUpdate"
-#define XML_UPD_UPDATES_EL_ROOT					"VirtuozzoUpdates"
+#define XML_UPD_UPDATES_EL_ROOT					"ParallelsUpdates"
 #define XML_UPD_UPDATES_EL_PRODUCT				"Product"
 #define XML_UPD_UPDATES_EL_PRODUCT_VER		"Version"
 #define XML_UPD_UPDATES_EL_LOCALE					"Locale"
@@ -2206,4 +2206,4 @@ public:
 #define EVT_PARAM_VCMMD_CONFIG_FIELD				"vcmmd_config_field"
 #define EVT_PARAM_VCMMD_CONFIG_VALUE				"vcmmd_config_value"
 
-#endif // VIRTUOZZODOMMODEL_H
+#endif // PARALLELSDOMMODEL_H

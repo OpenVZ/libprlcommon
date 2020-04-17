@@ -30,7 +30,7 @@
 #define COMMAND_CONV_HELPER_H
 
 #include "PrlStringifyConsts.h"
-#include "../Interfaces/VirtuozzoNamespace.h"
+#include "../Interfaces/ParallelsNamespace.h"
 #include <prlsdk/PrlEnums.h>
 
 /**

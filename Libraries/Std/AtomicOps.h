@@ -33,7 +33,7 @@
 #ifndef ATOMICOPS_H_INCLUDED
 #define ATOMICOPS_H_INCLUDED
 
-#include "../Interfaces/VirtuozzoTypes.h"
+#include "../Interfaces/ParallelsTypes.h"
 #include "MemBarrier.h"
 
 //

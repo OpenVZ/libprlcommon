@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 ///
-/// @file VirtuozzoSDKPrivate.h
+/// @file ParallelsSDKPrivate.h
 ///
 /// @brief Private internal constants with used by SDK
 ///
@@ -33,8 +33,8 @@
 ///
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef __VIRTUOZZO_SDK_PRIVATE__
-#define __VIRTUOZZO_SDK_PRIVATE__
+#ifndef __PARALLELS_SDK_PRIVATE__
+#define __PARALLELS_SDK_PRIVATE__
 
 #include <prlsdk/PrlOses.h>
 
@@ -71,5 +71,5 @@ static inline int PVS_GUEST_SCSI_LSI_SAS_SUPPORTED(unsigned int nVersion)
 	return nVersion >= PVS_GUEST_VER_WIN_VISTA && nVersion <= PVS_GUEST_VER_WIN_LAST;
 }
 
-#endif // __VIRTUOZZO_SDK_PRIVATE__
+#endif // __PARALLELS_SDK_PRIVATE__
 

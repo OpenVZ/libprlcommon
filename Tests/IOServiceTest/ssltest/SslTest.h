@@ -2,7 +2,7 @@
 ///
 ///	@file IOTCPControlBlockStatTest.h
 ///
-///	This file is the part of Virtuozzo IO service tests suite.
+///	This file is the part of Parallels IO service tests suite.
 ///	Tests ssl helper library
 ///
 ///	@author ipasechnik

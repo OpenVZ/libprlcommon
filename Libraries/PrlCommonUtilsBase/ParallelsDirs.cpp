@@ -1,5 +1,5 @@
 /*
- * VirtuozzoDirs.cpp: Helper class for getting default virtuozzo
+ * ParallelsDirs.cpp: Helper class for getting default parallels
  * configs locations.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
@@ -25,19 +25,19 @@
  * Schaffhausen, Switzerland.
  */
 
-#include "VirtuozzoDirs.h"
-#include "VirtuozzoQt.h"
+#include "ParallelsDirs.h"
+#include "ParallelsQt.h"
 
 #include "Libraries/Logging/Logging.h"
 #include "Libraries/HostUtils/HostUtils.h"
-#include "Interfaces/VirtuozzoTypes.h"
+#include "Interfaces/ParallelsTypes.h"
 #include <prlsdk/PrlOses.h>
 #include "Libraries/PrlCommonUtilsBase/Common.h"
 #include "Libraries/Std/PrlAssert.h"
 
 #include "CommandLine.h"
 #include "OsInfo.h"
-#include "VirtuozzoDirsDefs.h"
+#include "ParallelsDirsDefs.h"
 
 #include <QCoreApplication>
 #include <QFileInfo>
@@ -61,37 +61,37 @@
 #include <sys/stat.h>
 
 
-PRL_APPLICATION_MODE VirtuozzoDirs::ms_nApplicationMode =  PAM_UNKNOWN;
-VirtuozzoDirs::InitOptions VirtuozzoDirs::ms_nInitOptions = VirtuozzoDirs::smNormalMode;
-bool VirtuozzoDirs::ms_bAppModeInited =  false;
+PRL_APPLICATION_MODE ParallelsDirs::ms_nApplicationMode =  PAM_UNKNOWN;
+ParallelsDirs::InitOptions ParallelsDirs::ms_nInitOptions = ParallelsDirs::smNormalMode;
+bool ParallelsDirs::ms_bAppModeInited =  false;
 
 namespace
 {
-	const char g_strVirtuozzoDirName[] = "vz";
+	const char g_strParallelsDirName[] = "vz";
 }
 
-VirtuozzoDirs::UserInfo::UserInfo()
+ParallelsDirs::UserInfo::UserInfo()
 {
 }
 
-VirtuozzoDirs::UserInfo::UserInfo(const QString& userName, const QString& homePath)
+ParallelsDirs::UserInfo::UserInfo(const QString& userName, const QString& homePath)
 : m_userName(userName),
   m_homePath( homePath )
 {
 }
 
-bool VirtuozzoDirs::UserInfo::isValid()  const
+bool ParallelsDirs::UserInfo::isValid()  const
 {
 	return !m_userName.isEmpty();
 }
 
-VirtuozzoDirs::UserInfo::UserInfo( const VirtuozzoDirs::UserInfo& ui)
+ParallelsDirs::UserInfo::UserInfo( const ParallelsDirs::UserInfo& ui)
 {
 		m_userName = ui.m_userName;
 		m_homePath = ui.m_homePath;
 }
 
-VirtuozzoDirs::UserInfo& VirtuozzoDirs::UserInfo::operator=( const VirtuozzoDirs::UserInfo& ui )
+ParallelsDirs::UserInfo& ParallelsDirs::UserInfo::operator=( const ParallelsDirs::UserInfo& ui )
 {
 	if( &ui == this )
 		return *this;
@@ -102,13 +102,13 @@ VirtuozzoDirs::UserInfo& VirtuozzoDirs::UserInfo::operator=( const VirtuozzoDirs
 	return *this;
 }
 
-void VirtuozzoDirs::UserInfo::printUserInfo()
+void ParallelsDirs::UserInfo::printUserInfo()
 {
 	WRITE_TRACE( DBG_WARNING, "User with home path %s",
 					QSTR2UTF8( m_homePath ) );
 }
 
-QString VirtuozzoDirs::getConfigScriptsDir()
+QString ParallelsDirs::getConfigScriptsDir()
 {
     PRL_APPLICATION_MODE appMode = getAppExecuteMode();
     QString folder;
@@ -122,7 +122,7 @@ QString VirtuozzoDirs::getConfigScriptsDir()
     return QDir::toNativeSeparators(getDispatcherConfigDir() + '/' + folder);
 }
 
-QString VirtuozzoDirs::getDispatcherConfigDir()
+QString ParallelsDirs::getDispatcherConfigDir()
 {
 	//Lin: /etc/vz
 
@@ -140,14 +140,14 @@ QString VirtuozzoDirs::getDispatcherConfigDir()
 
 		path="/etc/";
 
-		path+=UTF8_2QSTR(g_strVirtuozzoDirName);
+		path+=UTF8_2QSTR(g_strParallelsDirName);
 
 		path=QDir::fromNativeSeparators(path);
 	}while(0);
 	return path;
 }
 
-QString VirtuozzoDirs::getDispatcherConfigFilePath()
+QString ParallelsDirs::getDispatcherConfigFilePath()
 {
 	QString fName;
 
@@ -172,7 +172,7 @@ QString VirtuozzoDirs::getDispatcherConfigFilePath()
 	return strDispConfigFile;
 }
 
-QString VirtuozzoDirs::getDispatcherVmCatalogueFilePath()
+QString ParallelsDirs::getDispatcherVmCatalogueFilePath()
 {
 	QString fName;
 
@@ -193,16 +193,16 @@ QString VirtuozzoDirs::getDispatcherVmCatalogueFilePath()
 	return path;
 }
 
-QString VirtuozzoDirs::getLicensesFilePath()
+QString ParallelsDirs::getLicensesFilePath()
 {
 	QString strLicensesFilePath = QString( "%1/%2" ).
 		arg( getDispatcherConfigDir() ).
-		arg( VIRTUOZZO_LICENSES_XML_FILE );
+		arg( PARALLELS_LICENSES_XML_FILE );
 
 	return strLicensesFilePath;
 }
 
-QString VirtuozzoDirs::getNetworkConfigFilePath( PRL_APPLICATION_MODE appMode )
+QString ParallelsDirs::getNetworkConfigFilePath( PRL_APPLICATION_MODE appMode )
 {
 	QString fName;
 	switch( appMode )
@@ -223,7 +223,7 @@ QString VirtuozzoDirs::getNetworkConfigFilePath( PRL_APPLICATION_MODE appMode )
 }
 
 
-QString VirtuozzoDirs::getNetworkConfigFilePath()
+QString ParallelsDirs::getNetworkConfigFilePath()
 {
 	PRL_APPLICATION_MODE appMode = getAppExecuteMode();
 	QString path = getNetworkConfigFilePath( appMode );
@@ -241,7 +241,7 @@ QString VirtuozzoDirs::getNetworkConfigFilePath()
 	return path;
 }
 
-QString VirtuozzoDirs::getCallerUserPreferencesDir()
+QString ParallelsDirs::getCallerUserPreferencesDir()
 {
 //Lin: $HOME/.vz
 
@@ -259,27 +259,27 @@ QString VirtuozzoDirs::getCallerUserPreferencesDir()
 		//get home
 		path=UTF8_2QSTR(pPswd->pw_dir);
 		path+="/";
-		path+= QString(".") + UTF8_2QSTR(g_strVirtuozzoDirName);
+		path+= QString(".") + UTF8_2QSTR(g_strParallelsDirName);
 		path=QDir::fromNativeSeparators(path);
 
 	}while(0);
 	return path;
 }
 
-QString VirtuozzoDirs::getUserDefaultVmCatalogue(const VirtuozzoDirs::UserInfo*pUserInfo)
+QString ParallelsDirs::getUserDefaultVmCatalogue(const ParallelsDirs::UserInfo*pUserInfo)
 {
 	return getDefaultVmCatalogue(pUserInfo);
 }
 
 
-QString VirtuozzoDirs::getCommonDefaultVmCatalogue()
+QString ParallelsDirs::getCommonDefaultVmCatalogue()
 {
 	// Call PRIVATE METHOD. THAT SUPPORT ONLY SERVER or DESKTOP mode.
 	return getDefaultVmCatalogue(0);
 
 }
 
-QString VirtuozzoDirs::getUserHomePath(const VirtuozzoDirs::UserInfo* pUserInfo)
+QString ParallelsDirs::getUserHomePath(const ParallelsDirs::UserInfo* pUserInfo)
 {
 	if ( ! pUserInfo || ! pUserInfo->isValid() )
 		return "";
@@ -287,8 +287,8 @@ QString VirtuozzoDirs::getUserHomePath(const VirtuozzoDirs::UserInfo* pUserInfo)
 	return pUserInfo->m_homePath;
 }
 
-QString VirtuozzoDirs::getDefaultVmCatalogue(
-	const VirtuozzoDirs::UserInfo* pUserInfo
+QString ParallelsDirs::getDefaultVmCatalogue(
+	const ParallelsDirs::UserInfo* pUserInfo
 	)
 {
 //Lin:
@@ -324,7 +324,7 @@ QString VirtuozzoDirs::getDefaultVmCatalogue(
 					break;
 				}
 				path=UTF8_2QSTR(pwd->pw_dir);//home dir
-				path+=QString("/")+ UTF8_2QSTR(g_strVirtuozzoDirName);
+				path+=QString("/")+ UTF8_2QSTR(g_strParallelsDirName);
 			}
 
 		}
@@ -335,31 +335,31 @@ QString VirtuozzoDirs::getDefaultVmCatalogue(
 	return path;
 }
 
-QString VirtuozzoDirs::getVirtuozzoApplicationDir()
+QString ParallelsDirs::getParallelsApplicationDir()
 {
-	QString sVirtuozzoInstallDir = Prl::getenvU(PVS_VM_EXECUTABLE_ENV);
-	if( sVirtuozzoInstallDir.isEmpty() )
+	QString sParallelsInstallDir = Prl::getenvU(PVS_VM_EXECUTABLE_ENV);
+	if( sParallelsInstallDir.isEmpty() )
 	{
-		sVirtuozzoInstallDir = QCoreApplication::applicationDirPath();
+		sParallelsInstallDir = QCoreApplication::applicationDirPath();
 	}
-	return sVirtuozzoInstallDir;
+	return sParallelsInstallDir;
 }
 
 
-QString VirtuozzoDirs::getVirtuozzoScriptsDir()
+QString ParallelsDirs::getParallelsScriptsDir()
 {
-	QString sVirtuozzoScriptsDir = Prl::getenvU(PVS_VM_SCRIPTS_ENV);
-	if( sVirtuozzoScriptsDir.isEmpty() )
+	QString sParallelsScriptsDir = Prl::getenvU(PVS_VM_SCRIPTS_ENV);
+	if( sParallelsScriptsDir.isEmpty() )
 	{
 		QDir dir(QCoreApplication::applicationDirPath());
 		dir.cd("scripts");
-		sVirtuozzoScriptsDir = dir.absolutePath();
+		sParallelsScriptsDir = dir.absolutePath();
 	}
-	return sVirtuozzoScriptsDir;
+	return sParallelsScriptsDir;
 }
 
 
-QString VirtuozzoDirs::getVirtuozzoDriversDir()
+QString ParallelsDirs::getParallelsDriversDir()
 {
 	QString currDir = QCoreApplication::applicationDirPath();
 
@@ -396,7 +396,7 @@ QString VirtuozzoDirs::getVirtuozzoDriversDir()
 
 
 // returns true if we are runt under developers build environment
-bool VirtuozzoDirs::isDevelopersBuild()
+bool ParallelsDirs::isDevelopersBuild()
 {
 	static bool s_bBuildModeInitialized = false;
 	static bool s_bDevelopersBuild = false;
@@ -416,58 +416,58 @@ bool VirtuozzoDirs::isDevelopersBuild()
 	return s_bDevelopersBuild;
 }
 
-QString VirtuozzoDirs::getSystemTempDir()
+QString ParallelsDirs::getSystemTempDir()
 {
 	return "/vz/tmp";
 }
 
-QString VirtuozzoDirs::getCurrentUserTempDir()
+QString ParallelsDirs::getCurrentUserTempDir()
 {
-	return VirtuozzoDirs::getSystemTempDir();
+	return ParallelsDirs::getSystemTempDir();
 }
 
 // get Mapping applications directory -
 // in this directory associations with Guest windows application stored
-QString VirtuozzoDirs::getMappingApplicationsDir(const QString & strVmHomeDir)
+QString ParallelsDirs::getMappingApplicationsDir(const QString & strVmHomeDir)
 {
 	return strVmHomeDir + "/" + QObject::tr(VM_GENERATED_WINDOWS_APPLICATION_DIR);
 }
 
 // get Mapping Disks directory -
 // in this directory associations with Guest disks stored
-QString VirtuozzoDirs::getMappingDisksDir(const QString & strVmHomeDir)
+QString ParallelsDirs::getMappingDisksDir(const QString & strVmHomeDir)
 {
 	return strVmHomeDir + "/" + QObject::tr(VM_GENERATED_WINDOWS_WIN_DISKS_DIR);
 }
 
 // get Snapshots directory -
 // in this directory Snapshot storage present
-QString VirtuozzoDirs::getSnapshotsDir(const QString & strVmHomeDir)
+QString ParallelsDirs::getSnapshotsDir(const QString & strVmHomeDir)
 {
 	return strVmHomeDir + "/" + QObject::tr(VM_GENERATED_WINDOWS_SNAPSHOTS_DIR);
 }
 
 // get Guest Crash Dumps directory -
 // in this directory guest crash dumps stored
-QString VirtuozzoDirs::getVmGuestCrashDumpsDir(const QString & strVmHomeDir)
+QString ParallelsDirs::getVmGuestCrashDumpsDir(const QString & strVmHomeDir)
 {
 	return strVmHomeDir + "/" + VM_GENERATED_GUEST_CRASH_DUMPS_DIR;
 }
 
 // get full path to VmInfo file for VM with [strVmHomeDir] home path
-QString VirtuozzoDirs::getVmInfoPath(const QString & strVmHomeDir)
+QString ParallelsDirs::getVmInfoPath(const QString & strVmHomeDir)
 {
 	return strVmHomeDir + "/" + VM_INFO_FILE_NAME;
 }
 
-// get Virtuozzo application directory
-QString VirtuozzoDirs::getVirtuozzoDirName()
+// get Parallels application directory
+QString ParallelsDirs::getParallelsDirName()
 {
-	return QString(g_strVirtuozzoDirName);
+	return QString(g_strParallelsDirName);
 }
 
-// get base path to Virtuozzo Tools .iso image
-QString VirtuozzoDirs::getToolsBaseImagePath(PRL_APPLICATION_MODE mode)
+// get base path to Parallels Tools .iso image
+QString ParallelsDirs::getToolsBaseImagePath(PRL_APPLICATION_MODE mode)
 {
 	QString path;
 
@@ -476,7 +476,7 @@ QString VirtuozzoDirs::getToolsBaseImagePath(PRL_APPLICATION_MODE mode)
 	return path;
 }
 
-QString VirtuozzoDirs::getToolsImage(PRL_APPLICATION_MODE mode, unsigned int nOsVersion)
+QString ParallelsDirs::getToolsImage(PRL_APPLICATION_MODE mode, unsigned int nOsVersion)
 {
 	QString qsFileName;
 	if (IS_WINDOWS(nOsVersion) && (nOsVersion >= PVS_GUEST_VER_WIN_2K))
@@ -504,7 +504,7 @@ QString VirtuozzoDirs::getToolsImage(PRL_APPLICATION_MODE mode, unsigned int nOs
 	return qsToolsImage;
 }
 
-QString VirtuozzoDirs::getToolsTarGz(PRL_APPLICATION_MODE mode, unsigned int nOsVersion)
+QString ParallelsDirs::getToolsTarGz(PRL_APPLICATION_MODE mode, unsigned int nOsVersion)
 {
 	QString qsFileName;
 	if (IS_WINDOWS(nOsVersion) && (nOsVersion >= PVS_GUEST_VER_WIN_2K))
@@ -532,7 +532,7 @@ QString VirtuozzoDirs::getToolsTarGz(PRL_APPLICATION_MODE mode, unsigned int nOs
 	return qsToolsImage;
 }
 
-QString VirtuozzoDirs::getToolsInstallerName(unsigned int nOsVersion)
+QString ParallelsDirs::getToolsInstallerName(unsigned int nOsVersion)
 {
 	QString qsFileName;
 	if (IS_WINDOWS(nOsVersion) && (nOsVersion >= PVS_GUEST_VER_WIN_2K))
@@ -551,19 +551,19 @@ QString VirtuozzoDirs::getToolsInstallerName(unsigned int nOsVersion)
 	return qsFileName;
 }
 
-// get base fil name of .fdd Virtuozzo Tools
-QString VirtuozzoDirs::getFddToolsImageBaseName( unsigned int uGuestOsType )
+// get base fil name of .fdd Parallels Tools
+QString ParallelsDirs::getFddToolsImageBaseName( unsigned int uGuestOsType )
 {
 	if (uGuestOsType == PVS_GUEST_TYPE_OS2)
 		return "vz-guest-tools-os2.fdd";
 	else
 		return "";
 }
-// get full path to .fdd with Virtuozzo Tools
-QString VirtuozzoDirs::getFddToolsImage( PRL_APPLICATION_MODE mode, unsigned int uGuestOsType )
+// get full path to .fdd with Parallels Tools
+QString ParallelsDirs::getFddToolsImage( PRL_APPLICATION_MODE mode, unsigned int uGuestOsType )
 {
 	if (uGuestOsType == PVS_GUEST_TYPE_OS2 )
-		return getToolsBaseImagePath(mode) + VirtuozzoDirs::getFddToolsImageBaseName( uGuestOsType );
+		return getToolsBaseImagePath(mode) + ParallelsDirs::getFddToolsImageBaseName( uGuestOsType );
 	else
 		return "";
 }
@@ -594,7 +594,7 @@ static const char* getShortWinVersion(unsigned int osVersion_)
 	return "";
 }
 
-QString VirtuozzoDirs::getWindowsUnattendedFloppy(unsigned int osVersion_)
+QString ParallelsDirs::getWindowsUnattendedFloppy(unsigned int osVersion_)
 {
 	PRL_ASSERT(IS_WINDOWS(osVersion_));
 
@@ -631,32 +631,32 @@ namespace{
 
 } // namespace
 
-QString VirtuozzoDirs::getCrashDumpsPath()
+QString ParallelsDirs::getCrashDumpsPath()
 {
 	return getSystemTempDir() + "/vz_crash_dumps";
 }
 
-QString VirtuozzoDirs::getSystemLogPath()
+QString ParallelsDirs::getSystemLogPath()
 {
 	return QString("%1/%2").arg(UTF8_2QSTR(GetDefaultLogFilePath()))
 						   .arg(GetProdDefaultLogFileName());
 }
 
-QString VirtuozzoDirs::getDefaultSystemLogPath(PRL_APPLICATION_MODE)
+QString ParallelsDirs::getDefaultSystemLogPath(PRL_APPLICATION_MODE)
 {
 	QString fileName = PRL_LOG_FILE_NAME_DEFAULT;
 	return QString("%1/%2").arg(UTF8_2QSTR(GetDefaultLogFilePath()))
 						   .arg(fileName);
 }
 
-QString VirtuozzoDirs::getClientLogPath()
+QString ParallelsDirs::getClientLogPath()
 {
 	return QString("%1/%2").arg(UTF8_2QSTR(GetUserHomeDir()))
 						   .arg(GetProdDefaultLogFileName());
 }
 
 // get for currently logged user home path
-QString VirtuozzoDirs::getCurrentUserHomeDir()
+QString ParallelsDirs::getCurrentUserHomeDir()
 {
 	//Lin: $HOME
 
@@ -679,8 +679,8 @@ QString VirtuozzoDirs::getCurrentUserHomeDir()
 	return path;
 }
 
-// get full path to .iso with Virtuozzo Tools
-QString VirtuozzoDirs::getToolsFileName(unsigned int uGuestOsType)
+// get full path to .iso with Parallels Tools
+QString ParallelsDirs::getToolsFileName(unsigned int uGuestOsType)
 {
 	QString strToolsPath;
 
@@ -700,15 +700,15 @@ QString VirtuozzoDirs::getToolsFileName(unsigned int uGuestOsType)
 	return strToolsPath;
 }
 
-QString VirtuozzoDirs::getPathToDispatcherTesterConfig()
+QString ParallelsDirs::getPathToDispatcherTesterConfig()
 {
 	return QString( "%1/%2" )
 		.arg( getDispatcherConfigDir())
 		.arg( "dispatcher.tester.conf" );
 }
 
-QPair<PRL_APPLICATION_MODE, VirtuozzoDirs::InitOptions>
-	VirtuozzoDirs::loadAppExecuteMode( const QString& appPath )
+QPair<PRL_APPLICATION_MODE, ParallelsDirs::InitOptions>
+	ParallelsDirs::loadAppExecuteMode( const QString& appPath )
 {
 	QFile fAppMode( appPath + ".params" );
 	if( ! fAppMode.open( QIODevice::ReadOnly ) )
@@ -739,25 +739,25 @@ QPair<PRL_APPLICATION_MODE, VirtuozzoDirs::InitOptions>
 	return qMakePair(mode, subMode);
 }
 
-PRL_APPLICATION_MODE VirtuozzoDirs::getBuildExecutionMode()
+PRL_APPLICATION_MODE ParallelsDirs::getBuildExecutionMode()
 {
 	PRL_APPLICATION_MODE mode = PAM_SERVER;
 	return mode;
 }
 
-QString VirtuozzoDirs::getDefaultBackupDir()
+QString ParallelsDirs::getDefaultBackupDir()
 {
-	QString sVirtuozzoBackupDir = getCommonDefaultVmCatalogue();
-	sVirtuozzoBackupDir += "/backups";
-	return sVirtuozzoBackupDir;
+	QString sParallelsBackupDir = getCommonDefaultVmCatalogue();
+	sParallelsBackupDir += "/backups";
+	return sParallelsBackupDir;
 }
 
-QString VirtuozzoDirs::getDefaultPramPath()
+QString ParallelsDirs::getDefaultPramPath()
 {
 	return "/mnt/pram_vms";
 }
 
-QString VirtuozzoDirs::getAppGuiName( PRL_APPLICATION_MODE nAppMode )
+QString ParallelsDirs::getAppGuiName( PRL_APPLICATION_MODE nAppMode )
 {
 	switch (nAppMode)
 	{
@@ -766,21 +766,21 @@ QString VirtuozzoDirs::getAppGuiName( PRL_APPLICATION_MODE nAppMode )
 	}
 }
 
-QString	VirtuozzoDirs::getAppSwitcherAppName()
+QString	ParallelsDirs::getAppSwitcherAppName()
 {
 	return PRL_APP_SWITCHER_NAME;
 }
 
-QString VirtuozzoDirs::getLearnVideoAppName()
+QString ParallelsDirs::getLearnVideoAppName()
 {
 	return PRL_APP_LEARN_VIDEO_NAME;
 }
 
 #define VM_SWAP_SUBDIR	"swap"
 
-QString VirtuozzoDirs::getDefaultSwapPathForVMOnNetworkShares()
+QString ParallelsDirs::getDefaultSwapPathForVMOnNetworkShares()
 {
-	QString sqSwapPath = QString("/var/.") + UTF8_2QSTR(g_strVirtuozzoDirName)  +
+	QString sqSwapPath = QString("/var/.") + UTF8_2QSTR(g_strParallelsDirName)  +
 						 QString("_") + QString(VM_SWAP_SUBDIR);
 
 	return sqSwapPath;
@@ -788,7 +788,7 @@ QString VirtuozzoDirs::getDefaultSwapPathForVMOnNetworkShares()
 
 
 // Get Installation log file path
-QStringList VirtuozzoDirs::getInstallationLogFilePaths()
+QStringList ParallelsDirs::getInstallationLogFilePaths()
 {
 	QStringList lstPathes;
 
@@ -814,12 +814,12 @@ static QString getLocalUnixSocketFileName()
 	return "prl_disp_service.socket";
 }
 
-QString VirtuozzoDirs::getDispatcherLocalSocketPath()
+QString ParallelsDirs::getDispatcherLocalSocketPath()
 {
 	return getIPCPath(getLocalUnixSocketFileName(), "UnixSockPath");
 }
 
-QString VirtuozzoDirs::getIPCPath( const QString& fileName, const QString& humanName)
+QString ParallelsDirs::getIPCPath( const QString& fileName, const QString& humanName)
 {
 	QString path;
 	path = QString( "/var/run/%1" ).arg(fileName);
@@ -838,7 +838,7 @@ parameters are:
 - dispatcher's swap path for shared Vm
 - use dispatcher's swap path for shared Vm by default
 */
-QString VirtuozzoDirs::getVmMemoryFileLocation(
+QString ParallelsDirs::getVmMemoryFileLocation(
 		const QString &sVmUuid,
 		const QString &sVmHomeDir,
 		const QString &sSwapDir,
@@ -875,7 +875,7 @@ QString VirtuozzoDirs::getVmMemoryFileLocation(
 }
 
 
-QString VirtuozzoDirs::getVmAppPath(bool bX64)
+QString ParallelsDirs::getVmAppPath(bool bX64)
 {
 	QString strVmExecutableDir = UTF8_2QSTR(getenv(PVS_VM_EXECUTABLE_ENV));
 
@@ -889,7 +889,7 @@ QString VirtuozzoDirs::getVmAppPath(bool bX64)
 	return strVmExecutableDir + (bX64 ? VM_EXECUTABLE64 : VM_EXECUTABLE);
 }
 
-QString VirtuozzoDirs::getVmStarterPath()
+QString ParallelsDirs::getVmStarterPath()
 {
 	QString strVmExecutableDir;
 
@@ -899,7 +899,7 @@ QString VirtuozzoDirs::getVmStarterPath()
 }
 
 
-QString VirtuozzoDirs::getConvertToolPath( const QDir& baseDir )
+QString ParallelsDirs::getConvertToolPath( const QDir& baseDir )
 {
 	QString sConvertToolPath = CONVERT_TOOL_EXECUTABLE;
 	if ( !QFile::exists( sConvertToolPath ) )//Might we have a deal with developer's build?
@@ -907,7 +907,7 @@ QString VirtuozzoDirs::getConvertToolPath( const QDir& baseDir )
 	return baseDir.absoluteFilePath( sConvertToolPath );
 }
 
-QString VirtuozzoDirs::getDiskToolPath( const QDir& baseDir )
+QString ParallelsDirs::getDiskToolPath( const QDir& baseDir )
 {
 	QString sDiskToolPath = DISK_TOOL_EXECUTABLE;
 	if ( !QFile::exists( sDiskToolPath ) )//Might we have a deal with developer's build?
@@ -915,7 +915,7 @@ QString VirtuozzoDirs::getDiskToolPath( const QDir& baseDir )
 	return baseDir.absoluteFilePath( sDiskToolPath );
 }
 
-QString VirtuozzoDirs::getVmScriptsDir(const QString &sBaseDir)
+QString ParallelsDirs::getVmScriptsDir(const QString &sBaseDir)
 {
 	PRL_ASSERT( !sBaseDir.isEmpty() );
 	if( sBaseDir.isEmpty() )
@@ -923,7 +923,7 @@ QString VirtuozzoDirs::getVmScriptsDir(const QString &sBaseDir)
 	return sBaseDir + "/scripts";
 }
 
-QString VirtuozzoDirs::getVmActionScriptPath(const QString &sBaseDir, PRL_VM_ACTION nAction)
+QString ParallelsDirs::getVmActionScriptPath(const QString &sBaseDir, PRL_VM_ACTION nAction)
 {
 	PRL_ASSERT( !sBaseDir.isEmpty() );
 	if( sBaseDir.isEmpty() )
@@ -943,7 +943,7 @@ QString VirtuozzoDirs::getVmActionScriptPath(const QString &sBaseDir, PRL_VM_ACT
 	return QString();
 }
 
-QString VirtuozzoDirs::getVmConfigurationSamplePath(const QString &sName)
+QString ParallelsDirs::getVmConfigurationSamplePath(const QString &sName)
 {
 	QString sPath = QString( "%1/samples/%2.pvs" ).
 		arg( getDispatcherConfigDir() ).
@@ -952,7 +952,7 @@ QString VirtuozzoDirs::getVmConfigurationSamplePath(const QString &sName)
 	return sPath;
 }
 
-QString VirtuozzoDirs::getServiceAppName()
+QString ParallelsDirs::getServiceAppName()
 {
 	return DISPATCHER_SERVICE_COMMON_NAME;
 }

@@ -1,5 +1,5 @@
 /*
- * CommandLine.cpp: Base Virtuozzo types declarations.
+ * CommandLine.cpp: Base Parallels types declarations.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
  * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
@@ -28,7 +28,7 @@
 #include "CommandLine.h"
 #include <QRegExp>
 
-#include "Interfaces/VirtuozzoQt.h"
+#include "Interfaces/ParallelsQt.h"
 #include "Libraries/Logging/Logging.h"
 
 #ifdef _WIN_

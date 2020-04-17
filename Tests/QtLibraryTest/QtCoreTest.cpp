@@ -43,7 +43,7 @@
 #include <QDateTime>
 #include <stdio.h>
 
-#include "Interfaces/VirtuozzoQt.h"
+#include "Interfaces/ParallelsQt.h"
 
 #include "Libraries/Logging/Logging.h"
 #include "Libraries/Std/PrlAssert.h"

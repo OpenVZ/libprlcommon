@@ -28,7 +28,7 @@
 #ifndef IOPROTOCOLCOMMON_H
 #define IOPROTOCOLCOMMON_H
 
-#include "../../Interfaces/VirtuozzoTypes.h"
+#include "../../Interfaces/ParallelsTypes.h"
 
 namespace IOService
 {

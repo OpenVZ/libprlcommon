@@ -1,5 +1,5 @@
 /*
- * VirtuozzoCompiler.h: There are some "generic" compiler-specific
+ * ParallelsCompiler.h: There are some "generic" compiler-specific
  * options that are useful to keep in one place to re-use and
  * disable when time comes.
  *
@@ -28,8 +28,8 @@
 
 
 
-#ifndef __VIRTUOZZO_COMPILER_H__
-#define __VIRTUOZZO_COMPILER_H__
+#ifndef __PARALLELS_COMPILER_H__
+#define __PARALLELS_COMPILER_H__
 
 #ifdef __INTEL_COMPILER
 
@@ -66,4 +66,4 @@
 #define SUPPORT_ASM_GCC
 #endif
 
-#endif // __VIRTUOZZO_COMPILER_H__
+#endif // __PARALLELS_COMPILER_H__

@@ -28,7 +28,7 @@
 
 #include "CPrlStringDataSerializer.h"
 
-#include "Interfaces/VirtuozzoQt.h"
+#include "Interfaces/ParallelsQt.h"
 #include "Libraries/Logging/Logging.h"
 
 CPrlStringDataSerializer::CPrlStringDataSerializer(QString &sData)

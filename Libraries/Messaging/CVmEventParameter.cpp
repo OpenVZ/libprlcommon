@@ -526,7 +526,7 @@ int CVmEventParameter::readXml(QDomElement* RootElement, QString ext_tag_name, b
 	tag_name = RootElement->tagName();
 	m_qsTagName = tag_name;
 	m_qsExtRootTagName = ext_tag_name;
-	if (eqName(tag_name, (ext_tag_name.isEmpty() ? QString("EventParameter") : ext_tag_name), true))
+	if (tag_name != (ext_tag_name.isEmpty() ? QString("EventParameter") : ext_tag_name))
 	{
 		m_qsErrorMessage = "Error in class 'CVmEventParameter': wrong root element with tag name '" + tag_name + "'";
 		return PRL_ERR_PARSE_VM_CONFIG;
@@ -582,7 +582,7 @@ int CVmEventParameter::readXml(QDomElement* RootElement, QString ext_tag_name, b
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "IsList"))
+		else if (tag_name == "IsList")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -613,7 +613,7 @@ int CVmEventParameter::readXml(QDomElement* RootElement, QString ext_tag_name, b
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "Name"))
+		else if (tag_name == "Name")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -644,7 +644,7 @@ int CVmEventParameter::readXml(QDomElement* RootElement, QString ext_tag_name, b
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "Type"))
+		else if (tag_name == "Type")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -675,7 +675,7 @@ int CVmEventParameter::readXml(QDomElement* RootElement, QString ext_tag_name, b
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "Value"))
+		else if (tag_name == "Value")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -706,7 +706,7 @@ int CVmEventParameter::readXml(QDomElement* RootElement, QString ext_tag_name, b
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "Data"))
+		else if (tag_name == "Data")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -720,7 +720,7 @@ int CVmEventParameter::readXml(QDomElement* RootElement, QString ext_tag_name, b
 		}
 
 
-		if (eqName(tag_name, "Value") && Values_count > 0)
+		if (tag_name == "Value" && Values_count > 0)
 		{
 			unused_tag = false;
 			CVmEventValue* object = m_lstValues[1 - Values_count];

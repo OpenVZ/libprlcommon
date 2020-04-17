@@ -39,11 +39,11 @@
 #include <QDateTime>
 
 #include "Build/Current.ver"
-#include "VirtuozzoQt.h"
-#include "VirtuozzoDomModel.h"
+#include "ParallelsQt.h"
+#include "ParallelsDomModel.h"
 #include "CommonTestsUtils.h"
 #include "Libraries/PrlCommonUtilsBase/CommandLine.h"
-#include "Libraries/PrlCommonUtilsBase/VirtuozzoDirs.h"
+#include "Libraries/PrlCommonUtilsBase/ParallelsDirs.h"
 #include "Libraries/Logging/Logging.h"
 
 #include "Libraries/Std/PrlAssert.h"
@@ -69,7 +69,7 @@ namespace {
 PRL_APPLICATION_MODE TestConfig::g_executeMode = PAM_UNKNOWN;
 bool TestConfig::g_CtMode = false;
 namespace{
-	VirtuozzoDirs::InitOptions g_nInitOptions	= 0;
+	ParallelsDirs::InitOptions g_nInitOptions	= 0;
 }
 
 
@@ -80,12 +80,12 @@ TestConfig::InitRandom::InitRandom()
 
 void TestConfig::readTestParameters()
 {
-	TestConfig::g_executeMode = VirtuozzoDirs::getBuildExecutionMode();
+	TestConfig::g_executeMode = ParallelsDirs::getBuildExecutionMode();
 	if( PAM_UNKNOWN != TestConfig::g_executeMode )
 	{
 		WRITE_TRACE(DBG_INFO, "Run in execute mode: %s",
-				VirtuozzoDirs::getAppExecuteModeAsCString( TestConfig::g_executeMode ) );
-		PRL_ASSERT( VirtuozzoDirs::Init( TestConfig::g_executeMode, g_nInitOptions ) );
+				ParallelsDirs::getAppExecuteModeAsCString( TestConfig::g_executeMode ) );
+		PRL_ASSERT( ParallelsDirs::Init( TestConfig::g_executeMode, g_nInitOptions ) );
 		return;
 	}
 
@@ -110,7 +110,7 @@ PRL_APPLICATION_MODE TestConfig::getApplicationMode()
 PRL_UINT32	TestConfig::getSdkInitFlags()
 {
 	PRL_UINT32 nFlags = 0;
-	if( g_nInitOptions & VirtuozzoDirs::smAppStoreMode )
+	if( g_nInitOptions & ParallelsDirs::smAppStoreMode )
 		nFlags |= PAIF_INIT_AS_APPSTORE_CLIENT;
 	return nFlags;
 }
@@ -151,7 +151,7 @@ char* TestConfig::getLocalHostName()
 
 QString TestConfig::getPathToDispatcherConfig()
 {
-	QString path=VirtuozzoDirs::getDispatcherConfigFilePath();
+	QString path=ParallelsDirs::getDispatcherConfigFilePath();
 	if ( path.isEmpty() )
 		WRITE_TRACE(DBG_FATAL, "Can't get dispatcher config dir");
 

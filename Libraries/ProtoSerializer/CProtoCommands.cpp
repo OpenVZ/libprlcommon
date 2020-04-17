@@ -32,7 +32,7 @@
 #include <../PrlUuid/Uuid.h>
 #include <../Std/PrlAssert.h>
 
-namespace Virtuozzo
+namespace Parallels
 {
 
 CProtoCommandBase::CProtoCommandBase(bool bForceQuestionsSign, quint32 nFlags)
@@ -2433,5 +2433,5 @@ quint32 CProtoVmCaptureScreen::GetHeight()
     return GetUnsignedIntParamValue(EVT_PARAM_CAPTURE_SCREEN_CMD_HEIGHT);
 }
 
-}//namespace Virtuozzo
+}//namespace Parallels
 

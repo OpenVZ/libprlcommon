@@ -41,7 +41,7 @@
 #include "Socket/Socket_p.h"
 #include "Libraries/Logging/Logging.h"
 
-#include "Interfaces/VirtuozzoAlloc.h"
+#include "Interfaces/ParallelsAlloc.h"
 #include "Libraries/Std/AtomicOps.h"
 
 using namespace IOService;

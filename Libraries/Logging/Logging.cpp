@@ -111,7 +111,7 @@
 
 /* for rate limit check */
 #include "Libraries/Std/PrlTime.h"
-#include "Interfaces/VirtuozzoTypes.h"
+#include "Interfaces/ParallelsTypes.h"
 #include "Libraries/Std/AtomicOps.h"
 
 

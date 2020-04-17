@@ -1,5 +1,5 @@
 /*
- * VirtuozzoQt.h: All Qt definitions in one place to ease
+ * ParallelsQt.h: All Qt definitions in one place to ease
  * compilation. All important includes in one file - very bad for
  * compilation performance was introduced in the time when we
  * gathered everything together - probably better to include needed
@@ -29,8 +29,8 @@
  */
 
 
-#ifndef __VIRTUOZZO_QT_H__
-#define __VIRTUOZZO_QT_H__
+#ifndef __PARALLELS_QT_H__
+#define __PARALLELS_QT_H__
 
 #ifdef QSTR2UTF8
 	#error "QSTR2UTF8 already defined."
@@ -62,5 +62,5 @@
 
 #endif//UTF16_2QSTR
 
-#endif // __VIRTUOZZO_QT_H__
+#endif // __PARALLELS_QT_H__
 

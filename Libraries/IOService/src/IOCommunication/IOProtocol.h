@@ -38,7 +38,7 @@
 
 #include "../../Std/SmartPtr.h"
 #include "../../PrlUuid/Uuid.h"
-#include "../../Interfaces/VirtuozzoTypes.h"
+#include "../../Interfaces/ParallelsTypes.h"
 #include <prlsdk/PrlIOStructs.h>
 #include "IOSenderHandle.h"
 #include "IOProtocolCommon.h"

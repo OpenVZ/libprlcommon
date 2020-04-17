@@ -4,7 +4,7 @@
 ///
 /// @brief spinlocks. Synchornization objects and functions working with it.
 ///
-/// @author Virtuozzo, Korotaev Kirill <dev@virtuozzo.com>
+/// @author Parallels, Korotaev Kirill <dev@parallels.com>
 ///
 /// A common way to use SPINLOCK interface would be:
 ///
@@ -49,7 +49,7 @@
 #ifndef __SPINLOCK_H__
 #define __SPINLOCK_H__
 
-#include "../Interfaces/VirtuozzoTypes.h"
+#include "../Interfaces/ParallelsTypes.h"
 #include "Pause.h"
 
 #define CONFIG_BLOCKING_SPINLOCK

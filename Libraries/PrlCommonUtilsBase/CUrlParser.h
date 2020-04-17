@@ -26,8 +26,8 @@
  */
 
 
-#ifndef __VIRTUOZZO_URL_PARSER_H__
-#define __VIRTUOZZO_URL_PARSER_H__
+#ifndef __PARALLELS_URL_PARSER_H__
+#define __PARALLELS_URL_PARSER_H__
 
 #include <QString>
 
@@ -68,5 +68,5 @@ private:
 	QString m_sUrl;
 };
 
-#endif // __VIRTUOZZO_URL_PARSER_H__
+#endif // __PARALLELS_URL_PARSER_H__
 

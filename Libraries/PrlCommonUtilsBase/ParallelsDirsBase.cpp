@@ -1,5 +1,5 @@
 /*
- * VirtuozzoDirsBase.cpp: Base functionality of VirtuozzoDirs class.
+ * ParallelsDirsBase.cpp: Base functionality of ParallelsDirs class.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
  * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
@@ -25,18 +25,18 @@
  */
 
 
-#include "VirtuozzoDirs.h"
+#include "ParallelsDirs.h"
 
 #include "Libraries/Logging/Logging.h"
 
 // #include "Build/Current.ver" for VER_FULL_BUILD_NUMBER_STR
 #include "Build/Current.ver"
 
-bool VirtuozzoDirs::Init( PRL_APPLICATION_MODE mode, VirtuozzoDirs::InitOptions options, bool bForce )
+bool ParallelsDirs::Init( PRL_APPLICATION_MODE mode, ParallelsDirs::InitOptions options, bool bForce )
 {
 	bool ret = false;
 	if( ms_bAppModeInited && ! bForce )
-		WRITE_TRACE(DBG_FATAL, "Error: VirtuozzoDirs::Init( %d ) is already called!  This call will be ignored.", mode );
+		WRITE_TRACE(DBG_FATAL, "Error: ParallelsDirs::Init( %d ) is already called!  This call will be ignored.", mode );
 	else
 	{
 		ms_bAppModeInited = true;
@@ -45,7 +45,7 @@ bool VirtuozzoDirs::Init( PRL_APPLICATION_MODE mode, VirtuozzoDirs::InitOptions 
 
 		ret = true;
 
-		WRITE_TRACE(DBG_FATAL, "VirtuozzoDirs::Init( ) was called. Current app mode = %d ( %s )"
+		WRITE_TRACE(DBG_FATAL, "ParallelsDirs::Init( ) was called. Current app mode = %d ( %s )"
 			" initOpts = %d %s "
 			" build version: %s %s"
 			, mode
@@ -59,11 +59,11 @@ bool VirtuozzoDirs::Init( PRL_APPLICATION_MODE mode, VirtuozzoDirs::InitOptions 
 	return ret;
 }
 
-const char* VirtuozzoDirs::getAppExecuteModeAsCString()
+const char* ParallelsDirs::getAppExecuteModeAsCString()
 {
 	return getAppExecuteModeAsCString( getAppExecuteMode() );
 }
-const char* VirtuozzoDirs::getAppExecuteModeAsCString( PRL_APPLICATION_MODE mode )
+const char* ParallelsDirs::getAppExecuteModeAsCString( PRL_APPLICATION_MODE mode )
 {
 	switch( mode )
 	{
@@ -74,15 +74,15 @@ const char* VirtuozzoDirs::getAppExecuteModeAsCString( PRL_APPLICATION_MODE mode
 	}
 }
 
-PRL_APPLICATION_MODE VirtuozzoDirs::getAppExecuteMode()
+PRL_APPLICATION_MODE ParallelsDirs::getAppExecuteMode()
 {
 	if( ! ms_bAppModeInited  )
-		WRITE_TRACE(DBG_FATAL, "Error: VirtuozzoDirs::getAppExecuteMode() called without initialize!!! "
-			"You should use VirtuozzoDirs::Init() before. Return %d", ms_nApplicationMode );
+		WRITE_TRACE(DBG_FATAL, "Error: ParallelsDirs::getAppExecuteMode() called without initialize!!! "
+			"You should use ParallelsDirs::Init() before. Return %d", ms_nApplicationMode );
 	return ms_nApplicationMode;
 }
 
-void VirtuozzoDirs::setLogPath(const char* path)
+void ParallelsDirs::setLogPath(const char* path)
 {
 	SetLogFileName(path, GetProdDefaultLogFileName());
 }

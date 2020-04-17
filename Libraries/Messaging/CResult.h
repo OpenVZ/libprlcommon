@@ -33,7 +33,7 @@
 #include <QHash>
 #include <QEvent>
 
-#include "../Interfaces/VirtuozzoNamespace.h"
+#include "../Interfaces/ParallelsNamespace.h"
 
 class CVmEvent;
 

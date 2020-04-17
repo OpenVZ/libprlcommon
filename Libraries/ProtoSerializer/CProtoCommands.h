@@ -31,12 +31,12 @@
 
 #include <QString>
 #include <QStringList>
-#include "../Interfaces/VirtuozzoNamespace.h"
+#include "../Interfaces/ParallelsNamespace.h"
 #include "../Std/SmartPtr.h"
 #include "../Messaging/CVmEvent.h"
 #include "../Messaging/CResult.h"
 
-namespace Virtuozzo
+namespace Parallels
 {
 
 /**
@@ -1186,7 +1186,7 @@ public:
 	 */
 	void SetSystemStatistics(const QString &sSystemStatistics);
 	/**
-	 * Let to initialize Virtuozzo Net service status response field
+	 * Let to initialize Parallels Net service status response field
 	 * @param assigning value (expecting correct string representation of Net service status)
 	 */
 	void SetNetServiceStatus(const QString &sNetServiceStatus);
@@ -2197,7 +2197,7 @@ public:
 };
 
 
-}//namespace Virtuozzo
+}//namespace Parallels
 
 #endif
 

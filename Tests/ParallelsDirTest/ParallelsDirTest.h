@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 ///
-/// Copyright (c) 2006-2017, Parallels International GmbH
+/// Copyright (c) 2007-2017, Parallels International GmbH
 /// Copyright (c) 2017-2019 Virtuozzo International GmbH, All rights reserved.
 ///
 /// This file is part of Virtuozzo Core. Virtuozzo Core is free
@@ -23,32 +23,48 @@
 /// Schaffhausen, Switzerland.
 ///
 /// @file
-///		Main.cpp
+///		ParallelsDirTest.h
 ///
 /// @author
-///		sandro
+///		sergeyt@
 ///
 /// @brief
-///		Dispatcher internal tests entry point.
+///		Tests fixture class for testing ParallelsDir class functionality.
 ///
 /// @brief
-///		None.
+///
+/// last version of specification is available on http://wiki/index.php/Paths_to_Configuration_Files
 ///
 /////////////////////////////////////////////////////////////////////////////
+
+#ifndef ParallelsDirTest_H
+#define ParallelsDirTest_H
+
 #include <QtTest/QtTest>
 
-#include "Tests/CommonTestsUtils.h"
-
-#include "VirtuozzoDirTest.h"
-#include "CUrlParserTest.h"
-
-int main(int argc, char *argv[])
+class ParallelsDirTest : public QObject
 {
-	QCoreApplication a(argc, argv);
-	TestConfig::readTestParameters();
+Q_OBJECT
+public:
 
-	int nRet = 0;
-	EXECUTE_TESTS_SUITE(VirtuozzoDirTest)
-	EXECUTE_TESTS_SUITE(CUrlParserTest)
-	return nRet;
-}
+private slots:
+	void testGetDispatcherConfigDir();
+	void testGetCallerUserPreferencesDir();
+	void testGetDefaultVmCatalogue_serverMode();
+	void testGetToolsBaseImagePath();
+	void testGetToolsImage();
+private:
+	enum OsType {osUnknown=-1, osWinXp, osWinVista, osLinux, osMac};
+
+private:
+	OsType getOsType();
+	bool currentProcessHasRootPermission();
+
+	void unixImpersonateTo(const QString& userName);
+	void unixRevertToSelf();
+	QString linuxGetUserHomePath(const QString& userName);
+
+	uid_t m_last_euid;
+};
+
+#endif

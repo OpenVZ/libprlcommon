@@ -35,7 +35,7 @@
 #include <malloc.h>
 #include <string.h>
 
-#include "Interfaces/VirtuozzoTypes.h"
+#include "Interfaces/ParallelsTypes.h"
 #include "Libraries/Std/std_list.h"
 #include "Libraries/Std/PrlTime.h"
 #include "Libraries/HostUtils/PCSUtils.h"

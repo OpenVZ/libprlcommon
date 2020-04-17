@@ -520,7 +520,7 @@ QDomElement CVmEventBase::getXml(QDomDocument* Document, bool no_save_option) co
 	QSet<int > setItemIds;
 	QMap<QString , int > mapMaxDynListIds = m_mapMaxDynListIds;
 
-	QDomElement root_element = Document->createElement(m_qsExtRootTagName.isEmpty() ? QString("VirtuozzoEvent") : m_qsExtRootTagName);
+	QDomElement root_element = Document->createElement(m_qsExtRootTagName.isEmpty() ? QString("ParallelsEvent") : m_qsExtRootTagName);
 
 	checkAndInsertExtDocElement(root_element, nElemIdx);
 	element = Document->createElement("EventType");
@@ -603,7 +603,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 	tag_name = RootElement->tagName();
 	m_qsTagName = tag_name;
 	m_qsExtRootTagName = ext_tag_name;
-	if (eqName(tag_name, (ext_tag_name.isEmpty() ? QString("VirtuozzoEvent") : ext_tag_name), true))
+	if (tag_name != (ext_tag_name.isEmpty() ? QString("ParallelsEvent") : ext_tag_name))
 	{
 		m_qsErrorMessage = "Error in class 'CVmEventBase': wrong root element with tag name '" + tag_name + "'";
 		return PRL_ERR_PARSE_VM_CONFIG;
@@ -663,7 +663,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventType"))
+		else if (tag_name == "EventType")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -694,7 +694,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventLevel"))
+		else if (tag_name == "EventLevel")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -725,7 +725,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventCode"))
+		else if (tag_name == "EventCode")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -756,7 +756,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventNeedResponse"))
+		else if (tag_name == "EventNeedResponse")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -787,7 +787,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventIssuerType"))
+		else if (tag_name == "EventIssuerType")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -818,7 +818,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventIssuerId"))
+		else if (tag_name == "EventIssuerId")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -849,7 +849,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventSource"))
+		else if (tag_name == "EventSource")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -880,7 +880,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventInitialRequestId"))
+		else if (tag_name == "EventInitialRequestId")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -911,7 +911,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 			text_element = temp_doc.createTextNode( pElement->attribute(attribute) );
 			is_set = true;
 		}
-		else if (eqName(tag_name, "EventId"))
+		else if (tag_name == "EventId")
 		{
 			is_set = true;
 			text_element = element.firstChild().toText();
@@ -925,7 +925,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 		}
 
 
-		if (eqName(tag_name, "EventParameters") && BaseEventParameters_count > 0)
+		if (tag_name == "EventParameters" && BaseEventParameters_count > 0)
 		{
 			unused_tag = false;
 			CVmEventParameters* object = m_lstBaseEventParameters[1 - BaseEventParameters_count];
@@ -1035,7 +1035,7 @@ bool CVmEventBase::merge(CVmEventBase* pCur, CVmEventBase* pPrev, MergeOptions n
 	Q_UNUSED(pPrev);
 	Q_UNUSED(nOptions);
 
-	m_qsErrorMessage = "VirtuozzoEvent";
+	m_qsErrorMessage = "ParallelsEvent";
 
 	if (getEventType() != pCur->getEventType() && getEventType() == pPrev->getEventType())
 		setEventType(pCur->getEventType());

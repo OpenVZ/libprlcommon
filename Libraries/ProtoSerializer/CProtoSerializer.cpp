@@ -29,7 +29,7 @@
 #include "CProtoSerializer.h"
 #include <boost/scope_exit.hpp>
 
-namespace Virtuozzo
+namespace Parallels
 {
 
 CProtoCommandPtr CProtoSerializer::CreateDspCmdUserLoginCommand(
@@ -949,5 +949,5 @@ CProtoCommandPtr CProtoSerializer::CreateVmCaptureScreenProtoCommand(
     return (CProtoCommandPtr(new CProtoVmCaptureScreen(vmUuid, nWidth, nHeight, nFlags)));
 }
 
-}//namespace Virtuozzo
+}//namespace Parallels
 

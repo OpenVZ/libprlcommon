@@ -1,5 +1,5 @@
 /*
- * VirtuozzoNamespace.cpp
+ * ParallelsNamespace.cpp
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
  * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
@@ -24,7 +24,7 @@
  * Schaffhausen, Switzerland.
  */
 
-#include <Interfaces/VirtuozzoNamespace.h>
+#include <Interfaces/ParallelsNamespace.h>
 
 const char* PVE::DispatcherCommandToString( unsigned int cmd )
 {
@@ -175,7 +175,7 @@ const char* PVE::DispatcherCommandToString( unsigned int cmd )
 		CASE_DISPATCHER_COMMAND( DspCmdVmSubscribeToGuestStatistics )
 		CASE_DISPATCHER_COMMAND( DspCmdVmUnsubscribeFromGuestStatistics )
 		CASE_DISPATCHER_COMMAND( DspCmdVmInitiateDevStateNotifications )
-		CASE_DISPATCHER_COMMAND( DspCmdLookupVirtuozzoServers )
+		CASE_DISPATCHER_COMMAND( DspCmdLookupParallelsServers )
 		CASE_DISPATCHER_COMMAND( DspCmdVmUpdateSecurity )
 		CASE_DISPATCHER_COMMAND( DspCmdVmSectionValidateConfig )
 		CASE_DISPATCHER_COMMAND( DspCmdVmCompact )

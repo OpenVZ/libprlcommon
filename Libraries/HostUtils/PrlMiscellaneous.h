@@ -1,5 +1,5 @@
 /*
- * PrlMiscellaneous.h: This file is the part of virtuozzo public sdk
+ * PrlMiscellaneous.h: This file is the part of parallels public sdk
  * library Miscelaneous functions.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH

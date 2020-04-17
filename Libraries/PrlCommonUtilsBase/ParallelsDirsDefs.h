@@ -1,5 +1,5 @@
 /*
- * VirtuozzoDirsDefs.h: Virtuozzo Dirs defines.
+ * ParallelsDirsDefs.h: Parallels Dirs defines.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
  * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
@@ -25,16 +25,16 @@
  */
 
 
-#ifndef __VIRTUOZZO_DIRS_DEFS_H__
-#define __VIRTUOZZO_DIRS_DEFS_H__
+#ifndef __PARALLELS_DIRS_DEFS_H__
+#define __PARALLELS_DIRS_DEFS_H__
 
 // FIXME This path must be used on Mac only
-#define PRL_DIRS_BC_BACKUP_DIR "/Library/Virtuozzo/.bc_backup"
+#define PRL_DIRS_BC_BACKUP_DIR "/Library/Parallels/.bc_backup"
 
-#define PRL_DIRS_INSTALLED_EULA_PATH "/Library/Preferences/Virtuozzo"
+#define PRL_DIRS_INSTALLED_EULA_PATH "/Library/Preferences/Parallels"
 
 #define PRL_DIRS_MAC_OS_INSTALLATION_FILE "/Library/Receipts/BSD.pkg"
-#define PRL_DIRS_PD_INSTALLATION_STATS_FOLDER "/var/db/Virtuozzo/Stats"
+#define PRL_DIRS_PD_INSTALLATION_STATS_FOLDER "/var/db/Parallels/Stats"
 
 #ifdef _WIN_
 	#define VM_EXECUTABLE	"/prl_vm_app.exe"
@@ -91,5 +91,5 @@
 #define PRLPROCDUMP_EXECUTABLE64	"amd64/prl_procdump.exe"
 #endif
 
-#endif // __VIRTUOZZO_DIRS_DEFS_H__
+#endif // __PARALLELS_DIRS_DEFS_H__
 

@@ -52,7 +52,7 @@
 
 #define DMM_TEST
 
-#include "Interfaces/VirtuozzoTypes.h"
+#include "Interfaces/ParallelsTypes.h"
 
 #define BYTES2PAGES(b)	(((b) + (PAGE_SIZE - 1)) / PAGE_SIZE)
 #define ALIGNAT(var,align) ( ( ((var) + (align) - 1)/(align) ) * (align) )

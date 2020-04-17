@@ -27,7 +27,7 @@
 #include <ctype.h>
 
 #include "Libraries/Logging/Logging.h"
-#include "Interfaces/VirtuozzoQt.h"
+#include "Interfaces/ParallelsQt.h"
 #include "Libraries/PrlCommonUtilsBase/netutils.h"
 
 static inline bool is_eth_separator(char c)

@@ -34,7 +34,7 @@
 #include <QReadWriteLock>
 #include <QVector>
 
-#include "../../Interfaces/VirtuozzoNamespace.h"
+#include "../../Interfaces/ParallelsNamespace.h"
 #include "../IOCommunication/IOClient.h"
 #include <prlsdk/PrlIOStructs.h>
 
