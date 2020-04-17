@@ -206,13 +206,13 @@ static int init()
 	for (int v = 5; v > 0; v--) {
 		QString f(QString(LIBPCS_CLIENT".%1").arg(v));
 		dlhandle = dlopen(qPrintable(f), RTLD_LAZY);
-		if (dlhandle != NULL) {
+		if (dlhandle != NULL)
 			break;
-		} else if (errno != ENOENT || v == 1) {
-			last_load_error = PrlGetTimeMonotonic();
-			WRITE_TRACE(DBG_FATAL, "Failed to load %s: %s",	qPrintable(f), dlerror());
-			return -EAGAIN;
-		}
+	}
+	if (dlhandle == NULL) {
+		last_load_error = PrlGetTimeMonotonic();
+		WRITE_TRACE(DBG_FATAL, "Failed to open " LIBPCS_CLIENT);
+		return -EAGAIN;
 	}
 
 	for (i=0; funcs[i].name; ++i) {
