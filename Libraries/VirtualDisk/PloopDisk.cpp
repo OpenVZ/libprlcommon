@@ -169,7 +169,7 @@ PRL_RESULT Ploop::mount()
 	} else
 		m_wasMounted = false;
 
-	rc = m_file.open(dev, O_DIRECT | m_flags);
+	rc = m_file.open(dev, O_CLOEXEC | O_DIRECT | m_flags);
 	if (rc)
 		WRITE_TRACE(DBG_FATAL, "Failed to open %s", dev);
 
