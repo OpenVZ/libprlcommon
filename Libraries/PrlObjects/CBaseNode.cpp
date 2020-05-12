@@ -35,6 +35,7 @@
 #else
 #	include <stdio.h>
 #	include <sys/errno.h>
+#	include <sys/stat.h>
 #	include <fcntl.h>
 #	include <unistd.h>
 #endif
@@ -468,6 +469,27 @@ int CBaseNode::saveToFile(QFile* pOrigFile, bool , bool )
 	// mv pFile to pOrigFile
 	if( m_flgCrashSafeSaving )
 	{
+#ifdef _LIN_
+		struct stat st;
+		bool setOwner = true;
+
+		if (stat(qPrintable(pOrigFile->fileName()), &st))
+		{
+			if (errno != ENOENT)
+			{
+				WRITE_TRACE(DBG_FATAL, "stat(%s) failed: %m",
+						qPrintable(pOrigFile->fileName()));
+				return PRL_ERR_FAILURE;
+			}
+			setOwner = false;
+		}
+		if (setOwner && chown(qPrintable(pFile->fileName()), st.st_uid, st.st_gid))
+		{
+			WRITE_TRACE(DBG_FATAL, "chown(%s) failed: %m",
+					qPrintable(pFile->fileName()));
+			return PRL_ERR_CANT_CHANGE_OWNER_OF_FILE;
+		}
+#endif
 		if( !CSimpleFileHelper::AtomicMoveFile( pFile->fileName(), pOrigFile->fileName() ) )
 			return PRL_ERR_XML_WRITE_FILE;
 	}
