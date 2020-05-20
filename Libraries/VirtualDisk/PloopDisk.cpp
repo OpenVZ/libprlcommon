@@ -209,6 +209,9 @@ PRL_RESULT Ploop::open(const QString &fileName,
 		return PRL_ERR_FAILURE;
 	}
 
+	if (m_di->enc != NULL && m_di->enc->keyid != NULL)
+		return PRL_ERR_UNIMPLEMENTED;
+
 	QString c = getComponentName(m_di->top_guid ?: "");
 	m_ploop->set_component_name(m_di, c.toStdString().data());
 
