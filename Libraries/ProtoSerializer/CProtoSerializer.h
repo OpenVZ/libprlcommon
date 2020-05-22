@@ -627,6 +627,7 @@ public:
 	 * @param VM UUID
 	 * @param target server hostname
 	 * @param target server port
+	 * @param target server backup directory
 	 * @param target server session UUID
 	 * @param backup description
 	 * @param flags
@@ -637,6 +638,7 @@ public:
 		const QString &sVmUuid,
 		const QString &sServerHostname,
 		quint32 nServerPort,
+		const QString &sServerDirectory,
 		const QString &sServerSessionUuid,
 		const QString &sDescription,
 		quint32 nBackupFlags,
@@ -649,6 +651,7 @@ public:
 	 * @param backup UUID
 	 * @param target server hostname
 	 * @param target server port
+	 * @param target server backup directory
 	 * @param target server session UUID
 	 * @param target VM home path
 	 * @param flags
@@ -659,6 +662,7 @@ public:
 		const QString &sBackupUuid,
 		const QString &sServerHostname,
 		quint32 nServerPort,
+		const QString &sServerDirectory,
 		const QString &sServerSessionUuid,
 		const QString &sTargetVmHomePath,
 		const QString &sTargetVmName,
@@ -670,6 +674,7 @@ public:
 	 * @param VM UUID
 	 * @param target server hostname
 	 * @param target server port
+	 * @param target server backup directory
 	 * @param target server session UUID
 	 * @param flags
 	 * @param reserved flags
@@ -679,6 +684,7 @@ public:
 		const QString &sVmUuid,
 		const QString &sServerHostname,
 		quint32 nServerPort,
+		const QString &sServerDirectory,
 		const QString &sServerSessionUuid,
 		quint32 nBackupFlags,
 		quint32 nReservedFlags,
@@ -690,6 +696,7 @@ public:
 	 * @param backup UUID
 	 * @param target server hostname
 	 * @param target server port
+	 * @param target server backup directory
 	 * @param target server session UUID
 	 * @param flags
 	 * @param reserved flags
@@ -700,6 +707,7 @@ public:
 		const QString &sBackupUuid,
 		const QString &sServerHostname,
 		quint32 nServerPort,
+		const QString &sServerDirectory,
 		const QString &sServerSessionUuid,
 		quint32 nRestoreFlags,
 		quint32 nReservedFlags,
