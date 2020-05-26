@@ -1897,6 +1897,7 @@ public:
 #define EVT_PARAM_BACKUP_CMD_VM_NAME			"backup_cmd_vm_name"
 #define EVT_PARAM_BACKUP_CMD_SERVER_HOSTNAME		"backup_cmd_server_hostname"
 #define EVT_PARAM_BACKUP_CMD_SERVER_PORT		"backup_cmd_server_port"
+#define EVT_PARAM_BACKUP_CMD_SERVER_BACKUP_DIRECTORY	"backup_cmd_server_backup_directory"
 #define EVT_PARAM_BACKUP_CMD_SERVER_SESSION_UUID	"backup_cmd_server_session_uuid"
 #define EVT_PARAM_BACKUP_CMD_TARGET_VM_HOME_PATH	"backup_cmd_target_vm_home_path"
 #define EVT_PARAM_BACKUP_CMD_TARGET_VM_NAME		"backup_cmd_target_vm_name"

@@ -1890,6 +1890,7 @@ CProtoBackupCommand::CProtoBackupCommand(
 	const QString &sVmUuid,
 	const QString &sServerHostname,
 	quint32 nServerPort,
+	const QString &sServerDirectory,
 	const QString &sServerSessionUuid,
 	quint32 nFlags,
 	quint32 nReservedFlags,
@@ -1900,6 +1901,7 @@ CProtoBackupCommand::CProtoBackupCommand(
 	SetUnsignedIntParamValue(BACKUP_PROTO_VERSION, EVT_PARAM_BACKUP_PROTO_VERSION);
 	SetStringParamValue(sServerHostname, EVT_PARAM_BACKUP_CMD_SERVER_HOSTNAME);
 	SetUnsignedIntParamValue(nServerPort, EVT_PARAM_BACKUP_CMD_SERVER_PORT);
+	SetStringParamValue(sServerDirectory, EVT_PARAM_BACKUP_CMD_SERVER_BACKUP_DIRECTORY);
 	SetStringParamValue(sServerSessionUuid, EVT_PARAM_BACKUP_CMD_SERVER_SESSION_UUID);
 	SetUnsignedIntParamValue(nReservedFlags, EVT_PARAM_BACKUP_CMD_RESERVED_FLAGS);
 }
@@ -1944,11 +1946,17 @@ quint32 CProtoBackupCommand::GetFlags()
 	return GetCommandFlags();
 }
 
+QString CProtoBackupCommand::GetServerBackupDirectory()
+{
+	return (GetStringParamValue(EVT_PARAM_BACKUP_CMD_SERVER_BACKUP_DIRECTORY));
+}
+
 //+++++++++++++++++++++++++++++++CProtoCreateVmBackupCommand proto command class implementation++++++++++++++++
 CProtoCreateVmBackupCommand::CProtoCreateVmBackupCommand(
 	const QString &sVmUuid,
 	const QString &sServerHostname,
 	quint32 nServerPort,
+	const QString &sServerDirectory,
 	const QString &sServerSessionUuid,
 	const QString &sDescription,
 	quint32 nBackupFlags,
@@ -1960,6 +1968,7 @@ CProtoCreateVmBackupCommand::CProtoCreateVmBackupCommand(
 	sVmUuid,
 	sServerHostname,
 	nServerPort,
+	sServerDirectory,
 	sServerSessionUuid,
 	nBackupFlags,
 	nReservedFlags,
@@ -1991,6 +2000,7 @@ CProtoRestoreVmBackupCommand::CProtoRestoreVmBackupCommand(
 	const QString &sBackupUuid,
 	const QString &sServerHostname,
 	quint32 nServerPort,
+	const QString &sServerDirectory,
 	const QString &sServerSessionUuid,
 	const QString &sTargetVmHomePath,
 	const QString &sTargetVmName,
@@ -2002,6 +2012,7 @@ CProtoRestoreVmBackupCommand::CProtoRestoreVmBackupCommand(
 	sVmUuid,
 	sServerHostname,
 	nServerPort,
+	sServerDirectory,
 	sServerSessionUuid,
 	nRestoreFlags,
 	nReservedFlags,
@@ -2041,6 +2052,7 @@ CProtoRemoveVmBackupCommand::CProtoRemoveVmBackupCommand(
 	const QString &sBackupUuid,
 	const QString &sServerHostname,
 	quint32 nServerPort,
+	const QString &sServerDirectory,
 	const QString &sServerSessionUuid,
 	quint32 nRestoreFlags,
 	quint32 nReservedFlags,
@@ -2051,6 +2063,7 @@ CProtoRemoveVmBackupCommand::CProtoRemoveVmBackupCommand(
 	sVmUuid,
 	sServerHostname,
 	nServerPort,
+	sServerDirectory,
 	sServerSessionUuid,
 	nRestoreFlags,
 	nReservedFlags,
@@ -2075,6 +2088,7 @@ CProtoGetBackupTreeCommand::CProtoGetBackupTreeCommand(
 	const QString &sVmUuid,
 	const QString &sServerHostname,
 	quint32 nServerPort,
+	const QString &sServerDirectory,
 	const QString &sServerSessionUuid,
 	quint32 nBackupFlags,
 	quint32 nReservedFlags,
@@ -2085,6 +2099,7 @@ CProtoGetBackupTreeCommand::CProtoGetBackupTreeCommand(
 	sVmUuid,
 	sServerHostname,
 	nServerPort,
+	sServerDirectory,
 	sServerSessionUuid,
 	nBackupFlags,
 	nReservedFlags,
