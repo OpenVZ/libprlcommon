@@ -140,7 +140,8 @@ PRL_RESULT Ploop::mount()
 
 	if (m_ploop == NULL)
 		return PRL_ERR_UNINITIALIZED;
-	char dev[PATH_MAX];
+	char dev[64], devname[64], partname[64];
+
 	PRL_RESULT rc = m_ploop->get_dev(m_di, dev, sizeof(dev));
 	if (rc == -1)
 	{
@@ -169,7 +170,15 @@ PRL_RESULT Ploop::mount()
 	} else
 		m_wasMounted = false;
 
-	rc = m_file.open(dev, O_CLOEXEC | O_DIRECT | m_flags);
+	rc = m_ploop->get_devname(m_di, dev, devname, sizeof(devname),
+			partname, sizeof(partname));
+	if (rc) {
+		WRITE_TRACE(DBG_FATAL, "ploop_get_devname(%s): %s",
+				dev, m_ploop->get_last_error());
+		return PRL_ERR_FAILURE;
+	}
+
+	rc = m_file.open(devname, O_CLOEXEC | O_DIRECT | m_flags);
 	if (rc)
 		WRITE_TRACE(DBG_FATAL, "Failed to open %s", dev);
 
