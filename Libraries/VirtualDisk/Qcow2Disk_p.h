@@ -35,8 +35,10 @@
 #include "Util.h"
 #include <QFuture>
 #include <QProcess>
+#include <QFile>
 #include <QElapsedTimer>
 #include <QSharedPointer>
+#include <QScopedPointer>
 #include <QFutureInterface>
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/set.hpp>
@@ -46,7 +48,6 @@
 #include "../Logging/Logging.h"
 #include "../PrlCommonUtilsBase/SysError.h"
 
-class QFile;
 class QTimer;
 
 namespace VirtualDisk
@@ -276,7 +277,7 @@ struct Generic: Carcass
 	Generic(const Script& script_, T& state_, U flavor_);
 	~Generic()
 	{
-		if (NULL != m_engine.get())
+		if (NULL != m_engine.data())
 			m_engine->disconnect(this);
 	}
 
@@ -308,7 +309,7 @@ protected:
 	Flavor<T> m_flavor;
 
 private:
-	std::auto_ptr<QProcess> m_engine;
+	QScopedPointer<QProcess> m_engine;
 };
 
 } // namespace Machine
@@ -663,7 +664,7 @@ struct Flavor<Persistent::state_type>
 			Nbd::State::Retired
 		> unexpectedQuit_type;
 
-	void terminate(std::auto_ptr<QProcess>& nbd_);
+	void terminate(QScopedPointer<QProcess>& nbd_);
 
 	Persistent::Visitor::Started reactStarted() const
 	{
@@ -693,7 +694,7 @@ struct Flavor<Export::state_type>
 	{
 	}
 
-	void terminate(std::auto_ptr<QProcess>& nbd_);
+	void terminate(QScopedPointer<QProcess>& nbd_);
 
 	Export::Visitor::Started reactStarted() const
 	{
@@ -842,7 +843,7 @@ struct Flavor<Export::state_type>
 	startVisitor_type start(const Script& script_, const token_type& token_, Export::state_type& state_);
 
 private:
-	std::auto_ptr<QFile> m_guard;
+	QScopedPointer<QFile> m_guard;
 };
 
 } // namespace Backend
@@ -866,7 +867,7 @@ struct Frontend: QObject
 private:
 	QObject* m_nbd;
 	QString m_device;
-	std::auto_ptr<QFile> m_guard;
+	QScopedPointer<QFile> m_guard;
 };
 
 } // namespace Nbd

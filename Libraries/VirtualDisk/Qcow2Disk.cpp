@@ -275,9 +275,9 @@ Generic<T>::Generic(const Script& script_, T& state_, U flavor_):
 ///////////////////////////////////////////////////////////////////////////////
 // struct Flavor<Persistent::state_type>
 
-void Flavor<Persistent::state_type>::terminate(std::auto_ptr<QProcess>& nbd_)
+void Flavor<Persistent::state_type>::terminate(QScopedPointer<QProcess>& nbd_)
 {
-	if (NULL == nbd_.get())
+	if (NULL == nbd_.data())
 		return;
 
 	switch (nbd_->state())
@@ -293,10 +293,10 @@ void Flavor<Persistent::state_type>::terminate(std::auto_ptr<QProcess>& nbd_)
 ///////////////////////////////////////////////////////////////////////////////
 // struct Flavor<Export::state_type>
 
-void Flavor<Export::state_type>::terminate(std::auto_ptr<QProcess>& nbd_)
+void Flavor<Export::state_type>::terminate(QScopedPointer<QProcess>& nbd_)
 {
 	Flavor<Persistent::state_type>().terminate(nbd_);
-	if (NULL == nbd_.get())
+	if (NULL == nbd_.data())
 		m_guard.clear();
 }
 
@@ -558,7 +558,7 @@ Flavor<Export::state_type>::start(const Script& script_, const token_type& token
 	return startVisitor_type(
 		Export::State::Starting(
 			Export::machineCarrier_type(
-				new Export::Machine(script_, state_, QSharedPointer<QFile>(m_guard.release()))),
+				new Export::Machine(script_, state_, QSharedPointer<QFile>(m_guard.take()))),
 			token_));
 }
 
@@ -669,7 +669,7 @@ PRL_RESULT Frontend::start(const Script& script_)
 	}
 	QString d;
 	Backend::Base* b = NULL;
-	if (NULL == m_guard.get())
+	if (NULL == m_guard.data())
 	{
 		b = new Backend::Generic<Persistent::state_type>
 			(Backend::Flavor<Persistent::state_type>());
@@ -677,7 +677,7 @@ PRL_RESULT Frontend::start(const Script& script_)
 	else
 	{
 		d = m_guard->fileName();
-		b = new Backend::Generic<Export::state_type>(m_guard.release());
+		b = new Backend::Generic<Export::state_type>(m_guard.take());
 	}
 
 	b->moveToThread(QCoreApplication::instance()->thread());

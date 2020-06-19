@@ -22,6 +22,7 @@
 #ifndef CSPARCEBITMAP_H
 #define CSPARCEBITMAP_H
 
+#include <QScopedPointer>
 #include <prlsdk/PrlTypes.h>
 
 class Uuid;
@@ -79,7 +80,7 @@ private:
 	sp_bitmap *m_Bitmap;
 	UINT32 m_GranularityBits;
 	UINT64 m_Size;
-	std::auto_ptr<Uuid> m_Uid;
+	QScopedPointer<Uuid> m_Uid;
 	UINT32 m_WaitParts;
 };
 
