@@ -573,27 +573,37 @@ void CBaseNode::checkAndInsertExtDocElement(QDomElement root_element, int& nElem
 	++nElemIdx;
 }
 
-bool CBaseNode::eqName(QString& tag_name, const QString xml_name, const bool replace_name)
+QString CBaseNode::getLegacyProductTag(const QString& xml_name) const
+{
+	static const char *v = "Virtuozzo";
+	static const int d[] = {-6, -8, 0, -19, -9, -3, -21, -14, 4};
+
+	int n = xml_name.indexOf(v, 0, Qt::CaseInsensitive);
+	if (n == -1)
+		return QString();
+
+	QString p(xml_name);
+	for (unsigned int i = 0; i < sizeof(d) / sizeof(d[0]); i++)
+		p[n + i] = QChar((char)((int)xml_name[n + i].toLatin1() + d[i]));
+
+	return p;
+}
+
+bool CBaseNode::eqName(QString& tag_name, const QString& xml_name, const bool replace_name)
 {
 	// At first we always use direct comparing names
 	if (tag_name == xml_name)
 		return true;
 	// At second try to find our keyword in true xml name
-	const QString vz("Virtuozzo");
-	const int delta[] = {-6, -8, 0, -19, -9, -3, -21, -14, 4};
-	int n = xml_name.indexOf(vz, 0, Qt::CaseInsensitive);
-	if (n != -1)
+	QString plz = getLegacyProductTag(xml_name);
+	if (!plz.isEmpty())
 	{
-		// Make second version of xml name for check
-		QString plz(xml_name);
-		for(int i = 0; i < vz.size(); i++)
-			plz[n + i] = QChar((char)((int)xml_name[n + i].toLatin1() + delta[i]));
 		if (tag_name == plz)
 		{
 			// Change tag name in parameter to true xml name
 			// Because it may be to use in future
 			tag_name = xml_name;
-			// Akso change saved tag names for object
+			// Also change saved tag names for object
 			if (replace_name)
 			{
 				m_qsTagName = xml_name;
