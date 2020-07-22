@@ -894,6 +894,10 @@ IOPackage::~IOPackage ()
     if ( callback.destructorCall )
         callback.destructorCall( callback.destructorContext );
 
+    QSharedPointer<Limiter> l = limiter.toStrongRef();
+    if (l)
+        l->get(buffersSize());
+
     if ( header.buffersNumber > 1 ) {
         // Reverse order
         SmartPtr<char> *p = buffers;
@@ -1145,6 +1149,41 @@ qint32 IOPackage::stowBuffer(quint32 buffer_, const void* data_, const PODData& 
 		return -1;
 
 	return b.bufferSize;
+}
+
+IOPackage::Limiter::Limiter()
+	: bytes(0), paused(false)
+{
+}
+
+IOPackage::Limiter::~Limiter()
+{
+	if (paused)
+		full.wakeOne();
+}
+
+void IOPackage::Limiter::put(quint32 size)
+{
+	mutex.lock();
+	bytes += size;
+	if (bytes > HIGH_MARK) {
+		WRITE_TRACE(DBG_DEBUG, "IOPackage::Limiter wait %d %p", bytes, this);
+		paused = true;
+		full.wait(&mutex);
+	}
+	mutex.unlock();
+}
+
+void IOPackage::Limiter::get(quint32 size)
+{
+	mutex.lock();
+	bytes -= size;
+	if (paused && bytes < LOW_MARK) {
+		WRITE_TRACE(DBG_DEBUG, "IOPackage::Limiter resume %d %p", bytes, this);
+		paused = false;
+		full.wakeOne();
+	}
+	mutex.unlock();
 }
 
 /*****************************************************************************/

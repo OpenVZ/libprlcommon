@@ -171,7 +171,8 @@ SocketClientPrivate::SocketClientPrivate (
     m_lastfd(-1),
     m_bLimitErrorLogging(false),
     m_peerUid(uid),
-    m_peerPid(pid)
+    m_peerPid(pid),
+    m_limiter(new IOPackage::Limiter)
 {
 	m_rl.rate = 1;
 	m_rl.last = -1;
@@ -2651,9 +2652,16 @@ void SocketClientPrivate::doJob ()
 
             // Package callback
             {
+                if (p->limiter.isNull())
+                        p->limiter = m_limiter.toWeakRef();
+
+                m_limiter->put(p->buffersSize());
+
                 CALLBACK_MARK;
+
                 m_rcvSndListener->onPackageReceived( this,
                                                      m_peerConnectionUuid, p );
+
                 WARN_IF_CALLBACK_TOOK_MUCH_TIME;
             }
         }
