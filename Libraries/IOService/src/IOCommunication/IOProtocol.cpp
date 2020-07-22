@@ -1122,8 +1122,10 @@ PRL_RESULT IOPackage::setBuffer(quint32 buffer_, const SmartPtr<char>& data_, co
 	PODData& b = d[buffer_];
 	qint64 c = qint64(SIZE_LIMIT) - qint64(fullPackageSize()) + qint64(b.bufferSize) -
 		qint64(pod_.bufferSize);
-	if (0 > c)
+	if (0 > c) {
+		WRITE_TRACE(DBG_FATAL, "Buffer size exceeds the limit!");
 		return PRL_ERR_BUFFER_OVERRUN;
+	}
 
 	b = pod_;
 	buffers[buffer_] = data_;
