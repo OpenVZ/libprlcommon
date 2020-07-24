@@ -201,8 +201,8 @@ namespace IOService {
 	// SocketClient buffer size limiter
 	class Limiter {
 		enum {
-			HIGH_MARK = SIZE_LIMIT,
-			LOW_MARK  = 16 * (1 << 20)
+			HIGH_MARK = 64 * (1 << 20),
+			LOW_MARK  = 8 * (1 << 20)
 		};
 	public:
 		Limiter();
@@ -210,6 +210,7 @@ namespace IOService {
 
 		void put(quint32 size);
 		void get(quint32 size);
+		void wait();
 	private:
 		quint32		bytes;
 		bool		paused;

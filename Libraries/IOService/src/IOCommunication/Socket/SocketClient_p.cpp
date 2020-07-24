@@ -2777,6 +2777,11 @@ void SocketClientPrivate::doJob ()
         // Stop client if detaching
         if ( m_ctx == Cli_ServerContext && srv_detaching )
             goto cleanup_and_disconnect;
+
+	if (!p->limiter.isNull()) {
+		p.reset(NULL);
+		m_limiter->wait();
+	}
     }
 
 cleanup_and_disconnect:

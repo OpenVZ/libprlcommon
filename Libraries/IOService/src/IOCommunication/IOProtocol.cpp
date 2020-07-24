@@ -1166,11 +1166,6 @@ void IOPackage::Limiter::put(quint32 size)
 {
 	mutex.lock();
 	bytes += size;
-	if (bytes > HIGH_MARK) {
-		WRITE_TRACE(DBG_DEBUG, "IOPackage::Limiter wait %d %p", bytes, this);
-		paused = true;
-		full.wait(&mutex);
-	}
 	mutex.unlock();
 }
 
@@ -1182,6 +1177,17 @@ void IOPackage::Limiter::get(quint32 size)
 		WRITE_TRACE(DBG_DEBUG, "IOPackage::Limiter resume %d %p", bytes, this);
 		paused = false;
 		full.wakeOne();
+	}
+	mutex.unlock();
+}
+
+void IOPackage::Limiter::wait()
+{
+	mutex.lock();
+	if (bytes > HIGH_MARK) {
+		WRITE_TRACE(DBG_DEBUG, "IOPackage::Limiter wait %d %p", bytes, this);
+		paused = true;
+		full.wait(&mutex);
 	}
 	mutex.unlock();
 }
