@@ -33,6 +33,9 @@
 #include <QPair>
 #include <QHash>
 #include <QString>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QWeakPointer>
 
 #include "IODataBuffer.h"
 
@@ -193,6 +196,26 @@ namespace IOService {
 	enum
 	{
 		SIZE_LIMIT = (1 << 27)
+	};
+
+	// SocketClient buffer size limiter
+	class Limiter {
+		enum {
+			HIGH_MARK = 64 * (1 << 20),
+			LOW_MARK  = 8 * (1 << 20)
+		};
+	public:
+		Limiter();
+		~Limiter();
+
+		void put(quint32 size);
+		void get(quint32 size);
+		void wait();
+	private:
+		quint32		bytes;
+		bool		paused;
+		QMutex		mutex;
+		QWaitCondition	full;
 	};
 
         /** Common package type */
@@ -537,6 +560,9 @@ namespace IOService {
             void* destructorContext;           /** Destructor context */
 
         } callback;
+
+	// buffers size limiter - owner is SocketPrivate
+	QWeakPointer<Limiter>	limiter;
 
         //
         // NOTE! dynamic buffers and data arrays must be at the end

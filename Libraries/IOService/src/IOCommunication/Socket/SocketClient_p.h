@@ -263,6 +263,9 @@ private:
 	// identification of the peer
 	quint32 m_peerUid;
 	quint32 m_peerPid;
+
+	// data size limiter for all not processed IOPackage'es
+	QSharedPointer<IOPackage::Limiter>	m_limiter;
 };
 
 } //namespace IOService
