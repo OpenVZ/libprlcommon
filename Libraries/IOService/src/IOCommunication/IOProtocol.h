@@ -195,7 +195,7 @@ namespace IOService {
     public:
 	enum
 	{
-		SIZE_LIMIT = (1 << 27)
+		SIZE_LIMIT = (1 << 30)
 	};
 
 	// SocketClient buffer size limiter
