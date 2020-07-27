@@ -520,7 +520,7 @@ QDomElement CVmEventBase::getXml(QDomDocument* Document, bool no_save_option) co
 	QSet<int > setItemIds;
 	QMap<QString , int > mapMaxDynListIds = m_mapMaxDynListIds;
 
-	QDomElement root_element = Document->createElement(m_qsExtRootTagName.isEmpty() ? QString("VirtuozzoEvent") : m_qsExtRootTagName);
+	QDomElement root_element = Document->createElement(m_qsExtRootTagName.isEmpty() ? getLegacyProductTag("VirtuozzoEvent") : m_qsExtRootTagName);
 
 	checkAndInsertExtDocElement(root_element, nElemIdx);
 	element = Document->createElement("EventType");
@@ -603,7 +603,7 @@ int CVmEventBase::readXml(QDomElement* RootElement, QString ext_tag_name, bool u
 	tag_name = RootElement->tagName();
 	m_qsTagName = tag_name;
 	m_qsExtRootTagName = ext_tag_name;
-	if (!eqName(tag_name, (ext_tag_name.isEmpty() ? QString("VirtuozzoEvent") : ext_tag_name), true))
+	if (!eqName(tag_name, (ext_tag_name.isEmpty() ? getLegacyProductTag("VirtuozzoEvent") : ext_tag_name), true))
 	{
 		m_qsErrorMessage = "Error in class 'CVmEventBase': wrong root element with tag name '" + tag_name + "'";
 		return PRL_ERR_PARSE_VM_CONFIG;
