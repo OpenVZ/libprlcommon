@@ -589,7 +589,7 @@ QString CBaseNode::getLegacyProductTag(const QString& xml_name) const
 	return p;
 }
 
-bool CBaseNode::eqName(QString& tag_name, const QString& xml_name, const bool replace_name)
+bool CBaseNode::eqName(QString& tag_name, const QString xml_name, const bool replace_name)
 {
 	// At first we always use direct comparing names
 	if (tag_name == xml_name)

@@ -518,7 +518,7 @@ protected:
 
 	void checkAndInsertExtDocElement(QDomElement root_element, int& nElemIdx) const;
 
-	bool eqName(QString& tag_name, const QString& xml_name, const bool replace_name = false);
+	bool eqName(QString& tag_name, const QString xml_name, const bool replace_name = false);
 
 	QString	m_qsFileName;
 
