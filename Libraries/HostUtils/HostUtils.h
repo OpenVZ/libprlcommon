@@ -436,6 +436,9 @@ public:
 
 	static quint32 convertWeightToIoprio(quint32 weight_);
 	static quint32 convertIoprioToWeight(quint32 prio_);
+
+	/* clear environment from unwanted vars like LD_PRELOAD */
+	static void sanitizeEnv(QProcess &process);
 private:
 	// Get FS type (win)
 	static PRL_FILE_SYSTEM_FS_TYPE GetFSType_Win(const QString& fileName);
