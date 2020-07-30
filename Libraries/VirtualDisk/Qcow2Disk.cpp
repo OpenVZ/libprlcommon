@@ -167,6 +167,11 @@ void Process::addChannel(int channel_)
 	m_channels << channel_;
 }
 
+Process::Process()
+{
+	HostUtils::sanitizeEnv(*this);
+}
+
 void Process::setupChildProcess()
 {
 	int x = 3;

@@ -971,11 +971,20 @@ PRL_RESULT HostUtils::CopyAccessRights(const QString& oldFile, const QString& ne
 	return PRL_ERR_SUCCESS;
 }
 
+void HostUtils::sanitizeEnv(QProcess &process)
+{
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	env.remove("LD_PRELOAD");
+	env.insert("LD_LIBRARY_PATH", "");
+	process.setProcessEnvironment(env);
+}
+
 RunCmdResult HostUtils::RunCmdLineUtilityEx(const QStringList& cmdline, QProcess &process, int timeout,
 		void (*afterStartCallback)(QProcess*))
 {
 	QStringList args = cmdline;
 	QString bin = args.takeFirst();
+	sanitizeEnv(process);
 	process.start(bin, args);
 	return waitProcessResult(process, timeout, afterStartCallback);
 }
@@ -983,6 +992,7 @@ RunCmdResult HostUtils::RunCmdLineUtilityEx(const QStringList& cmdline, QProcess
 RunCmdResult HostUtils::RunCmdLineUtilityEx(const QString &cmdline, QProcess &process, int timeout,
 		void (*afterStartCallback)(QProcess*))
 {
+	sanitizeEnv(process);
 	process.start(cmdline);
 	return waitProcessResult(process, timeout, afterStartCallback);
 }
