@@ -171,6 +171,8 @@ void Process::setupChildProcess()
 {
 	int x = 3;
 
+	HostUtils::sanitizeEnv(*this, true);
+
 	QProcess::setupChildProcess(); // requires vz-built qt version
 
 	if (m_channels.empty())
@@ -192,8 +194,6 @@ void Process::setupChildProcess()
 
 	qputenv("LISTEN_FDS", QString::number(m_channels.count()).toUtf8());
 	qputenv("LISTEN_PID", QString::number(getpid()).toUtf8());
-
-	HostUtils::sanitizeEnv(*this, true);
 }
 
 namespace State
