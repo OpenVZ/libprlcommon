@@ -167,11 +167,6 @@ void Process::addChannel(int channel_)
 	m_channels << channel_;
 }
 
-Process::Process()
-{
-	HostUtils::sanitizeEnv(*this);
-}
-
 void Process::setupChildProcess()
 {
 	int x = 3;
@@ -197,6 +192,8 @@ void Process::setupChildProcess()
 
 	qputenv("LISTEN_FDS", QString::number(m_channels.count()).toUtf8());
 	qputenv("LISTEN_PID", QString::number(getpid()).toUtf8());
+
+	HostUtils::sanitizeEnv(*this, true);
 }
 
 namespace State

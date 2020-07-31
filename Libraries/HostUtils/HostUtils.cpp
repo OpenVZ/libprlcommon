@@ -971,12 +971,17 @@ PRL_RESULT HostUtils::CopyAccessRights(const QString& oldFile, const QString& ne
 	return PRL_ERR_SUCCESS;
 }
 
-void HostUtils::sanitizeEnv(QProcess &process)
+void HostUtils::sanitizeEnv(QProcess &process, bool inplace)
 {
-	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-	env.remove("LD_PRELOAD");
-	env.insert("LD_LIBRARY_PATH", "");
-	process.setProcessEnvironment(env);
+	if (inplace) {
+		qputenv("LD_PRELOAD", "");
+		qputenv("LD_LIBRARY_PATH", "");
+	} else {
+		QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+		env.remove("LD_PRELOAD");
+		env.insert("LD_LIBRARY_PATH", "");
+		process.setProcessEnvironment(env);
+	}
 }
 
 RunCmdResult HostUtils::RunCmdLineUtilityEx(const QStringList& cmdline, QProcess &process, int timeout,

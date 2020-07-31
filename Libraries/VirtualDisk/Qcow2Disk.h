@@ -62,7 +62,6 @@ private:
 
 struct Process: QProcess
 {
-	Process();
 	void addChannel(int channel_);
 
 protected:
