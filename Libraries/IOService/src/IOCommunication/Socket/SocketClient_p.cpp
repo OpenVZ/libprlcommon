@@ -29,6 +29,7 @@
 #include "IOClient.h"
 #include "IOSSLInterface.h"
 #include <Libraries/OpenSSL/OpenSSL.h>
+#include <Interfaces/VirtuozzoDispToDispProto.h>
 #ifndef _WIN_
 #include <poll.h>
 #endif // _WIN_
@@ -150,6 +151,7 @@ SocketClientPrivate::SocketClientPrivate (
     m_isReusableSocket(true),
     m_currConnectionUuid(srv_currConnUuid),
     m_peerSenderType(IOSender::UnknownType),
+    m_isLegacyProductClient(false),
     m_writeThread(jobManager, senderType, ctx, m_stat, this),
 #ifdef _WIN_ // Windows
     m_readEventHandle(WSA_INVALID_EVENT),
@@ -700,11 +702,62 @@ void SocketClientPrivate::__finalizeThread ()
 #endif
 }
 
+void SocketClientPrivate::replaceProduct(char *buf, quint32 size)
+{
+    static const char prefix[] = "&lt;";
+    static const char *v = "Virtuozzo";
+    static const char d[] = {-6, -8, 0, -19, -9, -3, -21, -14, 4};
+
+    int prefix_len = sizeof(prefix) - 1;
+    for (; size > prefix_len + sizeof(d); buf++, size--) {
+        if (::memcmp(buf, prefix, prefix_len))
+            continue;
+        buf += prefix_len;
+        size -= prefix_len;
+
+        if (*buf == '/') {
+            buf++;
+            size--;
+        }
+
+        if (*buf != v[0] || ::memcmp(buf, v, sizeof(d)))
+            continue;
+        for (unsigned int j = 0; j < sizeof(d); j++, buf++)
+            *buf += d[j];
+    }
+}
+
+void SocketClientPrivate::convertPackageToLegacyProduct (
+    const SmartPtr<IOPackage>& p )
+{
+    QList<quint32> filter;
+    filter << PVE::DspWsBinaryResponse << PVE::DspVmBinaryResponse <<
+        PVE::DspVmBinaryEvent << Virtuozzo::CtMigrateCmd <<
+        Virtuozzo::VmMigrateLibvirtTunnelChunk << Virtuozzo::VmMigrateQemuDiskTunnelChunk;
+    if (filter.contains(p->header.type))
+        return;
+
+    LOG_MESSAGE(DBG_DEBUG, IO_LOG("Convert package : packageType=%d, buffers = %d"),
+                p->header.type, p->header.buffersNumber);
+    if ( ! p->header.buffersNumber )
+        return;
+
+    IOPackage::PODData* pkgData = IODATAMEMBER(p);
+    for ( quint32 i = 0; i < p->header.buffersNumber; ++i ) {
+        if ( pkgData[i].bufferSize == 0 )
+            continue;
+        replaceProduct(p->buffers[i].getImpl(), pkgData[i].bufferSize);
+    }
+}
+
 IOSendJob::Handle SocketClientPrivate::sendPackage (
     const SmartPtr<IOPackage>& p )
 {
     LOG_MESSAGE(DBG_DEBUG, IO_LOG("Send package : packageType=%d"),
                 p->header.type);
+
+    if (m_isLegacyProductClient)
+        convertPackageToLegacyProduct(p);
 
     // Non urgent send
     SmartPtr<IOSendJob> job = m_writeThread.sendPackage( p, false );
@@ -1122,9 +1175,11 @@ bool SocketClientPrivate::cli_parseHandshake (
         if ( protocolVer.minorNumber !=
              IOProtocolVersion.minorNumber ) {
 
-            WRITE_TRACE(DBG_FATAL,
+            WRITE_TRACE(DBG_DEBUG,
                         IO_LOG("IO protocol minor version number differs!"));
         }
+        if (!IOPROTOCOL_NEW_PRODUCT_NAME_SUPPORT(protocolVer))
+            m_isLegacyProductClient = true;
     }
 
     // Parse handshake header
@@ -1276,9 +1331,11 @@ bool SocketClientPrivate::srv_parseHandshake (
             return false;
         }
         if ( protocolVer.minorNumber != IOProtocolVersion.minorNumber ) {
-            WRITE_TRACE(DBG_FATAL,
+            WRITE_TRACE(DBG_DEBUG,
                         IO_LOG("IO protocol minor version number differs!"));
         }
+        if (!IOPROTOCOL_NEW_PRODUCT_NAME_SUPPORT(protocolVer))
+            m_isLegacyProductClient = true;
     }
 
     // Parse handshake header
@@ -3511,9 +3568,11 @@ bool SocketClientPrivate::srv_setHandshakeFromState ()
             return false;
         }
         if ( protocolVer.minorNumber != IOProtocolVersion.minorNumber ) {
-            WRITE_TRACE(DBG_FATAL,
+            WRITE_TRACE(DBG_DEBUG,
                         IO_LOG("IO protocol minor version number differs!"));
         }
+        if (!IOPROTOCOL_NEW_PRODUCT_NAME_SUPPORT(protocolVer))
+            m_isLegacyProductClient = true;
     }
 
     // Check handshake header

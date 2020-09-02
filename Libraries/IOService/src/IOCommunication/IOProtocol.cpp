@@ -58,7 +58,7 @@ const IOSender::Handle IOSender::InvalidHandle;
 const IOCommunication::ProtocolVersion IOService::IOProtocolVersion =
 {
     {'P','R','L','T'}, // Never changes, our 'PRLT' magic string
-    6, 9,              // Protocol version: MAJOR, MINOR
+    6, 10,              // Protocol version: MAJOR, MINOR
     VER_FILEVERSION_STR " (" VER_SPECIAL_BUILD_STR ")" // Build description
 };
 

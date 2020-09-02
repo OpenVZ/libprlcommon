@@ -873,6 +873,12 @@ namespace IOService {
 	( (ver).majorNumber > 6 || ((ver).majorNumber == 6 && (ver).minorNumber >= 9) )
 
 /**
+ * Returns true if protocol version supports new logging scheme.
+ */
+#define IOPROTOCOL_NEW_PRODUCT_NAME_SUPPORT(ver) \
+	( (ver).majorNumber > 6 || ((ver).majorNumber == 6 && (ver).minorNumber >= 10) )
+
+/**
  * IO protocol internal macroses
  */
 
