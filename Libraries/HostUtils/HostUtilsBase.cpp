@@ -64,21 +64,13 @@ QString HostUtils::parseMacAddress(const QString& mac)
 
 QString HostUtils::generateMacAddress (HostUtils::MacPrefixType prefix)
 {
+	Q_UNUSED(prefix);
 	QString macAddress;
 	boost::random::random_device g;
 	boost::uniform_int<quint32> d(16, (1<<24) - 1);
 
-	QString macPrefix;
-	switch ( prefix ) {
-	case MAC_PREFIX_CT:
-		macPrefix = "001851";
-		break;
-	case MAC_PREFIX_VM:
-		macPrefix = "001C42";
-		break;
-	};
 	macAddress.sprintf("%06X", d(g));
-	return macPrefix + macAddress;
+	return QString("C43772") + macAddress;
 }
 
 QString HostUtils::generateHostInterfaceName(const QString& mac)
