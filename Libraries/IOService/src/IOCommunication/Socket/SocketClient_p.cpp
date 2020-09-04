@@ -28,8 +28,8 @@
 #include "Socket/SocketClient_p.h"
 #include "IOClient.h"
 #include "IOSSLInterface.h"
+#include "Interfaces/VirtuozzoDispToDispProto.h"
 #include <Libraries/OpenSSL/OpenSSL.h>
-#include <Interfaces/VirtuozzoDispToDispProto.h>
 #ifndef _WIN_
 #include <poll.h>
 #endif // _WIN_

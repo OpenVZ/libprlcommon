@@ -28,7 +28,7 @@
 #ifndef VirtuozzoDispToDispProto_H
 #define VirtuozzoDispToDispProto_H
 
-#include <prlcommon/Interfaces/VirtuozzoNamespace.h>
+#include "VirtuozzoNamespace.h"
 
 namespace Virtuozzo
 {
