@@ -179,6 +179,8 @@ private:
                                 IOSendJob::Result,
                                 const SmartPtr<IOPackage>& );
     virtual void onWriteIsFinishedWithErrors ( SocketWriteThread* );
+    void replaceProduct(char *buf, quint32 size);
+    void convertPackageToLegacyProduct ( const SmartPtr<IOPackage>& );
 
 
 private:
@@ -212,6 +214,7 @@ private:
     QString m_currConnectionUuid;
     IOSender::Type m_peerSenderType;
     IOCommunication::ProtocolVersion m_peerProtoVersion;
+    bool m_isLegacyProductClient;
     IOCommunication::ProtocolVersion m_proxyPeerProtoVersion;
     QString m_peerHostName;
     IORoutingTable m_peerRoutingTable;
