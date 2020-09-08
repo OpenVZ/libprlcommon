@@ -65,23 +65,40 @@ namespace VirtualDisk
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-// struct NbdClient
+// struct NbdLoader
 
-struct NbdClient : boost::noncopyable
+struct NbdLoader : boost::noncopyable
 {
-	NbdClient *getNbdClient(void) { return isLoaded() ? this : NULL; }
+	const NbdLoader *get(void) const { return loaded ? this : NULL; }
 
-	NbdClient() : m_clnt(NULL), m_proc(NULL), loaded(false)
+	NbdLoader() : loaded(false)
 	{
 		load();
 	}
 
 	void load();
-	bool isLoaded() const { return loaded; }
+
+	struct nbd_functions m_nbd;
+	struct pcs_functions m_pcs;
+
+private:
+	bool loaded;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// struct NbdContext
+
+struct NbdContext
+{
+	explicit NbdContext(const NbdLoader *lib) : m_clnt(NULL), m_proc(NULL), m_lib(lib)
+	{
+	}
+
+	bool loaded(void) const { return m_lib != NULL; }
 
 	// nbd_client wrappers
-	int  init(void);
-	void fini(void);
+	int  nbd_init(void);
+	void nbd_fini(void);
 	int  connect(const char *addr, const char *exp_name);
 	int  disconnect(void);
 	void getsize(PRL_UINT32 *blksize, PRL_UINT64 *size);
@@ -96,53 +113,52 @@ struct NbdClient : boost::noncopyable
 
 	void move_to_coroutine(void)
 	{
-		m_pcs.pcs_move_to_coroutine(m_proc);
+		m_lib->m_pcs.pcs_move_to_coroutine(m_proc);
 	}
 
 	void move_from_coroutine(void)
 	{
-		m_pcs.pcs_move_from_coroutine();
+		m_lib->m_pcs.pcs_move_from_coroutine();
 	}
 
-
 private:
-	struct nbd_functions m_nbd;
-	struct pcs_functions m_pcs;
-
-	struct nbd_client  *m_clnt;
+	struct nbd_client *m_clnt;
 	struct pcs_process *m_proc;
 
-	bool loaded;
+	const NbdLoader *m_lib;
 };
 
-void NbdClient::load()
+///////////////////////////////////////////////////////////////////////////////
+// struct NbdLoader
+
+void NbdLoader::load()
 {
 	// resolve libpcs_nbd symbols
 	const char *dlname = "libpcs_nbd.so.1";
 
-	void *h = dlopen(dlname, RTLD_LAZY);
-	if (h == NULL) {
+	void *a = dlopen(dlname, RTLD_LAZY);
+	if (a == NULL) {
 		WRITE_TRACE(DBG_FATAL, "Failed to load %s: %s", dlname, strerror(errno));
 		return;
 	}
 
 	m_nbd.nbd_client_init = (struct nbd_client *(*)(void))
-		dlsym(h, "nbd_client_init");
+		dlsym(a, "nbd_client_init");
 	m_nbd.nbd_client_fini = (void (*)(nbd_client*))
-		dlsym(h, "nbd_client_fini");
+		dlsym(a, "nbd_client_fini");
 	m_nbd.nbd_client_connect = (int (*)(nbd_client*, const char*, const char*))
-		dlsym(h, "nbd_client_connect");
+		dlsym(a, "nbd_client_connect");
 	m_nbd.nbd_client_disconnect = (int (*)(nbd_client*))
-		dlsym(h, "nbd_client_disconnect");
+		dlsym(a, "nbd_client_disconnect");
 	m_nbd.nbd_client_getsize = (void (*)(nbd_client*, PRL_UINT32*, PRL_UINT64*))
-		dlsym(h, "nbd_client_getsize");
+		dlsym(a, "nbd_client_getsize");
 	m_nbd.nbd_client_read = (int (*)(nbd_client*, PRL_UINT64, void*, PRL_UINT32))
-		dlsym(h, "nbd_client_read");
+		dlsym(a, "nbd_client_read");
 	m_nbd.nbd_client_write = (int (*)(nbd_client*, PRL_UINT64, const void*, PRL_UINT32))
-		dlsym(h, "nbd_client_write");
+		dlsym(a, "nbd_client_write");
 	m_nbd.nbd_client_blk_status = (PRL_INT64 (*) (struct nbd_client*, const char*,
 			PRL_UINT64, PRL_UINT32, nbd_blk_status_cb, void*))
-		dlsym(h, "nbd_client_blk_status");
+		dlsym(a, "nbd_client_blk_status");
 
 	if (m_nbd.nbd_client_init == NULL ||
 	    m_nbd.nbd_client_fini == NULL ||
@@ -154,35 +170,36 @@ void NbdClient::load()
 	    m_nbd.nbd_client_blk_status == NULL)
 	{
 		WRITE_TRACE(DBG_FATAL, "Failed to resolve %s functions: %s", dlname, dlerror());
-		dlclose(h);
+		dlclose(a);
 		return;
 	}
 
 	// resolve libpcs_io symbols
 	dlname = "libpcs_io.so.4";
 
-	h = dlopen(dlname, RTLD_LAZY);
-	if (h == NULL) {
+	void *b = dlopen(dlname, RTLD_LAZY);
+	if (b == NULL) {
 		WRITE_TRACE(DBG_FATAL, "Failed to load %s: %s", dlname, strerror(errno));
+		dlclose(a);
 		return;
 	}
 
 	m_pcs.pcs_process_alloc =  (int (*)(struct pcs_process **))
-		dlsym(h, "pcs_process_alloc");
+		dlsym(b, "pcs_process_alloc");
 	m_pcs.pcs_process_fini = (int (*)(struct pcs_process *))
-		dlsym(h, "pcs_process_fini");
+		dlsym(b, "pcs_process_fini");
 	m_pcs.pcs_process_start = (int (*)(struct pcs_process *, const char *name))
-		dlsym(h, "pcs_process_start");
+		dlsym(b, "pcs_process_start");
 	m_pcs.pcs_process_terminate = (void (*)(struct pcs_process *))
-		dlsym(h, "pcs_process_terminate");
+		dlsym(b, "pcs_process_terminate");
 	m_pcs.pcs_process_wait = (int (*)(struct pcs_process *))
-		dlsym(h, "pcs_process_wait");
+		dlsym(b, "pcs_process_wait");
 	m_pcs.pcs_move_to_coroutine = (void (*)(struct pcs_process *))
-		dlsym(h, "pcs_move_to_coroutine");
+		dlsym(b, "pcs_move_to_coroutine");
 	m_pcs.pcs_move_from_coroutine = (void (*) (void))
-		dlsym(h, "pcs_move_from_coroutine");
+		dlsym(b, "pcs_move_from_coroutine");
 	m_pcs.pcs_free = (void (*)(void*))
-		dlsym(h, "__pcs_free");
+		dlsym(b, "__pcs_free");
 
 	if (m_pcs.pcs_process_alloc == NULL ||
 	    m_pcs.pcs_process_fini == NULL ||
@@ -194,26 +211,31 @@ void NbdClient::load()
 	    m_pcs.pcs_free == NULL)
 	{
 		WRITE_TRACE(DBG_FATAL, "Failed to resolve %s functions: %s", dlname, dlerror());
-		dlclose(h);
+		dlclose(a);
+		dlclose(b);
 		return;
 	}
 
 	loaded = true;
 }
 
-int NbdClient::pcs_init(void)
+
+///////////////////////////////////////////////////////////////////////////////
+// struct NbdContext
+
+int NbdContext::pcs_init(void)
 {
-	int rc = m_pcs.pcs_process_alloc(&m_proc);
+	int rc = m_lib->m_pcs.pcs_process_alloc(&m_proc);
 	if (rc) {
 		WRITE_TRACE(DBG_FATAL, "%s: %d", __PRETTY_FUNCTION__, rc);
 		return rc;
 	}
 
-	rc = m_pcs.pcs_process_start(m_proc, "VzNbdClient");
+	rc = m_lib->m_pcs.pcs_process_start(m_proc, "VzNbdContext");
 	if (rc) {
 		WRITE_TRACE(DBG_FATAL, "%s: %d", __PRETTY_FUNCTION__, rc);
-		m_pcs.pcs_process_fini(m_proc);
-		m_pcs.pcs_free(m_proc);
+		m_lib->m_pcs.pcs_process_fini(m_proc);
+		m_lib->m_pcs.pcs_free(m_proc);
 		m_proc = NULL;
 		return rc;
 	}
@@ -221,38 +243,38 @@ int NbdClient::pcs_init(void)
 	return 0;
 }
 
-void NbdClient::pcs_fini(void)
+void NbdContext::pcs_fini(void)
 {
 	if (m_proc) {
-		m_pcs.pcs_process_terminate(m_proc);
-		m_pcs.pcs_process_wait(m_proc);
-		m_pcs.pcs_process_fini(m_proc);
-		m_pcs.pcs_free(m_proc);
+		m_lib->m_pcs.pcs_process_terminate(m_proc);
+		m_lib->m_pcs.pcs_process_wait(m_proc);
+		m_lib->m_pcs.pcs_process_fini(m_proc);
+		m_lib->m_pcs.pcs_free(m_proc);
 		m_proc = NULL;
 	}
 }
 
-int NbdClient::init(void)
+int NbdContext::nbd_init(void)
 {
-	m_clnt = m_nbd.nbd_client_init();
+	m_clnt = m_lib->m_nbd.nbd_client_init();
 	return m_clnt == NULL;
 }
 
-void NbdClient::fini(void)
+void NbdContext::nbd_fini(void)
 {
-	if (m_clnt) {
+	if (m_clnt && m_proc) {
 		move_to_coroutine();
-		m_nbd.nbd_client_fini(m_clnt);
+		m_lib->m_nbd.nbd_client_fini(m_clnt);
 		move_from_coroutine();
 
 		m_clnt = NULL;
 	}
 }
 
-int NbdClient::connect(const char *addr, const char *exp_name)
+int NbdContext::connect(const char *addr, const char *exp_name)
 {
 	move_to_coroutine();
-	int rc = m_nbd.nbd_client_connect(m_clnt, addr, exp_name);
+	int rc = m_lib->m_nbd.nbd_client_connect(m_clnt, addr, exp_name);
 	move_from_coroutine();
 
 	if (rc)
@@ -260,10 +282,31 @@ int NbdClient::connect(const char *addr, const char *exp_name)
 	return rc;
 }
 
-int NbdClient::disconnect(void)
+int NbdContext::disconnect(void)
+{
+	int rc = 0;
+	if (m_clnt && m_proc) {
+		move_to_coroutine();
+		rc = m_lib->m_nbd.nbd_client_disconnect(m_clnt);
+		move_from_coroutine();
+
+		if (rc)
+			WRITE_TRACE(DBG_FATAL, "%s: %d", __PRETTY_FUNCTION__, rc);
+	}
+	return rc;
+}
+
+void NbdContext::getsize(PRL_UINT32 *blksize, PRL_UINT64 *size)
 {
 	move_to_coroutine();
-	int rc = m_nbd.nbd_client_disconnect(m_clnt);
+	m_lib->m_nbd.nbd_client_getsize(m_clnt, blksize, size);
+	move_from_coroutine();
+}
+
+int NbdContext::read(PRL_UINT64 offs, void *buf, PRL_UINT32 size)
+{
+	move_to_coroutine();
+	int rc = m_lib->m_nbd.nbd_client_read(m_clnt, offs, buf, size);
 	move_from_coroutine();
 
 	if (rc)
@@ -271,17 +314,10 @@ int NbdClient::disconnect(void)
 	return rc;
 }
 
-void NbdClient::getsize(PRL_UINT32 *blksize, PRL_UINT64 *size)
+int NbdContext::write(PRL_UINT64 offs, const void *buf, PRL_UINT32 size)
 {
 	move_to_coroutine();
-	m_nbd.nbd_client_getsize(m_clnt, blksize, size);
-	move_from_coroutine();
-}
-
-int NbdClient::read(PRL_UINT64 offs, void *buf, PRL_UINT32 size)
-{
-	move_to_coroutine();
-	int rc = m_nbd.nbd_client_read(m_clnt, offs, buf, size);
+	int rc = m_lib->m_nbd.nbd_client_write(m_clnt, offs, buf, size);
 	move_from_coroutine();
 
 	if (rc)
@@ -289,22 +325,11 @@ int NbdClient::read(PRL_UINT64 offs, void *buf, PRL_UINT32 size)
 	return rc;
 }
 
-int NbdClient::write(PRL_UINT64 offs, const void *buf, PRL_UINT32 size)
-{
-	move_to_coroutine();
-	int rc = m_nbd.nbd_client_write(m_clnt, offs, buf, size);
-	move_from_coroutine();
-
-	if (rc)
-		WRITE_TRACE(DBG_FATAL, "%s: %d", __PRETTY_FUNCTION__, rc);
-	return rc;
-}
-
-PRL_INT64 NbdClient::get_blk_status(const char *meta_ctx, PRL_UINT64 offs,
+PRL_INT64 NbdContext::get_blk_status(const char *meta_ctx, PRL_UINT64 offs,
 	PRL_UINT32 size, nbd_blk_status_cb cb, void *cb_arg)
 {
 	move_to_coroutine();
-	PRL_INT64 rc = m_nbd.nbd_client_blk_status(m_clnt, meta_ctx, offs, size, cb, cb_arg);
+	PRL_INT64 rc = m_lib->m_nbd.nbd_client_blk_status(m_clnt, meta_ctx, offs, size, cb, cb_arg);
 	move_from_coroutine();
 
 	if (rc < 0)
@@ -312,12 +337,12 @@ PRL_INT64 NbdClient::get_blk_status(const char *meta_ctx, PRL_UINT64 offs,
 	return rc;
 }
 
-Q_GLOBAL_STATIC(NbdClient, getNbdClient)
+Q_GLOBAL_STATIC(NbdLoader, get)
 
 ///////////////////////////////////////////////////////////////////////////////
 // struct NbdDisk
 
-NbdDisk::NbdDisk() : m_nbd(getNbdClient())
+NbdDisk::NbdDisk() : m_nbd(new NbdContext(get()))
 {
 }
 
@@ -333,7 +358,7 @@ PRL_RESULT NbdDisk::open(const QString &fileName,
 	Q_UNUSED(policies);
 	Q_UNUSED(flags);
 
-	if (m_nbd == NULL) {
+	if (!m_nbd->loaded()) {
 		WRITE_TRACE(DBG_FATAL, "libpcs_nbd.so initialization failed");
 		return PRL_ERR_UNINITIALIZED;
 	}
@@ -354,7 +379,7 @@ PRL_RESULT NbdDisk::open(const QString &fileName,
 		return PRL_ERR_FAILURE;
 	}
 
-	if (m_nbd->init()) {
+	if (m_nbd->nbd_init()) {
 		close();
 		return PRL_ERR_FAILURE;
 	}
@@ -423,7 +448,7 @@ Parameters::disk_type NbdDisk::getInfo(void)
 PRL_RESULT NbdDisk::close(void)
 {
 	m_nbd->disconnect();
-	m_nbd->fini();
+	m_nbd->nbd_fini();
 	m_nbd->pcs_fini();
 
 	return PRL_ERR_SUCCESS;
@@ -480,14 +505,14 @@ PRL_RESULT NbdDisk::Bitmap::operator()(T policy, int granularity)
 
 CSparseBitmap *NbdDisk::getUsedBlocksBitmap(UINT32 granularity, PRL_RESULT &err)
 {
-	NbdDisk::Bitmap bitmap(m_nbd);
+	NbdDisk::Bitmap bitmap(m_nbd.data());
 	err = bitmap(Allocation(), granularity);
 	return bitmap.take();
 }
 
 CSparseBitmap *NbdDisk::getTrackingBitmap(const QString& uuid)
 {
-	NbdDisk::Bitmap bitmap(m_nbd);
+	NbdDisk::Bitmap bitmap(m_nbd.data());
 	bitmap(Dirty(uuid));
 	return bitmap.take();
 }

@@ -41,7 +41,7 @@ namespace VirtualDisk
 ///////////////////////////////////////////////////////////////////////////////
 
 // struct NbdClient
-struct NbdClient;
+class NbdContext;
 
 // struct NbdDisk
 struct NbdDisk : Format
@@ -118,7 +118,7 @@ private:
 	};
 	struct Bitmap : private QScopedPointer<CSparseBitmap>
 	{
-		Bitmap(NbdClient *nbd) : m_nbd(nbd) { }
+		Bitmap(NbdContext *nbd) : m_nbd(nbd) { }
 		template <class T>
 		PRL_RESULT operator()(T, int granularity = DEFAULT_GRANULARITY);
 		using QScopedPointer<CSparseBitmap>::take;
@@ -126,13 +126,13 @@ private:
 		template <class T>
 		static void setRange(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg);
 
-		NbdClient *m_nbd;
+		NbdContext *m_nbd;
 	};
-
-	NbdClient *m_nbd;
 
 	QUrl	m_url;
 	QString	m_uuid;
+
+	QScopedPointer<NbdContext> m_nbd;
 };
 
 } // namespace VirtualDisk
