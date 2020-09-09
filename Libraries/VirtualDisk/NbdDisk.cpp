@@ -31,6 +31,8 @@
 
 extern "C" {
 
+#define PCS_ERR	1
+
 typedef void (*nbd_blk_status_cb)(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg);
 
 struct nbd_client;
@@ -225,6 +227,11 @@ void NbdLoader::load()
 
 int NbdContext::pcs_init(void)
 {
+	if (m_proc) {
+		WRITE_TRACE(DBG_FATAL, "%s: already initialized", __PRETTY_FUNCTION__);
+		return -PCS_ERR;
+	}
+
 	int rc = m_lib->m_pcs.pcs_process_alloc(&m_proc);
 	if (rc) {
 		WRITE_TRACE(DBG_FATAL, "%s: %d", __PRETTY_FUNCTION__, rc);
@@ -256,8 +263,13 @@ void NbdContext::pcs_fini(void)
 
 int NbdContext::nbd_init(void)
 {
+	if (m_clnt) {
+		WRITE_TRACE(DBG_FATAL, "%s: already initialized", __PRETTY_FUNCTION__);
+		return -PCS_ERR;
+	}
+
 	m_clnt = m_lib->m_nbd.nbd_client_init();
-	return m_clnt == NULL;
+	return m_clnt == NULL ? -PCS_ERR : 0;
 }
 
 void NbdContext::nbd_fini(void)
