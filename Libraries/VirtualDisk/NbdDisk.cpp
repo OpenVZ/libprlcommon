@@ -71,20 +71,19 @@ namespace VirtualDisk
 
 struct NbdLoader : boost::noncopyable
 {
-	const NbdLoader *get(void) const { return loaded ? this : NULL; }
-
-	NbdLoader() : loaded(false)
+	NbdLoader() : m_loaded(false)
 	{
 		load();
 	}
 
 	void load();
+	bool loaded(void) const { return m_loaded; }
 
 	struct nbd_functions m_nbd;
 	struct pcs_functions m_pcs;
 
 private:
-	bool loaded;
+	bool m_loaded;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,7 +95,7 @@ struct NbdContext
 	{
 	}
 
-	bool loaded(void) const { return m_lib != NULL; }
+	bool loaded(void) const { return m_lib != NULL && m_lib->loaded(); }
 
 	// nbd_client wrappers
 	int  nbd_init(void);
@@ -218,7 +217,7 @@ void NbdLoader::load()
 		return;
 	}
 
-	loaded = true;
+	m_loaded = true;
 }
 
 
@@ -349,12 +348,12 @@ PRL_INT64 NbdContext::get_blk_status(const char *meta_ctx, PRL_UINT64 offs,
 	return rc;
 }
 
-Q_GLOBAL_STATIC(NbdLoader, get)
+Q_GLOBAL_STATIC(NbdLoader, getNbdLoader)
 
 ///////////////////////////////////////////////////////////////////////////////
 // struct NbdDisk
 
-NbdDisk::NbdDisk() : m_nbd(new NbdContext(get()))
+NbdDisk::NbdDisk() : m_nbd(new NbdContext(getNbdLoader()))
 {
 }
 
