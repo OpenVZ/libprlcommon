@@ -30,9 +30,6 @@
 #include "SparseBitmap.h"
 #include "Util.h"
 
-struct nbd_client;
-struct nbd_functions;
-
 enum {
 	SECTOR_SIZE = 512,
 	DEFAULT_GRANULARITY = 128,
@@ -42,8 +39,11 @@ enum {
 namespace VirtualDisk
 {
 ///////////////////////////////////////////////////////////////////////////////
-// struct Nbd
 
+// struct NbdClient
+class NbdContext;
+
+// struct NbdDisk
 struct NbdDisk : Format
 {
 	NbdDisk();
@@ -118,8 +118,7 @@ private:
 	};
 	struct Bitmap : private QScopedPointer<CSparseBitmap>
 	{
-		Bitmap(struct nbd_client *clnt, struct nbd_functions *nbd)
-			: m_clnt(clnt), m_nbd(nbd) { }
+		Bitmap(NbdContext *nbd) : m_nbd(nbd) { }
 		template <class T>
 		PRL_RESULT operator()(T, int granularity = DEFAULT_GRANULARITY);
 		using QScopedPointer<CSparseBitmap>::take;
@@ -127,15 +126,13 @@ private:
 		template <class T>
 		static void setRange(PRL_UINT64 offs, PRL_UINT32 size, PRL_UINT32 flags, void *arg);
 
-		struct nbd_client    *m_clnt;
-		struct nbd_functions *m_nbd;
+		NbdContext *m_nbd;
 	};
-
-	struct nbd_client    *m_clnt;
-	struct nbd_functions *m_nbd;
 
 	QUrl	m_url;
 	QString	m_uuid;
+
+	QScopedPointer<NbdContext> m_nbd;
 };
 
 } // namespace VirtualDisk
