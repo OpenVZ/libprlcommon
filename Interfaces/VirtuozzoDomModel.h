@@ -1985,6 +1985,7 @@ public:
 #define EVT_PARAM_DISP_TO_DISP_RESPONSE_CMD_PARAMS_LIST				"disp_to_disp_response_cmd_params_list"
 
 #define EVT_PARAM_MIGRATE_PROTO_VERSION				"migrate_proto_version"
+#define EVT_PARAM_MIGRATE_PROTO_VERSION_2G			"migrate_proto_version_2g"
 #define EVT_PARAM_MIGRATE_CMD_TARGET_SERVER_HOSTNAME		"migrate_cmd_target_server_hostname"
 #define EVT_PARAM_MIGRATE_CMD_TARGET_SERVER_PORT		"migrate_cmd_target_server_port"
 #define EVT_PARAM_MIGRATE_CMD_TARGET_SERVER_SESSION_UUID	"migrate_cmd_target_server_session_uuid"
