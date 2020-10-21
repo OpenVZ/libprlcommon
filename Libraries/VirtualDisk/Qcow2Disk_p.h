@@ -77,6 +77,7 @@ struct Script
 	Script& addArgument(const QString& one_);
 	Script& addArguments(const QStringList& bunch_);
 	void operator()(Process& target_) const;
+	QString findConnectedDevice(const QString& image_) const;
 
 private:
 	QString m_image;

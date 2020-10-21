@@ -589,6 +589,10 @@ Script& Script::addArguments(const QStringList& bunch_)
 
 void Script::operator()(Process& target_) const
 {
+	QString dev = findConnectedDevice(m_image);
+	if (!dev.isEmpty())
+		Export::State::Running::disconnect(dev);
+
 	foreach(quint32 p, m_portList)
 	{
 		target_.addChannel(p);
@@ -599,6 +603,35 @@ void Script::operator()(Process& target_) const
 		<< "-f" << "qcow2" << "--detect-zeroes=on"
 		<< m_commandLine << m_image;
 	target_.start(a.join(" "));
+}
+
+
+/* Search running qemu-nbd with assigned image and return NBD device */
+QString Script::findConnectedDevice(const QString& image_) const
+{
+	foreach(const QString &dev, Nbd::Driver::getDeviceList())
+	{
+		QString pid;
+		QFile f(QString("/sys/block/%1/pid").arg(QFileInfo(dev).fileName()));
+		if (f.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			QTextStream s(&f);
+			pid = s.readLine();
+		}
+		if (pid.isEmpty())
+			continue;
+
+		QFile c(QString("/proc/%1/cmdline").arg(pid));
+		if (c.open(QIODevice::ReadOnly | QIODevice::Text))
+		{	
+			QTextStream s(&c);
+			QString cmd = s.readLine();
+			if (cmd.startsWith(QEMU_NBD) && cmd.contains(image_))
+				return dev;
+		}
+	}
+
+	return QString();;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
