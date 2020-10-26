@@ -587,11 +587,20 @@ Script& Script::addArguments(const QStringList& bunch_)
 	return *this;
 }
 
+class Sleeper : public QThread
+{
+public:
+	static void sleep(unsigned long secs){QThread::sleep(secs);}
+};
+
 void Script::operator()(Process& target_) const
 {
 	QString dev = findConnectedDevice(m_image);
 	if (!dev.isEmpty())
+	{
 		Export::State::Running::disconnect(dev);
+		Sleeper::sleep(5);
+	}
 
 	foreach(quint32 p, m_portList)
 	{
@@ -622,11 +631,10 @@ QString Script::findConnectedDevice(const QString& image_) const
 			continue;
 
 		QFile c(QString("/proc/%1/cmdline").arg(pid));
-		if (c.open(QIODevice::ReadOnly | QIODevice::Text))
-		{	
-			QTextStream s(&c);
-			QString cmd = s.readLine();
-			if (cmd.startsWith(QEMU_NBD) && cmd.contains(image_))
+		if (c.open(QIODevice::ReadOnly))
+		{
+			QByteArray cmd = c.readAll();
+			if (cmd.startsWith(QEMU_NBD) && cmd.contains(qPrintable(image_)))
 				return dev;
 		}
 	}
