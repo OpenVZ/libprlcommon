@@ -110,8 +110,10 @@
 #define MIGRATE_DISP_PROTO_V8   8
 /* Native shared migration */
 #define MIGRATE_DISP_PROTO_V9   9
+/* Native nvram migration */
+#define MIGRATE_DISP_PROTO_V10   10
 /* current migrate protocol version */
-#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V9
+#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V10
 
 /* backup client-dispatcher and dispatcher-dispatcher protocol versions */
 /* RC version */
