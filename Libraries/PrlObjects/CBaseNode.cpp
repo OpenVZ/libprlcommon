@@ -594,6 +594,9 @@ bool CBaseNode::eqName(QString& tag_name, const QString xml_name, const bool rep
 	// At first we always use direct comparing names
 	if (tag_name == xml_name)
 		return true;
+	// check for alias
+	if (tag_name == "VirtuozzoVirtualMachine" && xml_name == "ParallelsVirtualMachine")
+		return true;
 	// At second try to find our keyword in true xml name
 	QString plz = getLegacyProductTag(xml_name);
 	if (!plz.isEmpty())
