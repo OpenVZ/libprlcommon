@@ -34,6 +34,7 @@
 #include "Util.h"
 
 #include <sys/ioctl.h>
+#include <linux/nbd.h>
 #include <linux/fs.h>
 #include <fcntl.h>
 #include <cstdlib>
@@ -345,13 +346,19 @@ Disconnecting Running::disconnect() const
 PRL_RESULT Running::disconnect(const QString& device_)
 {
 	WRITE_TRACE(DBG_FATAL, "DISCONNECT %s", qPrintable(device_));
-	QStringList cmdLine = QStringList() << QEMU_NBD << "-d" << enquote(device_);
-	QString out;
-	if (!HostUtils::RunCmdLineUtility(cmdLine.join(" "), out, CMD_WORK_TIMEOUT))
+	int fd;
+
+	fd = open(qPrintable(device_), O_RDWR);
+	if (fd == -1)
 	{
-		WRITE_TRACE(DBG_FATAL, "Cannot disconnect device using qemu-nbd");
+		WRITE_TRACE(DBG_FATAL, "Cannot open %s: %m", qPrintable(device_));
 		return PRL_ERR_DISK_GENERIC_ERROR;
 	}
+
+	ioctl(fd, NBD_CLEAR_QUE);
+	ioctl(fd, NBD_DISCONNECT);
+	ioctl(fd, NBD_CLEAR_SOCK);
+	close(fd);
 
 	return PRL_ERR_SUCCESS;
 }
