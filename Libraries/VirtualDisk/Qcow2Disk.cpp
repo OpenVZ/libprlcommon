@@ -665,17 +665,16 @@ PRL_RESULT Frontend::stop()
 
 	future_type f;
 	bool x = QMetaObject::invokeMethod(m_nbd, "stop",
-				Qt::BlockingQueuedConnection,
+				Qt::QueuedConnection,
 				Q_RETURN_ARG(future_type, f));
 	if (!x) 
 		return PRL_ERR_FAILURE;
 
-	PRL_RESULT output = f.result();
 	m_device.clear();
 	m_nbd->deleteLater();
 	m_nbd = NULL;
 
-	return output;
+	return PRL_ERR_SUCCESS;
 }
 
 PRL_RESULT Frontend::bind(const QString& device_)
