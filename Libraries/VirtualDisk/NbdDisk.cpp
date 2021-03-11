@@ -176,7 +176,7 @@ void NbdLoader::load()
 	}
 
 	// resolve libpcs_io symbols
-	dlname = "libpcs_io.so.4";
+	dlname = "libpcs_io.so.5";
 
 	void *b = dlopen(dlname, RTLD_LAZY);
 	if (b == NULL) {
