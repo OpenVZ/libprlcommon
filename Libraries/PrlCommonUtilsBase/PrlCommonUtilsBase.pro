@@ -51,7 +51,9 @@ HEADERS = VirtuozzoDirs.h \
             CHardDiskHelper.h \
             CUrlParser.h \
             netutils.h \
-            Archive.h
+            Archive.h \
+            CFileHelper.h \
+            CAuthHelper.h
 
 
 SOURCES = VirtuozzoDirs.cpp \
@@ -71,7 +73,9 @@ SOURCES = VirtuozzoDirs.cpp \
             CHardDiskHelper.cpp \
             CUrlParser.cpp \
             netutils.cpp \
-            Archive.cpp
+            Archive.cpp \
+            CFileHelper.cpp \
+            CAuthHelper.cpp \
 
 SDK_VALUES = \
     $$SDK_HEADERS/prlsdk/PrlErrorsValues.h \

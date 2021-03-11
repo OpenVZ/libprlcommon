@@ -37,6 +37,9 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "TscTimeTest.h"
+#include "CAuthHelperTest.h"
+#include "CFileHelperTest.h"
+#include "CAclHelperTest.h"
 
 #define EXECUTE_TESTS_SUITE(TESTS_SUITE_CLASS_NAME)\
 {\
@@ -50,6 +53,9 @@ int main(int argc, char *argv[])
 
 	int nRet = 0;
 	EXECUTE_TESTS_SUITE(TscTimeTest);
+	EXECUTE_TESTS_SUITE(CFileHelperTest)
+	EXECUTE_TESTS_SUITE(CAuthHelperTest)
+	EXECUTE_TESTS_SUITE(CAclHelperTest)
 
 	return nRet;
 }
