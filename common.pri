@@ -141,6 +141,9 @@ win32:DEFINES += NTDDI_VERSION=0x05000100
 # since they are 32 bit by default on linux
 linux-*:DEFINES += _FILE_OFFSET_BITS=64 _LIN_
 
+# Add C++11 support
+QMAKE_CXXFLAGS += -std=c++11
+
 # These two configs are assential (!) for the dependencies tracking
 # Please see the 'Library Dependencies' section of Qt documentation
 # http://doc.trolltech.com/4.2/qmake-environment-reference.html
