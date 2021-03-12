@@ -2,7 +2,7 @@
  * std_list.h: Doubly- and singly-linked lists implementations.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
- * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
+ * Copyright (c) 2017-2021 Virtuozzo International GmbH. All rights reserved.
  *
  * This file is part of Virtuozzo SDK. Virtuozzo SDK is free
  * software; you can redistribute it and/or modify it under the
@@ -33,7 +33,7 @@
 #ifdef __GNUC__
 /* version of container_of with type checking inside */
 #define __prl_container_of(ptr, type, member) ({                    \
-		const typeof( ((type *)0)->member ) *__xptr = (ptr);  \
+		const auto *__xptr = (ptr);  \
 		(type *)( (char *)__xptr - __prl_offsetof(type,member) );})
 #else
 #define __prl_container_of(ptr, type, member) \
