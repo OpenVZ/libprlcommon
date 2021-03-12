@@ -2,7 +2,7 @@
 # PrlCommonUtilsBase.pro
 #
 # Copyright (c) 1999-2017, Parallels International GmbH
-# Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
+# Copyright (c) 2017-2021 Virtuozzo International GmbH. All rights reserved.
 #
 # This file is part of Virtuozzo SDK. Virtuozzo SDK is free
 # software; you can redistribute it and/or modify it under the
@@ -51,7 +51,9 @@ HEADERS = VirtuozzoDirs.h \
             CHardDiskHelper.h \
             CUrlParser.h \
             netutils.h \
-            Archive.h
+            Archive.h \
+            CFileHelper.h \
+            CAuthHelper.h
 
 
 SOURCES = VirtuozzoDirs.cpp \
@@ -71,7 +73,9 @@ SOURCES = VirtuozzoDirs.cpp \
             CHardDiskHelper.cpp \
             CUrlParser.cpp \
             netutils.cpp \
-            Archive.cpp
+            Archive.cpp \
+            CFileHelper.cpp \
+            CAuthHelper.cpp \
 
 SDK_VALUES = \
     $$SDK_HEADERS/prlsdk/PrlErrorsValues.h \

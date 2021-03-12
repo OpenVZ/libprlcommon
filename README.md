@@ -4,6 +4,7 @@ Virtuozzo Common Libraries
 Virtuozzo Common Libraries is a set of libraries used in other Virtuozzo
 components providing common functionality for them:
 
+- CAuth - class for checking user permissions on host;
 - HostUtils - a set of common functions for host information gathering/parsing;
 - IOService - common transport classes;
 - Logging - logging library;

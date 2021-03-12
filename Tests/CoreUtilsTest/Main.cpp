@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 ///
 /// Copyright (c) 2006-2017, Parallels International GmbH
-/// Copyright (c) 2017-2019 Virtuozzo International GmbH, All rights reserved.
+/// Copyright (c) 2017-2021 Virtuozzo International GmbH, All rights reserved.
 ///
 /// This file is part of Virtuozzo Core. Virtuozzo Core is free
 /// software; you can redistribute it and/or modify it under the terms
@@ -37,6 +37,9 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "TscTimeTest.h"
+#include "CAuthHelperTest.h"
+#include "CFileHelperTest.h"
+#include "CAclHelperTest.h"
 
 #define EXECUTE_TESTS_SUITE(TESTS_SUITE_CLASS_NAME)\
 {\
@@ -50,6 +53,9 @@ int main(int argc, char *argv[])
 
 	int nRet = 0;
 	EXECUTE_TESTS_SUITE(TscTimeTest);
+	EXECUTE_TESTS_SUITE(CFileHelperTest)
+	EXECUTE_TESTS_SUITE(CAuthHelperTest)
+	EXECUTE_TESTS_SUITE(CAclHelperTest)
 
 	return nRet;
 }

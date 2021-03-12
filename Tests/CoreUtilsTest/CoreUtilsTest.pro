@@ -4,11 +4,18 @@ QT = core
 include(CoreUtilsTest.deps)
 
 HEADERS += \
-	TscTimeTest.h
+	TscTimeTest.h \
+	CAuthHelperTest.h \
+	CFileHelperTest.h \
+	CAclHelperTest.h
 
 SOURCES += \
 	Main.cpp \
-	TscTimeTest.cpp
+	TscTimeTest.cpp \
+    CAuthHelperTest.cpp \
+    CFileHelperTest.cpp \
+    CAclHelperTest.cpp \
+    $$SRC_LEVEL/Tests/CommonTestsUtils.cpp
 
 macx {
     LIBS += \
