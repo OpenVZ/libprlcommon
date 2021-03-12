@@ -39,10 +39,10 @@
 #include "Tests/CommonTestsUtils.h"
 #include "Tests/AclTestsUtils.h"
 
-#include <prlcommon/PrlUuid/Uuid.h>
-#include <prlcommon/Interfaces/VirtuozzoQt.h>
+#include "Libraries/PrlUuid/Uuid.h"
+#include "Interfaces/VirtuozzoQt.h"
 
-#include <prlcommon/PrlCommonUtilsBase/CAuthHelper.h>
+#include "Libraries/PrlCommonUtilsBase/CAuthHelper.h"
 
 void CAclHelperTest::init()
 {
