@@ -1,8 +1,6 @@
 #
-# VirtuozzoObjects.pri
-#
 # Copyright (c) 1999-2017, Parallels International GmbH
-# Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
+# Copyright (c) 2017-2021 Virtuozzo International GmbH. All rights reserved.
 #
 # This file is part of Virtuozzo SDK. Virtuozzo SDK is free
 # software; you can redistribute it and/or modify it under the
@@ -22,9 +20,22 @@
 # Our contact details: Virtuozzo International GmbH, Vordergasse 59, 8200
 # Schaffhausen, Switzerland.
 #
+include(../common.pri)
+include(../Libraries/CAuth/CAuth.pri)
+include(../Libraries/Messaging/Messaging.pri)
+include(../Libraries/PrlCommonUtilsBase/PrlCommonUtilsBase.pri)
+include(../Libraries/Logging/Logging.pri)
+include(../Libraries/Std/Std.pri)
+include(../Libraries/PrlObjects/PrlObjects.pri)
+include(../Libraries/PrlDataSerializer/PrlDataSerializer.pri)
 
-LIBTARGET = prl_objects
-PROJ_FILE = $$PWD/PrlObjects.pro
+PROJ_PATH = $$PWD
+#include(../Build/qmake/build_target.pri)
+
+TARGET = prlTestsUtils
+LIBTARGET = prlTestsUtils
+PROJ_FILE = $$PWD/TestsUtils.pro
 QTCONFIG = core xml
-!include(../../Build/qmake/staticlib.pri): error(include error)
-include($$LIBS_LEVEL/PrlCommonUtilsBase/PrlCommonUtilsBase.pri)
+
+
+LIBS += -lprl_xml_model

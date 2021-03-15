@@ -7,18 +7,18 @@ include(VirtuozzoDirTest.deps)
 
 HEADERS += \
 	VirtuozzoDirTest.h\
-	CUrlParserTest.h \
-	$$SRC_LEVEL/Tests/CommonTestsUtils.h
+	CUrlParserTest.h
 
 SOURCES += \
 	VirtuozzoDirTest.cpp\
 	Main.cpp   \
-	CUrlParserTest.cpp \
-	$$SRC_LEVEL/Tests/CommonTestsUtils.cpp
+	CUrlParserTest.cpp
 
 macx {
 	LIBS += -framework Carbon
 }
+
+LIBS += -lTestsUtils
 
 # It is important to have "File Info" embedded in the
 # windows binaries - which means we need windows resource file

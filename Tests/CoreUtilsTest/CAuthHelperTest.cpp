@@ -40,7 +40,7 @@
 #include "CAuthHelperTest.h"
 #include "Libraries/PrlCommonUtilsBase/CAuthHelper.h"
 #include <Libraries/Logging/Logging.h>
-#include "Tests/CommonTestsUtils.h"
+#include "TestsUtils/CommonTestsUtils.h"
 
 #include <Libraries/PrlCommonUtilsBase/SysError.h>
 

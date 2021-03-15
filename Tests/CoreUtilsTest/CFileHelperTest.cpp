@@ -61,7 +61,7 @@
 #include <Libraries/PrlCommonUtilsBase/SysError.h>
 #include <Libraries/Std/SmartPtr.h>
 
-#include "Tests/CommonTestsUtils.h"
+#include "TestsUtils/CommonTestsUtils.h"
 
 namespace
 {

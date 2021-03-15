@@ -1,8 +1,6 @@
 #
-# common.pro
-#
 # Copyright (c) 1999-2017, Parallels International GmbH
-# Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
+# Copyright (c) 2017-2021 Virtuozzo International GmbH. All rights reserved.
 #
 # This file is part of Virtuozzo SDK. Virtuozzo SDK is free
 # software; you can redistribute it and/or modify it under the
@@ -23,16 +21,27 @@
 # Schaffhausen, Switzerland.
 #
 
-TEMPLATE = subdirs
+TEMPLATE = lib
+TARGET = prlTestsUtils
 
-include(Build/Options.pri)
-include(common.pri)
+include(TestsUtils.pri)
+include(../Build/Options.pri)
 
-TARGET = prlcommon
-PROJ_PATH = $$PWD
-include(Build/qmake/build_target.pri)
+CONFIG += shared
+CONFIG -= static
 
 target.path = $${PREFIX}/lib64
 INSTALLS += target
 
-include(common.deps)
+INCLUDEPATH += .
+
+HEADERS = 	AclTestsUtils.h \
+			CMockPveEventsHandler.h \
+			CommonTestsUtils.h
+
+SOURCES = 	CMockPveEventsHandler.cpp \
+			CommonTestsUtils.cpp
+
+headers.files = $${HEADERS}
+headers.path = $${PREFIX}/include/prlcommon/TestsUtils
+INSTALLS += headers
