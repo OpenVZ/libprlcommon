@@ -32,6 +32,7 @@ INCLUDEPATH *= $$PWD
 
 include($$LIBS_LEVEL/Logging/Logging.pri)
 include($$LIBS_LEVEL/PrlUuid/PrlUuid.pri)
+include($$LIBS_LEVEL/HostUtils/HostUtils.pri)
 win32 {
 	include($$LIBS_LEVEL/WmiWrap/WmiWrap.pri)
 	# TODO Check if these to libs are needed really
