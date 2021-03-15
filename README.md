@@ -12,6 +12,7 @@ components providing common functionality for them:
 - PrlDataSerializer - data serializer/deserializer;
 - PrlUuid - a wrapper for Virtuozzo uuids generation;
 - Std - set of simple common headers.
+- TestsUtils - Common utils used at all dispatcher API tests suites classes.
 
 How to install
 --------------
@@ -30,4 +31,25 @@ To build the libraries run:
 qmake-qt4
 make
 sudo make install
+```
+
+How to run tests
+----------------
+
+Before running tests, create users `prl_unit_test_user` and `prl_unit_test_user2`.
+Both users shall have password `test`.
+
+```bash
+useradd prl_unit_test_user
+useradd prl_unit_test_user2
+echo test | passwd prl_unit_test_user --stdin
+echo test | passwd prl_unit_test_user2 --stdin
+```
+
+To run tests:
+
+```bash
+cd Tests
+qmake-qt4
+make check
 ```
