@@ -85,11 +85,11 @@ linux-* {
 	QMAKE_CFLAGS_RELEASE += -g
 	QMAKE_CXXFLAGS_RELEASE += -g
 	exists( /usr/include/json-c ) {
-		QMAKE_CFLAGS_RELEASE += -I/usr/include/json-c
-		QMAKE_CXXFLAGS_RELEASE += -I/usr/include/json-c
+		QMAKE_CFLAGS += -I/usr/include/json-c
+		QMAKE_CXXFLAGS += -I/usr/include/json-c
 	} else {
-		QMAKE_CFLAGS_RELEASE += -I/usr/include/json
-		QMAKE_CXXFLAGS_RELEASE += -I/usr/include/json
+		QMAKE_CFLAGS += -I/usr/include/json
+		QMAKE_CXXFLAGS += -I/usr/include/json
 	}
 }
 
