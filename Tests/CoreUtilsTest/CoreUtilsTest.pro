@@ -14,13 +14,14 @@ SOURCES += \
 	TscTimeTest.cpp \
     CAuthHelperTest.cpp \
     CFileHelperTest.cpp \
-    CAclHelperTest.cpp \
-    $$SRC_LEVEL/Tests/CommonTestsUtils.cpp
+    CAclHelperTest.cpp
 
 macx {
     LIBS += \
 		-framework DirectoryService
 }
+
+LIBS += -lTestsUtils
 
 # It is important to have "File Info" embedded in the
 # windows binaries - which means we need windows resource file

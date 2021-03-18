@@ -1,5 +1,5 @@
 #
-# VirtuozzoObjects.pri
+# common.pro
 #
 # Copyright (c) 1999-2017, Parallels International GmbH
 # Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
@@ -23,8 +23,15 @@
 # Schaffhausen, Switzerland.
 #
 
-LIBTARGET = prl_objects
-PROJ_FILE = $$PWD/PrlObjects.pro
-QTCONFIG = core xml
-!include(../../Build/qmake/staticlib.pri): error(include error)
-include($$LIBS_LEVEL/PrlCommonUtilsBase/PrlCommonUtilsBase.pri)
+TEMPLATE = subdirs
+
+include(Build/Options.pri)
+include(common.pri)
+
+SUBDIRS = main test-utils
+
+main.subdir = Libraries
+test-utils.subdir = TestsUtils
+
+test-utils.depends = main
+

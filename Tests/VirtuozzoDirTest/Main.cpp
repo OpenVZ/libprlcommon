@@ -37,7 +37,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include <QtTest/QtTest>
 
-#include "Tests/CommonTestsUtils.h"
+#include "TestsUtils/CommonTestsUtils.h"
 
 #include "VirtuozzoDirTest.h"
 #include "CUrlParserTest.h"

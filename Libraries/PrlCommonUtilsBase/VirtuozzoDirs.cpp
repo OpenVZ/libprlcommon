@@ -26,7 +26,7 @@
  */
 
 #include "VirtuozzoDirs.h"
-#include "VirtuozzoQt.h"
+#include "Interfaces/VirtuozzoQt.h"
 
 #include "Libraries/Logging/Logging.h"
 #include "Libraries/HostUtils/HostUtils.h"

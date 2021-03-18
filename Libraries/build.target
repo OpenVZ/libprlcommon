@@ -30,19 +30,19 @@ CONFIG += shared
 CONFIG -= static
 QT -= gui xml
 
-include(Build/Options.pri)
-include(common.pri)
+include(../Build/Options.pri)
+include(../common.pri)
 
 TARGET = prlcommon
 PROJ_PATH = $$PWD
-include(Build/qmake/build_target.pri)
+include(../Build/qmake/build_target.pri)
 
 target.path = $${PREFIX}/lib64
 INSTALLS += target
 
 unix: QMAKE_LFLAGS += -Wl,-whole-archive
 
-include(common.deps)
+include(Libraries.deps)
 
 unix {
 	VERSION = $$cat(Makefile.version)
@@ -56,12 +56,12 @@ DEFINES += PRINTABLE_TARGET=common
 
 unix: LIBS += -Wl,-no-whole-archive
 
-INTERFACE_HEADERS = $$system(ls Interfaces/*.h)
+INTERFACE_HEADERS = $$system(ls ../Interfaces/*.h)
 headers.files = $${INTERFACE_HEADERS}
 headers.path = $${PREFIX}/include/prlcommon/Interfaces
 INSTALLS += headers
 
-STD_HEADERS = $$system(ls Libraries/Std/*.h)
+STD_HEADERS = $$system(ls Std/*.h)
 stdheaders.files = $${STD_HEADERS}
 stdheaders.path = $${PREFIX}/include/prlcommon/Std
 INSTALLS += stdheaders

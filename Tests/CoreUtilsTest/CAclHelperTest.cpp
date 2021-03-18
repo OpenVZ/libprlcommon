@@ -36,8 +36,8 @@
 #include <QFile>
 #include <QDir>
 
-#include "Tests/CommonTestsUtils.h"
-#include "Tests/AclTestsUtils.h"
+#include "TestsUtils/CommonTestsUtils.h"
+#include "TestsUtils/AclTestsUtils.h"
 
 #include "Libraries/PrlUuid/Uuid.h"
 #include "Interfaces/VirtuozzoQt.h"

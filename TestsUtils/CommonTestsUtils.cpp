@@ -55,11 +55,11 @@
 const int CONNECTION_TIMEOUT=4000;
 
 namespace {
-   char g_sUserName[] = "prl_unit_test_user";
-   char g_sUserName2[] = "prl_unit_test_user2";
-   char g_sPassword[] = "test";
-   char g_sRemoteHostName[] = "127.0.0.1";
-   char g_sLocalHostName[] = "xxx";
+	char g_sUserName[] = "prl_unit_test_user";
+	char g_sUserName2[] = "prl_unit_test_user2";
+	char g_sPassword[] = "test";
+	char g_sRemoteHostName[] = "127.0.0.1";
+	char g_sLocalHostName[] = "xxx";
 	char *g_sLongString = NULL;
 	bool g_bLongStringAlreadyInitialized = false;
 
@@ -114,14 +114,6 @@ PRL_UINT32	TestConfig::getSdkInitFlags()
 		nFlags |= PAIF_INIT_AS_APPSTORE_CLIENT;
 	return nFlags;
 }
-
-namespace QTest {
-template<>
-char *toString ( const PVE::IDispatcherCommands &value) {
-	return strdup(PVE::DispatcherCommandToString(value));
-}
-
-}//namespace QTest
 
 char* TestConfig::getUserLogin()
 {
