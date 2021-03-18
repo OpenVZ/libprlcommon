@@ -73,7 +73,7 @@ linux-*:QMAKE_CXXFLAGS += -fno-strict-aliasing -fno-gnu-unique -fno-weak
 
 # Release/Debug detection defines
 CONFIG(debug, debug|release) {
-    DEFINES += _DEBUG
+    DEFINES += _DEBUG BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 }
 CONFIG(release, debug|release) {
     DEFINES += _RELEASE
