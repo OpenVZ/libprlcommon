@@ -42,7 +42,7 @@
 #include <QObject>
 #include <QMutex>
 
-#include "Libraries/Messaging/CResult.h"
+#include "../Messaging/CResult.h"
 
 class CMockPveEventsHandler : public QObject {
 Q_OBJECT
