@@ -45,7 +45,7 @@ unix: QMAKE_LFLAGS += -Wl,-whole-archive
 include(Libraries.deps)
 
 unix {
-	VERSION = $$cat(Makefile.version)
+	VERSION = $$cat(../Makefile.version)
 	VERSIONS = $$split(VERSION, ".")
 	VER_MAJ = $$member(VERSIONS,0)
 	VER_MIN = $$member(VERSIONS,1)
