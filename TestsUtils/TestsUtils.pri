@@ -20,6 +20,15 @@
 # Our contact details: Virtuozzo International GmbH, Vordergasse 59, 8200
 # Schaffhausen, Switzerland.
 #
+
+unix {
+	VERSION = $$cat(../Makefile.version)
+	VERSIONS = $$split(VERSION, ".")
+	VER_MAJ = $$member(VERSIONS,0)
+	VER_MIN = $$member(VERSIONS,1)
+	VER_PAT = $$member(VERSIONS,2)
+}
+
 include(../common.pri)
 include(../Libraries/CAuth/CAuth.pri)
 include(../Libraries/Messaging/Messaging.pri)
