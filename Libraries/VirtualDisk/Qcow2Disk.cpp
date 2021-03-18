@@ -38,7 +38,7 @@
 #include <linux/fs.h>
 #include <fcntl.h>
 #include <cstdlib>
-#include <json/json.h>
+#include <json.h>
 #include <QStringList>
 #include <QDir>
 #include <errno.h>
