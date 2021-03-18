@@ -45,8 +45,8 @@
 #include <QList>
 #include <QString>
 #include <QtTest/QtTest>
-#include "../Libraries/Logging/Logging.h"
-#include "../Libraries/PrlCommonUtilsBase/PrlStringifyConsts.h"
+#include "../Logging/Logging.h"
+#include "../PrlCommonUtilsBase/PrlStringifyConsts.h"
 
 #define PRL_JOB_WAIT_TIMEOUT 18000
 #define STR_BUF_LENGTH 32768

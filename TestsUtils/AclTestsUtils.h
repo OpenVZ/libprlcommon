@@ -35,7 +35,7 @@
 #ifndef AclTestsUtils_H
 #define AclTestsUtils_H
 
-#include "Libraries/CAuth/CAclHelper.h"
+#include "../CAuth/CAclHelper.h"
 #include "Interfaces/VirtuozzoQt.h"
 using namespace Virtuozzo;
 
