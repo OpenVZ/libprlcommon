@@ -36,6 +36,3 @@ TARGET = prlTestsUtils
 LIBTARGET = prlTestsUtils
 PROJ_FILE = $$PWD/TestsUtils.pro
 QTCONFIG = core xml
-
-
-LIBS += -lprl_xml_model
