@@ -269,19 +269,23 @@ CProtoCommandPtr CProtoSerializer::CreateUpdateUsbAssocListProtoCommand(
 }
 
 CProtoCommandPtr CProtoSerializer::CreateDspWsResponseCommand(
-		PVE::IDispatcherCommands nOpCode,
-		PRL_RESULT nRetCode
+	PVE::IDispatcherCommands nOpCode,
+	PRL_RESULT nRetCode,
+	const QStringList& lstParams
 	)
 {
-	return CProtoCommandPtr(new CProtoCommandDspWsResponse(nOpCode, nRetCode));
+	CProtoCommandDspWsResponse* result = new CProtoCommandDspWsResponse(nOpCode, nRetCode);
+	result->SetParamsList(lstParams);
+	return CProtoCommandPtr(result);
 }
 
 CProtoCommandPtr CProtoSerializer::CreateDspWsResponseCommand(
-    const SmartPtr<IOService::IOPackage>& p,
-    PRL_RESULT nRetCode
+	const SmartPtr<IOService::IOPackage>& p,
+    PRL_RESULT nRetCode,
+	const QStringList& lstParams
     )
 {
-    return CreateDspWsResponseCommand( (PVE::IDispatcherCommands)p->header.type, nRetCode );
+    return CreateDspWsResponseCommand( (PVE::IDispatcherCommands)p->header.type, nRetCode, lstParams );
 }
 
 CProtoCommandPtr CProtoSerializer::CreateVmUpdateSecurityCommand(

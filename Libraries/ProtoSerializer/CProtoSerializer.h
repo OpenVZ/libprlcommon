@@ -563,7 +563,8 @@ public:
 	 */
 	static CProtoCommandPtr CreateDspWsResponseCommand(
 		PVE::IDispatcherCommands nOpCode,
-		PRL_RESULT nRetCode
+		PRL_RESULT nRetCode,
+		const QStringList& lstParams = QStringList()
 	);
 
 	/**
@@ -572,8 +573,9 @@ public:
 	 * @param nRetCode operation return code
 	 */
 	static CProtoCommandPtr CreateDspWsResponseCommand(
-                const SmartPtr<IOService::IOPackage>& p,
-		PRL_RESULT nRetCode
+		const SmartPtr<IOService::IOPackage>& p,
+		PRL_RESULT nRetCode,
+		const QStringList& lstParams = QStringList()
 	);
 	/**
 	 * Generates DspCmdFsGenerateEntryName protocol command
