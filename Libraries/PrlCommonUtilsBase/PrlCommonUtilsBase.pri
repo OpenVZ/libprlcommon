@@ -25,7 +25,7 @@
 
 LIBTARGET = prl_common_utils_base
 PROJ_FILE = $$PWD/PrlCommonUtilsBase.pro
-QTCONFIG = core network
+QTCONFIG = core xml network
 !include(../../Build/qmake/staticlib.pri): error(include error)
 
 INCLUDEPATH *= $$PWD
