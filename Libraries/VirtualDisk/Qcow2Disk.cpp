@@ -660,21 +660,23 @@ Frontend::Frontend(): m_nbd()
 
 PRL_RESULT Frontend::stop()
 {
-	if (NULL == m_nbd)
-		return PRL_ERR_UNINITIALIZED;
+    if (nullptr == m_nbd)
+        return PRL_ERR_UNINITIALIZED;
 
-	future_type f;
-	bool x = QMetaObject::invokeMethod(m_nbd, "stop",
-				Qt::QueuedConnection,
-				Q_RETURN_ARG(future_type, f));
-	if (!x) 
-		return PRL_ERR_FAILURE;
+    future_type f;
+    bool x = QMetaObject::invokeMethod(m_nbd, "stop",
+                Qt::BlockingQueuedConnection,
+                Q_RETURN_ARG(future_type, f));
+    if (!x)
+        return PRL_ERR_FAILURE;
 
-	m_device.clear();
-	m_nbd->deleteLater();
-	m_nbd = NULL;
+    PRL_RESULT output = f.result();
 
-	return PRL_ERR_SUCCESS;
+    m_device.clear();
+    m_nbd->deleteLater();
+    m_nbd = nullptr;
+
+    return output;
 }
 
 PRL_RESULT Frontend::bind(const QString& device_)
