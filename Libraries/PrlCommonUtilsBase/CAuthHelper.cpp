@@ -206,7 +206,11 @@ bool CAuthHelper::isLocalAdministrator()
 
 bool CAuthHelper::IsSelfProcessOwner() const
 {
-	return m_strUserName == getpwuid(getuid())->pw_name;
+	struct passwd pwd, *res = NULL;
+	char buf[16384];
+
+	getpwuid_r(getuid(), &pwd, buf, sizeof(buf), &res);
+	return res ? m_strUserName == res->pw_name : false;
 }
 
 /**
