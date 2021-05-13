@@ -204,6 +204,11 @@ bool CAuthHelper::isLocalAdministrator()
 	return is;
 }
 
+bool CAuthHelper::IsSelfProcessOwner() const
+{
+	return m_strUserName == getpwuid(getuid())->pw_name;
+}
+
 /**
  * @brief
  *         Class constructor for using from CDspInteractiveUser

@@ -121,6 +121,9 @@ public:
 	**/
 	bool isLocalAdministrator();
 
+	// Check if authenticated user is the self process owner
+	bool IsSelfProcessOwner() const;
+
 	bool isOwnerOfFile( const QString& path );
 
 	// returns user@domain if success or "" if failed
