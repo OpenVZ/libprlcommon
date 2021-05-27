@@ -616,8 +616,8 @@ void Script::operator()(Process& target_) const
 	QStringList a;
 	a << QEMU_NBD << "-v"
 //		<< "-T" << QString("enable=*,file=/vz/tmp/rempy/%1").arg(m_logUuid)
-		<< "-f" << "qcow2" << "--detect-zeroes=on"
-		<< m_commandLine << m_image;
+		<< "--detect-zeroes=on"
+		<< m_commandLine;
 	target_.start(a.join(" "));
 }
 
@@ -766,7 +766,7 @@ struct SetImage
 	typedef QSharedPointer<Nbd::Frontend> qemuCarrier_type;
 
 	SetImage():
-		m_offset(0), m_compressed(false), m_cache("none"), m_aio("native"),
+		m_offset(0), m_compressed(false), m_cached(false),
 		m_device(qemuCarrier_type(new Nbd::Frontend()))
 	{
 	}
@@ -780,7 +780,7 @@ struct SetImage
 		if (readOnly)
 			x.addArgument("-r");
 
-		return m_device.value()->start(x.addArguments(buildArgs()));
+		return m_device.value()->start(x.addArguments(buildArgs(image)));
 	}
 
 	const qemuCarrier_type& getDevice() const
@@ -833,14 +833,9 @@ struct SetImage
 		m_compressed = compressed;
 	}
 
-	void setCache(const QString& cache)
+	void setCached(bool cached)
 	{
-		m_cache = cache;
-	}
-
-	void setAio(const QString& aio)
-	{
-		m_aio = aio;
+		m_cached = cached;
 	}
 
 	void setExportName(const QString& value_)
@@ -849,25 +844,39 @@ struct SetImage
 	}
 
 private:
-	QStringList buildArgs() const
+	QStringList buildArgs(const QString& image_) const
 	{
 		QStringList a(m_args);
 		if (m_offset)
 			a << "-o" << QString::number(m_offset);
-		if (m_compressed)
-			a << "-C";
-		a << QString("--cache=%1").arg(m_cache);
-		a << QString("--aio=%1").arg(m_aio);
 		if (!m_exportName.isEmpty())
 			a << "-x" << m_exportName;
+
+		// --image-opts driver=compress,file.driver=qcow2,file.file.driver=file,file.file.filename=filename.qcow2,file.file.cache.direct=on,file.file.aio=native
+		// or
+		// --image-opts driver=qcow2,file.driver=file,file.filename=filename.qcow2,file.cache.direct=on,file.aio=native
+		QString o, p;
+		if (m_compressed) {
+			o += "driver=compress,";
+			p = "file.";
+		}
+		o += p + "driver=qcow2,";
+		o += p + "file.driver=file,";
+		o += p + "file.filename=" + image_ + ",";
+		if (!m_cached) {
+			o += p + "file.cache.direct=on,";
+			o += p + "file.aio=native";
+		}
+
+		a << "--image-opts";
+		a << o;
 
 		return a;
 	}
 
 	PRL_UINT64 m_offset;
 	bool m_compressed;
-	QString m_cache;
-	QString m_aio;
+	bool m_cached;
 	QString m_exportName;
 	Nbd::Script::portList_type m_portList;
 
@@ -927,8 +936,7 @@ template<> void Open::operator() (const Policy::Qcow2::compressed_type &c)
 
 template<> void Open::operator() (const Policy::Qcow2::cached_type &c)
 {
-	m_setImage.setCache(c ? "writeback" : "none");
-	m_setImage.setAio(c ? "threads" : "native");
+	m_setImage.setCached(c);
 }
 
 template<>
