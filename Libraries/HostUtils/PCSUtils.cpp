@@ -203,7 +203,7 @@ static int init()
 		last_load_error = load_time;
 	}
 
-	for (int v = 5; v > 0; v--) {
+	for (int v = 6; v > 0; v--) {
 		QString f(QString(LIBPCS_CLIENT".%1").arg(v));
 		dlhandle = dlopen(qPrintable(f), RTLD_LAZY);
 		if (dlhandle != NULL)
