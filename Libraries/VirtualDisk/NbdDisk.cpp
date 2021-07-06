@@ -176,11 +176,16 @@ void NbdLoader::load()
 	}
 
 	// resolve libpcs_io symbols
-	dlname = "libpcs_io.so.5";
-
-	void *b = dlopen(dlname, RTLD_LAZY);
+	void *b = NULL;
+	foreach(const QString &dlname, QStringList() << "libpcs_io.so.6" << "libpcs_io.so.5")
+	{
+		b = dlopen(qPrintable(dlname), RTLD_LAZY);
+		if (b)
+			break;
+		
+	}
 	if (b == NULL) {
-		WRITE_TRACE(DBG_FATAL, "Failed to load %s: %s", dlname, strerror(errno));
+		WRITE_TRACE(DBG_FATAL, "Failed to load libpcs_io.so.6: %s", strerror(errno));
 		dlclose(a);
 		return;
 	}
