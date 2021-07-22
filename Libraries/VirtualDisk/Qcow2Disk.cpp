@@ -962,7 +962,7 @@ struct Create: boost::static_visitor<>
 	{
 		return QStringList() << QEMU_IMG << "create"
 			<< "-f" << "qcow2"
-			<< "-o" << QString("cluster_size=%1,lazy_refcounts=on,extended_l2=on")
+			<< "-o" << QString("cluster_size=%1,lazy_refcounts=on")
 				.arg(m_clusterSize)
 			<< m_cmdLine;
 	}
