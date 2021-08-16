@@ -46,7 +46,7 @@ Prl::Expected<QString, Error::Simple> CRsaHelper::getOpenSshPublicKey()
 {
 	QFile file(m_RsaPublicKeyFile.absoluteFilePath());
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return Error::Simple(PRL_ERR_READ_FAILED);
+		return Error::Simple(PRL_ERR_PUBLIC_KEY_NOT_EXISTS);
 	return QString(file.readAll()).trimmed();
 }
 
@@ -106,36 +106,43 @@ CRsaHelper::WriteKey(const QFileInfo& key)
 
 // Rsa Encryptor
 
-CRsaHelper::RsaEncryptor::RsaEncryptor(const QString& key)
+CRsaHelper::RsaEncryptor::RsaEncryptor(const QString& key) : m_InitFailure(PRL_ERR_SUCCESS)
 {
 	auto key_data = key.toUtf8();
 	QSharedPointer<BIO> buf(BIO_new_mem_buf(reinterpret_cast<void*>(key_data.data()), key_data.size()), BIO_free);
 	RSA* rsa_ = NULL;
 	if (PEM_read_bio_RSAPublicKey(buf.data(), &rsa_, NULL, NULL) == NULL)
+	{
+		m_InitFailure = PRL_ERR_INVALID_PUBLIC_KEY;
 		WRITE_TRACE(DBG_FATAL, "Invalid public key");
+	}
 	m_Rsa = QSharedPointer<RSA>(rsa_, RSA_free);
 }
 
-CRsaHelper::RsaEncryptor::RsaEncryptor(const QFileInfo& key_file)
+CRsaHelper::RsaEncryptor::RsaEncryptor(const QFileInfo& key_file) : m_InitFailure(PRL_ERR_SUCCESS)
 {
 	auto path = qPrintable(key_file.absoluteFilePath());
 	QSharedPointer<FILE> fp(fopen(path, "rb"), &fclose);
 	if (fp.isNull())
 	{
+		m_InitFailure = PRL_ERR_PUBLIC_KEY_NOT_EXISTS;
 		WRITE_TRACE(DBG_FATAL, "Can't open public key file %s", path);
 		return;
 	}
 	RSA* rsa_ = NULL;
 	if (PEM_read_RSAPublicKey(fp.data(), &rsa_, NULL, NULL) == NULL)
+	{
+		m_InitFailure = PRL_ERR_INVALID_PUBLIC_KEY;
 		WRITE_TRACE(DBG_FATAL, "Invalid public key from file %s", path);
+	}
 	m_Rsa = QSharedPointer<RSA>(rsa_, &RSA_free);
 }
 
 Prl::Expected<QString, Error::Simple>
 CRsaHelper::RsaEncryptor::operator()(const QString& data)
 {
-	if (m_Rsa == NULL)
-		return Error::Simple(PRL_ERR_RSA_ENCRYPTION_FAILED);
+	if (m_InitFailure != PRL_ERR_SUCCESS)
+		return Error::Simple(m_InitFailure);
 	QByteArray buf(RSA_size(m_Rsa.data()), 0);
 	QByteArray raw = data.toUtf8();
 	if (RSA_public_encrypt(raw.size(),
@@ -150,36 +157,43 @@ CRsaHelper::RsaEncryptor::operator()(const QString& data)
 
 // Rsa Decryptor
 
-CRsaHelper::RsaDecryptor::RsaDecryptor(const QString& key)
+CRsaHelper::RsaDecryptor::RsaDecryptor(const QString& key) : m_InitFailure(PRL_ERR_SUCCESS)
 {
 	auto key_data = key.toUtf8();
 	QSharedPointer<BIO> buf(BIO_new_mem_buf(reinterpret_cast<void*>(key_data.data()), key_data.size()), BIO_free);
 	RSA* rsa_ = NULL;
 	if (PEM_read_bio_RSAPrivateKey(buf.data(), &rsa_, NULL, NULL) == NULL)
+	{
+		m_InitFailure = PRL_ERR_INVALID_PRIVATE_KEY;
 		WRITE_TRACE(DBG_FATAL, "Invalid private key");
+	}
 	m_Rsa = QSharedPointer<RSA>(rsa_, RSA_free);
 }
 
-CRsaHelper::RsaDecryptor::RsaDecryptor(const QFileInfo& key_file)
+CRsaHelper::RsaDecryptor::RsaDecryptor(const QFileInfo& key_file) : m_InitFailure(PRL_ERR_SUCCESS)
 {
 	auto path = qPrintable(key_file.absoluteFilePath());
 	QSharedPointer<FILE> fp(fopen(path, "rb"), &fclose);
 	if (fp.isNull())
 	{
+		m_InitFailure = PRL_ERR_PRIVATE_KEY_NOT_EXISTS;
 		WRITE_TRACE(DBG_FATAL, "Can't open private key file %s", path);
 		return;
 	}
 	RSA* rsa_ = NULL;
 	if (PEM_read_RSAPrivateKey(fp.data(), &rsa_, NULL, NULL) == NULL)
+	{
+		m_InitFailure = PRL_ERR_INVALID_PRIVATE_KEY;
 		WRITE_TRACE(DBG_FATAL, "Invalid private key from file %s", path);
+	}
 	m_Rsa = QSharedPointer<RSA>(rsa_, &RSA_free);
 }
 
 Prl::Expected<QString, Error::Simple>
 CRsaHelper::RsaDecryptor::operator()(const QString& data)
 {
-	if (m_Rsa == NULL)
-		return Error::Simple(PRL_ERR_RSA_DECRYPTION_FAILED);
+	if (m_InitFailure != PRL_ERR_SUCCESS)
+		return Error::Simple(m_InitFailure);
 	QByteArray buf(RSA_size(m_Rsa.data()), 0);
 	auto raw = QByteArray::fromBase64(data.toUtf8());
 	if (RSA_private_decrypt(raw.size(),
@@ -187,8 +201,9 @@ CRsaHelper::RsaDecryptor::operator()(const QString& data)
 							reinterpret_cast<unsigned char*>(buf.data()),
 							m_Rsa.data(), RSA_PKCS1_OAEP_PADDING) == -1)
 	{
-		return Error::Simple(PRL_ERR_RSA_ENCRYPTION_FAILED);
+		return Error::Simple(PRL_ERR_RSA_DECRYPTION_FAILED);
 	}
 
 	return QString(buf);
 }
+
