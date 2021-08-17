@@ -106,6 +106,7 @@ private:
 		Prl::Expected<QString, Error::Simple> operator()(const QString& data);
 	private:
 		QSharedPointer<RSA> m_Rsa;
+		PRL_RESULT m_InitFailure;
 	};
 
 	class RsaDecryptor
@@ -116,6 +117,7 @@ private:
 		Prl::Expected<QString, Error::Simple> operator()(const QString& data);
 	private:
 		QSharedPointer<RSA> m_Rsa;
+		PRL_RESULT m_InitFailure;
 	};
 
 	/**
@@ -186,3 +188,4 @@ CRsaHelper::Decrypt(const QString& data, const T& private_key)
 {
 	return RsaDecryptor(private_key)(data);
 }
+
