@@ -602,7 +602,7 @@ QString VirtuozzoDirs::getWindowsUnattendedFloppy(unsigned int osVersion_)
 {
 	PRL_ASSERT(IS_WINDOWS(osVersion_));
 
-	return QString("/usr/share/vz-guest-tools/floppy_win%1.vfd").arg(getShortWinVersion(osVersion_));
+	return QString("/usr/share/vz-guest-tools/hdd_win%1.img").arg(getShortWinVersion(osVersion_));
 }
 
 namespace{
