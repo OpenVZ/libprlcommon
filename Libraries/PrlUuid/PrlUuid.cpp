@@ -269,9 +269,6 @@ static inline void helper_uuid_from_str(Uuid_t uid, const char* str)
 	}
 }
 
-/*****************************************************************************/
-QThreadStorage<boost::uuids::random_generator> PrlUuid::s_generator;
-
 PrlUuid::PrlUuid()
 {
 	helper_uuid_clear(m_uuid);
@@ -351,11 +348,10 @@ void PrlUuid::generate()
 }
 
 void PrlUuid::generate(Uuid_t uuid)
-{
-	if (!s_generator.hasLocalData())
-		s_generator.setLocalData(boost::uuids::random_generator());
+{	
+	s_generator = boost::uuids::random_generator();
 
-	boost::uuids::uuid u = s_generator.localData()();
+	boost::uuids::uuid u = s_generator();
 	std::copy(u.begin(), u.end(), uuid);
 }
 

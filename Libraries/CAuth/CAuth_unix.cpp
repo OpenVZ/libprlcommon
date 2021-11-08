@@ -245,12 +245,12 @@ bool CAuth::AuthUser(const QString & userName,
 	m_bAuthAvailable = true;
 
     int ret;
-    QByteArray a = password.toAscii();
+	QByteArray a = password.toUtf8();
     struct pam_conv pamConv = { pamConvers, a.data() };
     pam_handle_t* pamh;
 
     // Init library
-    ret = pam_start(m_qsService.toAscii().constData(), userName.toUtf8().constData(), &pamConv, &pamh);
+	ret = pam_start(m_qsService.toUtf8().constData(), userName.toUtf8().constData(), &pamConv, &pamh);
     if (ret != PAM_SUCCESS) {
 		m_bAuthAvailable = false;
         WRITE_TRACE(DBG_FATAL, "Can't init PAM library: %s", pam_strerror(pamh, ret));
@@ -497,7 +497,7 @@ bool CAuth::SetFilePermissions(CAuth::AccessMode ulFilePermissions,
             mode |= S_IWUSR;
         if(ulFilePermissions & fileMayExecute)
             mode |= S_IXUSR;
-        ::chmod(strFileName.toAscii().constData(),mode);
+		::chmod(strFileName.toUtf8().constData(),mode);
         return  true;
     }
 
@@ -510,7 +510,7 @@ bool CAuth::SetFilePermissions(CAuth::AccessMode ulFilePermissions,
             mode |= S_IWGRP;
         if(ulFilePermissions & fileMayExecute)
             mode |= S_IXGRP;
-        ::chmod(strFileName.toAscii().constData(),mode);
+		::chmod(strFileName.toUtf8().constData(),mode);
         return true;
     }
     return false;

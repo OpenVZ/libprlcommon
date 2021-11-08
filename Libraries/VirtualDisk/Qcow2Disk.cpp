@@ -39,6 +39,7 @@
 #include <fcntl.h>
 #include <cstdlib>
 #include <json.h>
+#include <json-c/json.h>
 #include <QStringList>
 #include <QDir>
 #include <errno.h>
@@ -50,6 +51,7 @@
 #include "../HostUtils/HostUtils.h"
 #include "Util.h"
 #include <boost/algorithm/string.hpp>
+#include <QtConcurrent/QtConcurrent>
 
 namespace VirtualDisk
 {
@@ -338,7 +340,8 @@ Disconnecting Running::disconnect() const
 	m_machine->connect(w, SIGNAL(finished()), SLOT(reactCompleted()));
 	w->connect(w, SIGNAL(finished()), SLOT(deleteLater()));
 	PRL_RESULT (* f)(const QString&) = &Running::disconnect;
-	w->setFuture(QtConcurrent::run(boost::bind(f, m_machine->getDevice())));
+
+	w->setFuture(QtConcurrent::run(f, m_machine->getDevice()));
 
 	return Disconnecting(m_machine);
 }

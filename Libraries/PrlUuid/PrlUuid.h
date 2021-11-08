@@ -94,7 +94,7 @@ protected:
 	Uuid_t m_uuid;
 
 private:
-	static QThreadStorage<boost::uuids::random_generator> s_generator;
+	static thread_local boost::uuids::random_generator s_generator;
 };
 
 

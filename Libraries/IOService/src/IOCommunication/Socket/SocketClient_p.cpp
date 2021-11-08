@@ -886,13 +886,13 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
         // Recv msg
         struct iovec iov[1];
         struct msghdr msg;
-        struct {
-            struct cmsghdr head;
-            int fd;
-        } cmsg;
+
+		char cmsg_data[sizeof(struct cmsghdr) + sizeof(int) ];
+
+		struct cmsghdr *cmsg = (struct cmsghdr*)cmsg_data;
 
         ::memset( &msg, 0, sizeof(msg) );
-        ::memset( &cmsg, 0, sizeof(cmsg) );
+		::memset( cmsg, 0, sizeof(*cmsg));
 
         iov->iov_base = m_rawBuffer.data() + s;
         iov->iov_len = m_rawBuffer.capacity() - s;
@@ -900,10 +900,10 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
         msg.msg_iovlen = 1;
         msg.msg_name = 0;
         msg.msg_namelen = 0;
-        msg.msg_control = (caddr_t)&cmsg;
-        msg.msg_controllen = sizeof(cmsg);
+		msg.msg_control = (caddr_t)cmsg;
+		msg.msg_controllen = sizeof(cmsg_data);
 
-        ssize_t readBytes = ::recvmsg( sock, &msg, 0 );
+		ssize_t readBytes = ::recvmsg( sock, &msg, 0 );
 
         if ( readBytes == 0 ) {
             WRITE_TRACE(DBG_INFO, IO_LOG("Socket graceful shutdown detected. "
@@ -926,8 +926,8 @@ bool SocketClientPrivate::read ( int sock, char* inBuf, quint32 size,
             return false;
         }
 	m_rawBuffer.data_ptr()->size = m_rawBuffer.size() + readBytes;
-        if ( msg.msg_controllen == sizeof(cmsg) ) {
-            lastfd = *(int *)CMSG_DATA(&cmsg.head);
+		if ( msg.msg_controllen == sizeof(*cmsg) ) {
+			lastfd = *(int *)CMSG_DATA(cmsg);
         }
     } while ( readMode == IOContinuousRead );
 

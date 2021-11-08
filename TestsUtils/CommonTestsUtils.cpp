@@ -237,7 +237,7 @@ bool checkArguments(int argc, char **argv, const QString testName, QStringList &
 	while (*argv != NULL)
 	{
 		QString test( *argv );
-		QStringList testArgs = test.split(":", QString::SkipEmptyParts);
+		QStringList testArgs = test.split(":", Qt::SkipEmptyParts);
 
 		QString testArgsName = testArgs[0];
 
@@ -257,7 +257,7 @@ bool checkArguments(int argc, char **argv, const QString testName, QStringList &
 		//clean args
 		testArgsArgs = testArgsArgs.trimmed();
 
-		testArgsList += testArgsArgs.split(" ", QString::SkipEmptyParts);
+		testArgsList += testArgsArgs.split(" ", Qt::SkipEmptyParts);
 		if (!bFound)
 			testArgsList.insert(0, testName);
 
