@@ -79,8 +79,8 @@ protected:
 
 };
 
-#ifndef DM_212734958
-#define DM_212734958
+#ifndef DM_2471202121
+#define DM_2471202121
 Q_DECLARE_METATYPE(QList<QString>)
 #endif
 

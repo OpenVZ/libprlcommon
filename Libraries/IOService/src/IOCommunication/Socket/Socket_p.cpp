@@ -850,24 +850,26 @@ IOSendJob::Result SocketWriteThread::write ( int sock,
 
 		// Send msg
 		struct msghdr msg;
-		struct {
-			struct cmsghdr head;
-			int fd;
-		} cmsg;
+
+		char cmsg_data[sizeof(struct cmsghdr) + sizeof(int)];
+
+		struct cmsghdr *cmsg = (struct cmsghdr*)cmsg_data;
 
 		::memset( &msg, 0, sizeof(msg) );
-		::memset( &cmsg, 0, sizeof(cmsg) );
+		::memset( cmsg, 0, sizeof(*cmsg));
 
 		msg.msg_iov = &data_[i];
 		msg.msg_iovlen = data_.size() - i;
 
 		if ( unixfd != 0 && *unixfd >= 0 ) {
-			cmsg.head.cmsg_level = SOL_SOCKET;
-			cmsg.head.cmsg_type = SCM_RIGHTS;
-			cmsg.head.cmsg_len = CMSG_LEN(sizeof(int));
-			*(int *)CMSG_DATA(&cmsg.head) = *unixfd;
-			msg.msg_control = (caddr_t)&cmsg;
-			msg.msg_controllen = sizeof(cmsg);
+			cmsg->cmsg_level = SOL_SOCKET;
+			cmsg->cmsg_type = SCM_RIGHTS;
+			cmsg->cmsg_len = CMSG_LEN(sizeof(int));
+
+			*(int *)CMSG_DATA(cmsg) = *unixfd;
+
+			msg.msg_control = (caddr_t)cmsg;
+			msg.msg_controllen = sizeof(cmsg_data);
 			*unixfd = -1;
 		}
 		ssize_t written = ::sendmsg( sock, &msg, 0 );

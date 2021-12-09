@@ -115,7 +115,7 @@ Parser::Parser(
 Parser::Parser ( const QString& cmd_line )
 {
 	QRegExp rx("\\s+");
-	m_lstArgs=cmd_line.split(rx, QString::SkipEmptyParts);
+	m_lstArgs=cmd_line.split(rx, Qt::SkipEmptyParts);
 	LOG_MESSAGE(DBG_FATAL, "m_lstArgs.size()=%d", m_lstArgs.size());
 }
 
