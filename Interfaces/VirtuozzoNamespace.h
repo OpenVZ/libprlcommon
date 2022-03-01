@@ -1425,6 +1425,7 @@ public:
 			DspCmdVmCommitEncryption 	= DspClientToDispatcherCommandRangeStart + 185,
 			DspCmdUserEasyLoginLocal		= DspClientToDispatcherCommandRangeStart + 186,
 			DspCmdGetVcmmdConfig		= DspClientToDispatcherCommandRangeStart + 187,
+			DspCmdGetCpuMaskSupport		= DspClientToDispatcherCommandRangeStart + 188,
 
 			DspClientToDispatcherCommandRangeEnd = 2999,
 
