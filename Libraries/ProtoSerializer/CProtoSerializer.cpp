@@ -437,6 +437,7 @@ CProtoCommandPtr CProtoSerializer::ParseCommand(PVE::IDispatcherCommands nCmdIde
 		case PVE::DspCmdJoinCPUPool:
 		case PVE::DspCmdLeaveCPUPool:
 		case PVE::DspCmdGetVcmmdConfig:
+		case PVE::DspCmdGetCpuMaskSupport:
 			pCommand = static_cast<CProtoCommand *>(new CProtoCommandWithoutParams(nCmdIdentifier));
 		break;
 
