@@ -454,7 +454,7 @@ Parameters::disk_type NbdDisk::getInfo(void)
 	image.setType(PRL_IMAGE_TRY_GUESS);
 	image.setStart(0);
 	image.setSize(size);
-	image.setFilename(m_url.toString());
+	image.setFilename(m_url.toString(QUrl::DecodeReserved));
 
 	disk.addStorage(image);
 
