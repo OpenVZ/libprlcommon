@@ -849,32 +849,39 @@ struct SetImage
 private:
 	QStringList buildArgs(const QString& image_) const
 	{
-		QStringList a(m_args);
+		QStringList argList(m_args);
 		if (m_offset)
-			a << "-o" << QString::number(m_offset);
+			argList << "-o" << QString::number(m_offset);
 		if (!m_exportName.isEmpty())
-			a << "-x" << m_exportName;
+			argList << "-x" << m_exportName;
 
-		// --image-opts driver=compress,file.driver=qcow2,file.file.driver=file,file.file.filename=filename.qcow2,file.file.cache.direct=on,file.file.aio=native
+		//Qemu layers: compress[optional]->qcow2->preallocate->file
+		//Sample of arguments:
+		// --image-opts driver=compress,file.driver=qcow2,file.file.driver=preallocate,file.file.file.driver=file,file.file.file.filename=filename.qcow2,file.file.file.cache.direct=on,file.file.file.aio=native
 		// or
-		// --image-opts driver=qcow2,file.driver=file,file.filename=filename.qcow2,file.cache.direct=on,file.aio=native
-		QString o, p;
+		// --image-opts driver=qcow2,file.driver=preallocate,file.file.driver=file,file.file.filename=filename.qcow2,file.file.cache.direct=on,file.file.aio=native
+		QString opts, prefix;
+		//compress layer
 		if (m_compressed) {
-			o += "driver=compress,";
-			p = "file.";
+			opts += "driver=compress,";
+			prefix = "file.";
 		}
-		o += p + "driver=qcow2,";
-		o += p + "file.driver=file,";
-		o += p + "file.filename=" + image_ + ",";
+		//qcow2 layer
+		opts += prefix + "driver=qcow2,";
+		//preallocate layer
+		opts += prefix + "file.driver=preallocate,";
+		//append driver file
+		opts += prefix + "file.file.driver=file,";
+		opts += prefix + "file.file.filename=" + image_ + ",";
 		if (!m_cached) {
-			o += p + "file.cache.direct=on,";
-			o += p + "file.aio=native";
+			opts += prefix + "file.file.cache.direct=on,";
+			opts += prefix + "file.file.aio=native";
 		}
 
-		a << "--image-opts";
-		a << o;
+		argList << "--image-opts";
+		argList << opts;
 
-		return a;
+		return argList;
 	}
 
 	PRL_UINT64 m_offset;
