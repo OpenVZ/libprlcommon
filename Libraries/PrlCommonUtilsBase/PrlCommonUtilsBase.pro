@@ -51,7 +51,6 @@ HEADERS = VirtuozzoDirs.h \
             CHardDiskHelper.h \
             CUrlParser.h \
             netutils.h \
-            Archive.h \
             CFileHelper.h \
             CAuthHelper.h \
             CKeygenHelper.h \
@@ -75,7 +74,6 @@ SOURCES = VirtuozzoDirs.cpp \
             CHardDiskHelper.cpp \
             CUrlParser.cpp \
             netutils.cpp \
-            Archive.cpp \
             CFileHelper.cpp \
             CAuthHelper.cpp \
             CKeygenHelper.cpp \
