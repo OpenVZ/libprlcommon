@@ -42,7 +42,8 @@ static inline int PVS_GUEST_VIRTIO_SUPPORTED(unsigned int nVersion)
 	return ((IS_WINDOWS(nVersion) && nVersion >= PVS_GUEST_VER_WIN_VISTA) ||
 			(IS_LINUX(nVersion)
 			 && nVersion != PVS_GUEST_VER_LIN_KRNL_24
-			 && nVersion != PVS_GUEST_VER_LIN_RHLES3 ));
+			 && nVersion != PVS_GUEST_VER_LIN_RHLES3 ) ||
+			 (IS_FREEBSD(nVersion) && PVS_GUEST_VER_BSD_OTHER));
 }
 
 static inline int PVS_GUEST_HYPERV_SUPPORTED(unsigned int nVersion)
