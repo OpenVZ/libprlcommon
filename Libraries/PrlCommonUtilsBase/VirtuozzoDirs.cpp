@@ -491,6 +491,10 @@ QString VirtuozzoDirs::getToolsImage(PRL_APPLICATION_MODE mode, unsigned int nOs
 	{
 		qsFileName = "vz-guest-tools-lin.iso";
 	}
+	else if IS_FREEBSD(nOsVersion)
+	{
+		qsFileName = "vz-guest-tools-bsd.iso";
+	}
 	else
 	{
 		qsFileName = "vz-guest-tools-other.iso";
@@ -519,6 +523,10 @@ QString VirtuozzoDirs::getToolsTarGz(PRL_APPLICATION_MODE mode, unsigned int nOs
 	{
 		qsFileName = "vz-guest-tools-lin.tar.gz";
 	}
+	else if IS_FREEBSD(nOsVersion)
+	{
+		qsFileName = "vz-guest-tools-bsd.tar.gz";
+	}
 	else
 	{
 		qsFileName = "vz-guest-tools-other.tar.gz";
@@ -546,6 +554,10 @@ QString VirtuozzoDirs::getToolsInstallerName(unsigned int nOsVersion)
 	else if IS_LINUX(nOsVersion)
 	{
 		qsFileName = "vz-guest-tools-lin.iso";
+	}
+	else if IS_FREEBSD(nOsVersion)
+	{
+		qsFileName = "vz-guest-tools-bsd.iso";
 	}
 
 	return qsFileName;
@@ -699,6 +711,10 @@ QString VirtuozzoDirs::getToolsFileName(unsigned int uGuestOsType)
 	else if IS_LINUX(uGuestOsType)
 	{
 		strToolsPath = "vz-guest-tools-lin.iso";
+	}
+	else if IS_FREEBSD(uGuestOsType)
+	{
+		strToolsPath = "vz-guest-tools-bsd.iso";
 	}
 
 	return strToolsPath;
