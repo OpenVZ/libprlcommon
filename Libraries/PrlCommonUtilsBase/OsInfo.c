@@ -382,6 +382,7 @@ unsigned int osInfo_getMinRecommendedOsMemorySize(unsigned int nOsVersion)
 	case PVS_GUEST_VER_LIN_VZLINUX_7:
 	case PVS_GUEST_VER_LIN_VZLINUX_8:
 	case PVS_GUEST_VER_LIN_CLOUDLINUX_7:
+	case PVS_GUEST_VER_LIN_CLOUDLINUX_8:
 	case PVS_GUEST_VER_BSD_OTHER:
 		return 512;
 
