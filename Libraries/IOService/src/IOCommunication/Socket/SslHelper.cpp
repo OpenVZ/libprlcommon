@@ -205,7 +205,7 @@ bool SSLHelper::InitSSLContext(const IOCredentials& credentials)
 
 	// Create client context
 	{
-		s_clientSSLCtx = SSL_CTX_new( SSLv23_client_method() );
+		s_clientSSLCtx = SSL_CTX_new( TLS_client_method() );
 		if ( ! s_clientSSLCtx ) {
 			ERR_error_string_n( ERR_get_error(), errBuff, ErrBuffSize );
 			WRITE_TRACE(DBG_FATAL,
@@ -234,7 +234,7 @@ bool SSLHelper::InitSSLContext(const IOCredentials& credentials)
 
 	// Create server context
 	{
-		s_serverSSLCtx = SSL_CTX_new( SSLv23_server_method() );
+		s_serverSSLCtx = SSL_CTX_new( TLS_server_method() );
 		if ( ! s_serverSSLCtx ) {
 			ERR_error_string_n( ERR_get_error(), errBuff, ErrBuffSize );
 			WRITE_TRACE(DBG_FATAL,
