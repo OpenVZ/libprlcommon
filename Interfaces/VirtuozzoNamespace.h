@@ -87,6 +87,8 @@
 #define UNATTENDED_ISO			"Unattended.iso"
 #define UNATTENDED_FDD			"unattended.fdd"
 
+constexpr char const VZ_VM_NVRAM_FILE_NAME[] = "NVRAM_4M.dat";
+
 /* migrate client-dispatcher protocol versions */
 /* RC version */
 #define MIGRATE_CLIENT_PROTO_V1	1
