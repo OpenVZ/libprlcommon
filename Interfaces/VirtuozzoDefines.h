@@ -5,7 +5,7 @@
  * this file.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
- * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
+ * Copyright (c) 2017-2023 Virtuozzo International GmbH. All rights reserved.
  *
  * This file is part of Virtuozzo SDK. Virtuozzo SDK is free
  * software; you can redistribute it and/or modify it under the
@@ -46,5 +46,7 @@
 #define VMDIR_DEFAULT_CATALOGUE_SERVER_FILE			"vmdirectorylist.xml"
 
 #define NETWORK_CONFIGURATION_SERVER_XML_FILE		"network.xml"
+
+constexpr const char QEMU_IMG_BIN[] = "/usr/bin/qemu-img";
 
 #endif // __VIRTUOZZO_DEFINES__
