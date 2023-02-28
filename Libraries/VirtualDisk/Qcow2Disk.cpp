@@ -7,7 +7,7 @@
 /// @author mperevedentsev
 ///
 /// Copyright (c) 2016-2017, Parallels International GmbH
-/// Copyright (c) 2017-2020 Virtuozzo International GmbH, All rights reserved.
+/// Copyright (c) 2017-2023 Virtuozzo International GmbH, All rights reserved.
 ///
 /// This file is part of Virtuozzo SDK. Virtuozzo SDK is free
 /// software; you can redistribute it and/or modify it under the terms
@@ -65,7 +65,6 @@ enum {
 
 const char MODPROBE[] = "/usr/sbin/modprobe";
 const char QEMU_NBD[] = "/usr/bin/qemu-nbd";
-const char QEMU_IMG[] = "/usr/bin/qemu-img";
 
 const char DEV[] = "/dev";
 const char NBD_PATTERN[] = "nbd*";
@@ -960,7 +959,7 @@ struct Create: boost::static_visitor<>
 
 	QStringList getCommandLine() const
 	{
-		return QStringList() << QEMU_IMG << "create"
+		return QStringList() << QEMU_IMG_BIN << "create"
 			<< "-f" << "qcow2"
 			<< "-o" << QString("cluster_size=%1,lazy_refcounts=on")
 				.arg(m_clusterSize)
@@ -1148,7 +1147,7 @@ Parameters::disk_type Qcow2::getInfo()
 bool Qcow2::isValid(const QString &fileName)
 {
 	QStringList cmdLine = QStringList()
-		<< QEMU_IMG << "info" << "--force-share" << "--output=json"
+		<< QEMU_IMG_BIN << "info" << "--force-share" << "--output=json"
 		<< fileName;
 	QString out;
 	if (!HostUtils::RunCmdLineUtility(
