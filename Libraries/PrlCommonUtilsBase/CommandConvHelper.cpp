@@ -3,7 +3,7 @@
  * constants and vice versa
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
- * Copyright (c) 2017-2019 Virtuozzo International GmbH. All rights reserved.
+ * Copyright (c) 2017-2023 Virtuozzo International GmbH. All rights reserved.
  *
  * This file is part of Virtuozzo SDK. Virtuozzo SDK is free
  * software; you can redistribute it and/or modify it under the
@@ -204,6 +204,7 @@ void InitializeDispatcherCommandsMaps()
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmCommitEncryption] = PJOC_VM_COMMIT_ENCRYPTION;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdGetVcmmdConfig] = PJOC_SRV_GET_VCMMD_CONFIG;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdGetCpuMaskSupport] = PJOC_SRV_GET_CPU_MASKING_FEATURE_SUPPORT;
+	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdVmUpdateNvram] = PJOC_VM_UPDATE_NVRAM;
 	(*DispatcherCommandsToJobTypesMap())[PVE::DspCmdCtReinstall] = PJOC_CT_REINSTALL;
 
 	DispatcherCmdsToJobTypesMapType::const_iterator _it = DispatcherCommandsToJobTypesMap()->begin();
