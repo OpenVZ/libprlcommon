@@ -114,8 +114,10 @@ constexpr char const VZ_VM_NVRAM_FILE_NAME[] = "NVRAM_4M.dat";
 #define MIGRATE_DISP_PROTO_V9   9
 /* Native nvram migration */
 #define MIGRATE_DISP_PROTO_V10   10
+/* Migration with 4M OVMF loader */
+#define MIGRATE_DISP_PROTO_V11   11
 /* current migrate protocol version */
-#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V10
+#define MIGRATE_DISP_PROTO_VERSION MIGRATE_DISP_PROTO_V11
 
 /* backup client-dispatcher and dispatcher-dispatcher protocol versions */
 /* RC version */
