@@ -326,7 +326,7 @@ int NbdContext::read(PRL_UINT64 offs, void *buf, PRL_UINT32 size)
 	int rc = m_lib->m_nbd.nbd_client_read(m_clnt, offs, buf, size);
 	move_from_coroutine();
 
-	if (rc)
+	if (rc < 0)
 		WRITE_TRACE(DBG_FATAL, "%s: %d", __PRETTY_FUNCTION__, rc);
 	return rc;
 }
@@ -337,7 +337,7 @@ int NbdContext::write(PRL_UINT64 offs, const void *buf, PRL_UINT32 size)
 	int rc = m_lib->m_nbd.nbd_client_write(m_clnt, offs, buf, size);
 	move_from_coroutine();
 
-	if (rc)
+	if (rc < 0)
 		WRITE_TRACE(DBG_FATAL, "%s: %d", __PRETTY_FUNCTION__, rc);
 	return rc;
 }
