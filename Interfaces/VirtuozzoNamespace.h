@@ -72,7 +72,6 @@
 #define PRL_PRINTER_DEFAULT_LOCATION			"Mac"
 #define PRL_DVD_DEFAULT_DEVICE_NAME				"Default CD/DVD-ROM"
 
-#define PRL_VM_NVRAM_FILE_NAME						"NVRAM.dat"
 #define PRL_VM_SUSPENDED_SCREEN_FILE_NAME			"suspended.png"
 #define PRL_HOST_OS_64_BIT							"64"
 #define PRL_HOST_OS_32_BIT							"32"
