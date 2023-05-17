@@ -395,7 +395,7 @@ int CBaseNode::saveToFile(QFile* pOrigFile, bool , bool )
 	if( m_flgCrashSafeSaving )
 	{
 		pFile = &tmpFile;
-		QString tmpFileName = QString( "%1.tmp.%2" )
+		QString tmpFileName = QString( "%1.libprlcommon_tmp.%2" )
 			.arg( pOrigFile->fileName() )
 			.arg( Uuid::createUuid().toString() );
 
