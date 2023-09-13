@@ -111,6 +111,7 @@ BOOST_STRONG_TYPEDEF(bool, compressed_type)
 BOOST_STRONG_TYPEDEF(bool, cached_type)
 BOOST_STRONG_TYPEDEF(QString, exportName_type)
 typedef PRL_UINT32 clusterSize_type;
+typedef bool extend_l2_type;
 
 } // namespace Qcow2
 } // namespace Policy
@@ -125,7 +126,8 @@ typedef boost::variant<
 	Policy::Qcow2::compressed_type,
 	Policy::Qcow2::cached_type,
 	Policy::Qcow2::exportName_type,
-	Policy::Qcow2::clusterSize_type
+	Policy::Qcow2::clusterSize_type,
+	Policy::Qcow2::extend_l2_type
 > qcow2Policy_type;
 typedef std::vector<qcow2Policy_type> qcow2PolicyList_type;
 

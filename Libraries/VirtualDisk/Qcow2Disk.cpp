@@ -969,20 +969,26 @@ struct Create: boost::static_visitor<>
 
 	QStringList getCommandLine() const
 	{
+		QString options = QString("cluster_size=%1,lazy_refcounts=on").arg(m_clusterSize);
+		if (m_Extended_l2)
+		{
+			options.append(",extended_l2=on");
+		}
+
 		return QStringList() << QEMU_IMG_BIN << "create"
 			<< "-f" << "qcow2"
-			<< "-o" << QString("cluster_size=%1,lazy_refcounts=on,extended_l2=on")
-				.arg(m_clusterSize)
+			<< "-o" << options 
 			<< m_cmdLine;
 	}
 
 private:
 	QStringList m_cmdLine;
 	PRL_UINT32 m_clusterSize;
+	bool m_Extended_l2;
 };
 
 Create::Create(const QString &fileName) :
-		m_clusterSize(1024 * 1024)
+		m_clusterSize(1024 * 1024), m_Extended_l2(true)
 {
 	m_cmdLine << enquote(fileName);
 }
@@ -1001,6 +1007,11 @@ template<> void Create::operator() (const Policy::Qcow2::base_type &value)
 template<> void Create::operator() (const Policy::Qcow2::clusterSize_type &value)
 {
 	m_clusterSize = value;
+}
+
+template<> void Create::operator() (const Policy::Qcow2::extend_l2_type &value)
+{
+	m_Extended_l2 = value;
 }
 
 } // namespace Command
