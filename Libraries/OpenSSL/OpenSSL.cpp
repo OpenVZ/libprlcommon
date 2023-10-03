@@ -86,7 +86,6 @@ namespace OpenSSL
 		CRYPTO_mem_leaks_fp(stderr);
 #endif
 		CRYPTO_cleanup_all_ex_data();
-		ERR_remove_state(0);
 		ERR_free_strings();
 
 		delete[] sslMuteces;
