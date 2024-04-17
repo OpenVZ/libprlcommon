@@ -2,7 +2,7 @@
  * VirtuozzoNamespace.cpp
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
- * Copyright (c) 2017-2023 Virtuozzo International GmbH. All rights reserved.
+ * Copyright (c) 2017-2024 Virtuozzo International GmbH. All rights reserved.
  *
  * This file is part of Virtuozzo SDK. Virtuozzo SDK is free
  * software; you can redistribute it and/or modify it under the
@@ -272,6 +272,7 @@ const char* PVE::DispatcherCommandToString( unsigned int cmd )
 		CASE_DISPATCHER_COMMAND( DspCmdGetVcmmdConfig )
 		CASE_DISPATCHER_COMMAND( DspCmdGetCpuMaskSupport )
 		CASE_DISPATCHER_COMMAND( DspCmdVmUpdateNvram )
+		CASE_DISPATCHER_COMMAND( DspCmdCtConvert )
 		CASE_DISPATCHER_COMMAND( DspCmdCtReinstall )
 	}
 	return "Unknown";
