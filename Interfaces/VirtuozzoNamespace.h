@@ -4,7 +4,7 @@
  * the project modules.
  *
  * Copyright (c) 1999-2017, Parallels International GmbH
- * Copyright (c) 2017-2023 Virtuozzo International GmbH. All rights reserved.
+ * Copyright (c) 2017-2024 Virtuozzo International GmbH. All rights reserved.
  *
  * This file is part of Virtuozzo SDK. Virtuozzo SDK is free
  * software; you can redistribute it and/or modify it under the
@@ -1431,6 +1431,7 @@ public:
 			DspCmdGetVcmmdConfig		= DspClientToDispatcherCommandRangeStart + 187,
 			DspCmdGetCpuMaskSupport		= DspClientToDispatcherCommandRangeStart + 188,
 			DspCmdVmUpdateNvram				= DspClientToDispatcherCommandRangeStart + 189,
+			DspCmdCtConvert					= DspClientToDispatcherCommandRangeStart + 190,
 
 			DspClientToDispatcherCommandRangeEnd = 2999,
 
